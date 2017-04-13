@@ -1,54 +1,62 @@
 Func entities
 =============
 
+We will refer to entities with class name prefixed by ``func_`` as *func entities*. There are a few func entities in Half-Life that are of interest to speedrunners. A complete description of all entities in Half-Life is beyond the scope of this documentation. The reader is invited to study the Half-Life SDK code and reverse engineer for further investigations.
+
 func_pushable
 -------------
+
+.. figure:: _static/movable-box.jpg
+   :align: center
+
+   A movable box (func_pushable).
+
+func_pushable is a rather common entity type in Half-Life. They are characterised by their ability to be moved by the player. Every time a pushable entity, it means the potential to go extraordinarily fast (see :ref:`object manoeuvre`). It is perhaps for this reason that later Half-Life mappers and modders tend to avoid pushable entities as much as possible, seeing the exploitations speedrunners have done with these innocuous objects. Indeed, in modern Half-Life maps, movable objects tend to be much harder to come by than the vanilla Half-Life maps.
+
+.. _object manoeuvre:
 
 Object manoeuvre
 ~~~~~~~~~~~~~~~~
 
-Let :math:`V` the value of ``sv_maxvelocity``.  Define
+Object manoeuvring is the act of boosting around by means of ``+use`` on a movable entity. Before describing the specific tricks to perform object manoeuvring, we must first write down the general equation for the player and object velocities during a ``+use`` operation on a movable entity.
 
-.. math:: \operatorname{clip}(\mathbf{v}) := \left[ \min(v_x, V), \min(v_y, V), \min(v_z, V) \right]
+.. TODO: reference the vel clip function
 
-which is basically ``PM_CheckVelocity``.  Assuming the player is not
-accelerating, :math:`\lVert\mathbf{v}\rVert > E` and the use key is pressed
-then with :math:`\mathbf{\tilde{v}}_0 = \mathbf{v}_0` the subsequence player
-velocities :math:`\mathbf{v}_k` and object velocities :math:`\mathbf{u}_k` is
-given by
+Recall that :math:`\mathfrak{C}(\mathbf{x})` is the velocity clip function that limits each component of some vector :math:`\mathbf{x}` to the value of ``sv_maxvelocity``. Define :math:`\mathbf{u}` the movable entity's velocity in the horizontal plane that is used to update the entity position. Namely, if :math:`\mathbf{q}` is the movable entity's position, then in the next frame :math:`\mathbf{q} \gets \mathbf{q} + \tau\mathbf{u}`. Define :math:`\mathbf{v}` the player velocity in the horizontal plane that is used to update the player horizontal position.
 
-.. math:: \begin{align*}
-          \mathbf{v}_{k+1} &= (1 - k\tau) \operatorname{clip}(0.3\mathbf{\tilde{v}}_k) \\
-          \mathbf{\tilde{v}}_{k+1} &= \mathbf{u}_k + \mathbf{v}_k \\
-          \mathbf{u}_{k+1} &= (1 - k\tau) \operatorname{clip}(0.3\mathbf{\tilde{v}}_{k+1})
-          \end{align*}
+When ``+use`` is held, the *initial* velocities may be denoted as :math:`\mathbf{u}_0` and :math:`\mathbf{v}_0`. At any frame :math:`j > 0`, :math:`\mathbf{u}_j` and :math:`\mathbf{v}_j` are defined to be the *final* velocities in the frame used for position update. For example, :math:`\mathbf{u}_1` is the final velocity in the *first* frame at which ``+use`` is issued. Then for all :math:`j \ge 0`, we have
 
-The physics of object boosting is well understood with trivial implementation.
-A trickier technique is fast object manoeuvre, which is the act of "bringing"
-an object with the player at extreme speed for a relatively long duration.
+.. math:: \boxed{\mathbf{u}_{j + 1} = \lambda_\mathrm{obj} \mathfrak{C}(\mathbf{u}_j + f \mathbf{v}_{j + 1})}
+   :label: obbo object vel
 
-The general idea is to repeatedly activate ``+use`` for just one frame then
-deactive it for subsequent :math:`n` frames while pulling an object.  Observe
-that when ``+use`` is active the player velocity will be reduced significantly.
-And yet, when ``+use`` is deactivated, the player velocity will be equal to the
-object velocity, which may well be moving very fast.  The player will then
-continue to experience friction.
+On the other hand, the player velocity is computed as
 
-One important note to make is that despite the player velocity being scaled
-down by 0.3 when ``+use`` is active, the object velocity will actually increase
-in magnitude.  An implication of this is that the object will gradually
-overtake the player, until it goes out of the player's use radius.  To put it
-another way, we say that the *mean* object speed is greater than the mean
-player speed.  To control the mean player speed, :math:`n` must be adjusted.
-If :math:`n` is too low or too high, the mean player speed will be very low.
-Therefore there must exist an optimal :math:`n` at which the mean player speed
-is maximised.
+.. math:: \boxed{\mathbf{v}_{j + 1} =
+          \begin{cases}
+          \mathfrak{C}(0.3 \lambda \mathfrak{C}(\mathbf{v}_0) + \Delta\mathbf{v}_\mathrm{PM}) & j = 0 \\
+          \mathfrak{C}(0.3 \lambda \mathfrak{C}(\mathbf{u}_{j - 1} + f \mathbf{v}_j) + \Delta\mathbf{v}_\mathrm{PM}) & j > 0
+          \end{cases}}
+   :label: obbo player vel
 
-However, we do not often use the optimal :math:`n` when carrying out this
-trick.  Instead, we would use the smallest possible :math:`n` so that the
-object mean speed will be as high as possible while ensuring the object stays
-within the use radius.  This means the object will hit an obstruction as soon
-as possible, so that we can change direction as soon as that happens.
+Note that these equations are as general as they reasonably can, but they did not account for other phenomena that can affect the velocities, such as collision events. :math:`f` is a scale factor that depends on a few circumstances. If the player is standing on the ground and not in water, then :math:`f = 1`.
+
+Suppose ``-use`` is issued in the current frame :math:`n`. Then the *final* velocity in the current frame is
+
+.. math:: \boxed{\mathbf{v} = \mathfrak{C}(\lambda \mathfrak{C}(\mathbf{u}_{n - 1} + f \mathbf{v}_n) + \Delta\mathbf{v}_\mathrm{PM})}
+
+Observe that if we ignore :math:`\Delta\mathbf{v}_\mathrm{PM}`, and assume :math:`\lambda_\mathrm{obj} = \lambda` (which is true the vast majority of the time), then :math:`\mathbf{v} = \mathbf{u}_{n - 1}`, and the factor of :math:`0.3` is gone from the usual case. In other words, by releasing the use key, the player velocity is "recovered" to equal the object velocity.
+
+To observe the behaviour of :math:`\mathbf{u}_j`, we first ignore the velocity clip :math:`\mathfrak{C}` for a moment, and assume :math:`f = 1`, :math:`j \ge 1` and :math:`\lambda_\mathrm{obj} = \lambda = 1 - \tau k`. Then the equations may be written as
+
+.. math::
+   \begin{align*}
+   \mathbf{u}_{j + 1} &= 1.3 (1 - \tau k) \mathbf{u}_j \\
+   \mathbf{v}_{j + 1} &= 0.3 \mathbf{u}_j
+   \end{align*}
+
+Here we immediately see that the growth of the object speed :math:`\lVert\mathbf{u}\rVert` is exponential, and so is the growth of the player speed, albeit at a slower rate and much lower speed than the corresponding object speed. This is why when one holds ``+use`` on an object for too long, the object will quickly move past the player until it is out of the use radius, due to it very high speed relative to the player.
+
+
 
 func_breakable
 --------------
