@@ -4,7 +4,7 @@
 
 This repo contains the source files for the Half-Life physics documentation hosted at
 
-* https://www.jwchong.com/hl/
+* https://www.jwchong.com/hl/ (or [bit.ly/hlphysics](https://bit.ly/hlphysics))
 * https://tastools.rtfd.io (mirror)
 
 ## Building
