@@ -1,6 +1,8 @@
 # Half-Life Physics Documentation
 
-This hosts the source files for Half-Life physics documentation at
+![Build Status](https://readthedocs.org/projects/tastools/badge/?version=latest)
+
+This repo contains the source files for the Half-Life physics documentation hosted at
 
 * https://www.jwchong.com/hl/
 * https://tastools.rtfd.io (mirror)
