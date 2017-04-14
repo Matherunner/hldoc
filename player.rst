@@ -3,8 +3,31 @@ Player fundamentals
 
 The *player* refers to the self. Specifically it is not necessarily *you*, but rather the *self* in the Half-Life universe.
 
+Input
+-----
+
+All player movements can be controlled through commands. In the default game setup, pressing down the "W" key usually results in the ``+forward`` command being issued. Releasing the same key will cause ``-forward`` to be issued. This is because the "W" key is bound to the ``+forward`` command with the ``bind`` command, usually issued from ``config.cfg``. The ``-forward`` command needs not be explicitly bound.
+
+There are many similar commands available. It is beyond the scope of this documentation to provide a detailed description for all commands and indeed all cvars. The reader is invited to generate a list of all commands with the ``cmdlist`` command and study the SDK code for each of them.
+
+There are, however, a few points to note about command issuing that are of concern to speedrunning. One of them is the *impulse down* phenomena. This affects primarily the viewangles (see :ref:`player viewangles`) and the FSU (see :ref:`FSU`) computations. For example, the viewangles are typically changed by one of the viewangles commands such as ``+left`` for yawing left. This is done by adding to subtracting the viewangles by the value
+
+.. math:: \tau \times \mathtt{cl\_yawspeed/cl\_pitchspeed} \times \mathrm{key state}
+
+The "key state" is the state of the command being issued (``+left`` for example). The key state is typically 1, but in the *first frame* in which the command is being issued the value is 0.5. In other words, the change in viewangles is half of what it normally is in the *first frame* of the active command.
+
+This is not limited to the viewangles. The FSU values (which is crucial to player movement as will be described in :ref:`FSU`) are also affected by the impulse down. For example, by issuing ``+forward``, the following value will be added to :math:`F`:
+
+.. math:: \mathtt{cl\_forwardspeed} \times \mathrm{key state}
+
+Again, the key state here is typically 1, except the first frame of the ``+forward`` command. This can result in a noticeably drop in player acceleration.
+
+.. tip:: The reader is advised to perform a detailed study of ``cl_dlls/input.cpp`` to understand the processes and computations involved to greater depths.
+
 Camera
 ------
+
+.. _player viewangles:
 
 Viewangles
 ~~~~~~~~~~
@@ -59,37 +82,7 @@ The above definitions are not valid if the roll is nonzero. Nevertheless, the ro
 Punchangles
 ~~~~~~~~~~~
 
-Ducking
--------
+.. _FSU:
 
-Jumping
--------
-
-When the jump bit is set, the player will jump. To be precise, the act of jumping refers to setting the vertical velocity to
-
-.. math:: v_z = \sqrt{2 \cdot 800 \cdot 45} = 120 \sqrt{5} \approx 268.3
-
-The unsimplified expression for the vertical velocity is how it is calculated in the code. It implies the intention of jumping to the height of 45 units with :math:`g = 800`, though all of the numbers are hardcoded constants independent of any game variables.
-
-The condition of jumping is being onground.
-
-.. _jumpbug:
-
-Jumpbug
-~~~~~~~
-
-.. _duckjump:
-
-Duckjump
-~~~~~~~~
-
-Gravity
--------
-
-Like other entities in the Half-Life universe, the player experiences gravity. Whenever the player is in the air, a constant downward acceleration will be applied.
-
-Air and ground movements
-------------------------
-
-Water movements
----------------
+Forwardmove, sidemove, and upmove
+---------------------------------

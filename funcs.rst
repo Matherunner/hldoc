@@ -11,7 +11,7 @@ func_pushable
 
    A movable box (func_pushable).
 
-func_pushable is a rather common entity type in Half-Life. They are characterised by their ability to be moved by the player. Every time a pushable entity, it means the potential to go extraordinarily fast (see :ref:`object manoeuvre`). It is perhaps for this reason that later Half-Life mappers and modders tend to avoid pushable entities as much as possible, seeing the exploitations speedrunners have done with these innocuous objects. Indeed, in modern Half-Life maps, movable objects tend to be much harder to come by than the vanilla Half-Life maps.
+func_pushable is a rather common entity type in Half-Life. They are characterised by their ability to be moved by the player. Whenever a pushable entity is spotted, it means the potential to go extraordinarily fast (see :ref:`object manoeuvre`). It is perhaps for this reason that later Half-Life mappers and modders tend to avoid pushable entities as much as possible, seeing the exploitations speedrunners have done with these innocuous objects. Indeed, in modern Half-Life maps, movable objects tend to be much harder to come by than the vanilla Half-Life maps.
 
 .. _object manoeuvre:
 

@@ -70,6 +70,8 @@ Contents
    game
    entity
    player
+   movement
+   duckjump
    strafing
    damage
    explosions

@@ -1,5 +1,5 @@
-Entity fundamentals
-===================
+Entities
+========
 
 .. TODO: entities get removed if moving too fast
 
@@ -7,6 +7,11 @@ For a more in-depth descriptions of specific entities, refer to
 
 Basic properties
 ----------------
+
+Camera
+------
+
+Not all entities can see, but for those that do, the eyes are the windows to the soul. In the Half-Life universe, an entity is called the *camera* or the *view*. The camera is located at a fixed position relative to the entity's origin, at least at server side. At client side, the player's camera position is slightly complicated by view bobbing if enabled.
 
 .. TODO: origin, velocity, body target, etc
 
