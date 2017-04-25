@@ -16,6 +16,9 @@
 import sys
 import os
 import datetime
+import sphinx_rtd_theme
+
+on_readthedocs = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -102,7 +105,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'hldoc_theme'
+html_theme = 'sphinx_rtd_theme' if on_readthedocs else 'hldoc_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -110,8 +113,10 @@ html_theme = 'hldoc_theme'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-html_theme_path = ['.']
+if on_readthedocs:
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    html_theme_path = ['.']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -189,7 +194,7 @@ mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?
 numfig = True
 
 numfig_format = {
-    'figure': 'Fig. %s.'
+    'figure': 'Fig. %s.' if on_readthedocs else 'Fig. %s'
 }
 
 
