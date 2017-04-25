@@ -6,7 +6,7 @@ We will refer to entities with class name prefixed by ``func_`` as *func entitie
 func_pushable
 -------------
 
-.. figure:: _static/movable-box.jpg
+.. figure:: static/movable-box.jpg
    :align: center
 
    A movable box (func_pushable).

@@ -81,7 +81,7 @@ One of the simplest tricks for the gauss weapon is simple gauss boosting. Namely
 
 From :eq:`gauss velocity` we know that, assuming zero pitch, the horizontal speed boost is proportional to the charging time. On the other hand, the minimum charging time is 0.5 seconds. What is then the optimal way to perform gauss boosts? This is better stated as, what is the boosting scheme for maximising the average speed (total distance travelled in a given time)? Should one repeatedly charge the gauss for 1s and firing, or repeatedly charge the gauss for 0.5s and firing? There is a simple way to answer this.
 
-.. figure:: _static/simple_gauss_boosts.gif
+.. figure:: static/simple_gauss_boosts.gif
    :scale: 90%
    :name: simple gauss boosts
    :align: center
@@ -214,7 +214,7 @@ And if :math:`\mathbf{v}_g` is its initial velocity and
 To visualise this equation, we plotted a graph of the handgrenade's horizontal
 speed and vertical velocity relative to the player against the player pitch.
 
-.. image:: _static/handgrenade-vel.png
+.. image:: static/handgrenade-vel.png
 
 TODO
 

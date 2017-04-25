@@ -147,7 +147,7 @@ the point where the latter is decreasing.  :math:`0 \le \theta \le \zeta` is
 the domain of the latter curve which contains the maximum point at
 :math:`\pi/2`.  Have a look at the graphs below:
 
-.. image:: _static/optang-1.png
+.. image:: static/optang-1.png
 
 Note that these are sketches of the real graphs, therefore they are by no means
 accurate.  However, they do illustrate the four observations made above
@@ -416,7 +416,7 @@ It is natural to ask exactly how this limit can be quantified for the benefit of
 
 Passageways in Half-Life commonly bend perpendicularly, so we frequently make 90 degrees turns by strafing. We can imagine how the width of a passage limits the maximum radius of curvature one can sustain without colliding with the walls. This implies that the speed is limited as well. When planning for speedruns, it can prove useful to be able to estimate this limit for a given turn without running a simulation or strafing by hand. In particular, we want to compute the maximum speed for a given passage width. We start by making some simplifying assumptions that will greatly reduce the difficulty of analysis while closely modelling actual situations in practice. Refer to the figure below.
 
-.. figure:: _static/90-degrees-strafe-radius.png
+.. figure:: static/90-degrees-strafe-radius.png
    :height: 800px
    :width: 754px
    :scale: 50%
@@ -435,7 +435,7 @@ Radius-speed relationship
 
 The following figure depicts the positions of the player at times :math:`t = 0`, :math:`t = \tau` and :math:`t = 2\tau`. The initial speed is :math:`\lVert\mathbf{v}\rVert`. All other symbols have their usual meaning.
 
-.. image:: _static/radius-estimate-xy.png
+.. image:: static/radius-estimate-xy.png
    :height: 775px
    :width: 1135px
    :scale: 50%
