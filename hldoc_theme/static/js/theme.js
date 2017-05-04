@@ -27,14 +27,6 @@ function ThemeNav () {
                 self.reset();
                 self.win.on('hashchange', self.reset);
 
-                // Set scroll monitor
-                self.win.on('scroll', function () {
-                    if (!self.linkScroll) {
-                        self.winScroll = true;
-                    }
-                });
-                setInterval(function () { if (self.winScroll) self.onScroll(); }, 25);
-
                 // Set resize monitor
                 self.win.on('resize', function () {
                     self.winResize = true;
@@ -130,19 +122,6 @@ function ThemeNav () {
                 console.log("Error expanding nav for anchor", err);
             }
         }
-    };
-
-    nav.onScroll = function () {
-        this.winScroll = false;
-        var newWinPosition = this.win.scrollTop(),
-            winBottom = newWinPosition + this.winHeight,
-            navPosition = this.navBar.scrollTop(),
-            newNavPosition = navPosition + (newWinPosition - this.winPosition);
-        if (newWinPosition < 0 || winBottom > this.docHeight) {
-            return;
-        }
-        this.navBar.scrollTop(newNavPosition);
-        this.winPosition = newWinPosition;
     };
 
     nav.onResize = function () {
