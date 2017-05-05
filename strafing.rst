@@ -1,18 +1,18 @@
+.. _strafing:
+
 Strafing
 ========
 
-Here we will be discussing movement physics primarily associated with the
-player.  Physics of other entities such as monster and boxes are presumed to
-share some similarities with the player, though they are usually not important.
+*Strafing* in the context of Half-Life physics refers to the act of pressing the correct movement keys and moving the mouse in a precise way, typically with the aim of gradually increasing the horizontal speed or cornering without losing too much speed. Strafing is commonly accompanied by a series of jumps intended to keep the player off the ground, as ground movements are subject to friction. This combination of techniques is simply *bunnyhopping*. Since the strafing part of bunnyhopping is much more interesting than the jumping part, we will focus only on the former in this chapter.
 
+Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. This applies to TASes as well: we want to optimise strafing as much as possible so that we can pretty much forget about it when TASing, allowing us to concentrate on the "general picture".
+
+.. caution:: Before venturing further in this chapter, be sure to familiarise yourself with the fundamentals (:ref:`player movement`).
 
 Fundamental movement equation
 -----------------------------
 
-For subsequence analyses that involve mathematics, we will not concern
-ourselves with the details of how they were implemented in ``PM_AirMove`` and
-``PM_WalkMove``.  For example, we will not be thinking in terms of ``wishvel``,
-``addspeed``, ``pmove->right`` and so on.
+For subsequent analyses that involve mathematics, we will not concern ourselves with the details of how they were implemented in ``PM_AirMove`` and ``PM_WalkMove``.  For example, we will not be thinking in terms of ``wishvel``, ``addspeed``, ``pmove->right`` and so on.
 
 Denote :math:`\mathbf{v}` the player velocity in the current frame and
 :math:`\mathbf{v}'` the new velocity.  Denote :math:`\mathbf{\hat{a}}` the unit
@@ -34,7 +34,6 @@ with
           \gamma_1 = k_e \tau MA
           \quad\quad
           \gamma_2 = L - \mathbf{v} \cdot \mathbf{\hat{a}} = L - \lVert\mathbf{v}\rVert \cos\theta
-   :nowrap:
 
 where :math:`\tau` is called the *frame time*, which is just the inverse of
 frame rate.  :math:`L = 30` when airstrafing and :math:`L = M` when

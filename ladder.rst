@@ -1,4 +1,4 @@
-.. _ladder-phy:
+.. _ladder physics:
 
 Ladders
 -------
