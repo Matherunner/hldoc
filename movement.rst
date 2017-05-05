@@ -49,7 +49,53 @@ It can be shown that the player locus is indeed independent of the frame rate, t
 Basevelocity
 ------------
 
+Ground friction
+---------------
 
+When the player is moving on the ground, friction will be applied to reduce the horizontal speed. The friction is applied before air and ground movement calculations (see :ref:`player air ground`) in ``PM_Friction``. The player friction differs from the friction applied to all other entities in that different types of friction is applied depending on the horizontal speed.
+
+Let :math:`E` be the *stop speed*, the value of ``sv_stopspeed`` which is typically 100. Let :math:`k` be the value of
+
+.. math:: \mathtt{sv\_friction} \times k_e \times e_f
+
+which is usually 4 and where :math:`k_e` is called the *entity friction*. The entity friction can be modified by a friction entity (see :ref:`func_friction`). The :math:`e_f` is the *edgefriction* which will be described in a moment. It is usually 1 but can often be 2. The two dimensional player velocity immediately after applying friction (but before air or ground acceleration) is now
+
+.. math:: \lambda(\mathbf{v}) =
+   \begin{cases}
+   (1 - \tau k) \mathbf{v} & \lVert\mathbf{v}\rVert \ge E \\
+   \mathbf{v} - \tau Ek \mathbf{\hat{v}} & \max(0.1, \tau Ek) \le \lVert\mathbf{v}\rVert < E \\
+   \mathbf{0} & \lVert\mathbf{v}\rVert < \max(0.1, \tau Ek)
+   \end{cases}
+
+Assuming :math:`\lVert\mathbf{v}\rVert \ge E`. Now observe that the player speed is scaled by a constant factor (assuming :math:`k` and :math:`\tau` are constant) each frame, resulting in an exponential decrease. This may be called *geometric friction*, because the series of speeds forms a geometric series. At higher horizontal speeds this type of friction can be devastating, because higher speeds are harder to achieve and maintain (owing to the sublinear growth of speed by pure strafing, see :ref:`strafing`).
+
+At frame :math:`n`, the speed due to geometric friction is
+
+.. math:: \lVert\mathbf{v}_n\rVert = \lVert\lambda^n(\mathbf{v})\rVert = (1 - \tau k)^n \lVert\mathbf{v}_0\rVert
+
+Since time is discretised in the Half-Life universe, we have :math:`t = \tau n`. Therefore,
+
+.. math:: \lVert\mathbf{v}_t\rVert = (1 - \tau k)^{t/\tau} \lVert\mathbf{v}_0\rVert
+
+From this equation, it can be shown that the lower the friction, the greater the geometric friction. However, the difference in friction between different frame rates is so minute that one can hardly notice it.
+
+Assuming :math:`\tau Ek \le \lVert\mathbf{v}\rVert < E`, the type of friction may be called *arithmetic friction*, because the speeds form an arithmetic series. Namely, we have
+
+.. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert - n\tau Ek, \quad
+   \lVert\mathbf{v}_t\rVert = \lVert\mathbf{v}_0\rVert - tEk
+
+This type of friction is straightforward and independent of the frame rate.
+
+Edgefriction
+~~~~~~~~~~~~
+
+Edgefriction is a an extra friction applied to the player when the player is sufficiently close to an edge that is sufficiently high above from a lower ground.
+
+.. note:: TODO: maths descriptions
+
+Although doubling :math:`k` seems minor at the first glance, the effect is *devastating*. Prolonged groundstrafing towards an edge can drastically reduce the horizontal speed, which in turn affects the overall acceleration from airstrafing after jumping off the edge. One way to avoid edgefriction is to jump or ducktap before reaching an edge and start airstrafing. However, this is sometimes impractical. The most optimal way to deal with edgefriction is highly dependent on the circumstances. Extensive offline simulations may be desirable.
+
+.. _player air ground:
 
 Air and ground movements
 ------------------------

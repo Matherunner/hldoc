@@ -139,4 +139,8 @@ tracing functions and they do not save the pointer to the desired crate
 func_rotating
 -------------
 
+.. _func_friction:
+
+func_friction
+-------------
 
