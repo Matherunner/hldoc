@@ -7,6 +7,8 @@ Player movement basics
 
 In this chapter, we will focus on the fundamental governing equations for the air and ground player movements, and the exploitation of some of the miscellaneous physical phenomena. This chapter also serves as a prerequisite to :ref:`strafing`.
 
+.. _player gravity:
+
 Gravity
 -------
 
@@ -48,6 +50,8 @@ It can be shown that the player locus is indeed independent of the frame rate, t
 
 Basevelocity
 ------------
+
+.. _player friction:
 
 Ground friction
 ---------------
@@ -100,7 +104,52 @@ Although doubling :math:`k` seems minor at the first glance, the effect is *deva
 Air and ground movements
 ------------------------
 
-The physics governing the player's air and ground movements are of primary importance.
+The physics governing the player's air and ground movements are of primary importance. With precise inputs, they can be exploited to allow mathematically unbounded speed gain (barring ``sv_maxvelocity``). The consequences of the air and ground physics will be described in detail in :ref:`strafing`.
+
+.. caution:: All vectors in this section are two dimensional on the :math:`xy` plane unless stated otherwise.
+
+The air or ground accelerations are computed before position update. Assuming :math:`\mathbf{v}'` is the velocity after air or ground acceleration, and :math:`\mathbf{r}` the player position. Ignoring collision (see :ref:`collision`), the position update entails
+
+.. math:: \mathbf{r}' = \mathbf{r} + \tau\mathbf{v}'
+
+Here, the new velocity :math:`\mathbf{v}'` is given by the *fundamental movement equation* (FME). Let :math:`\mathbf{v}` the initial player velocity in *two dimensions*, namely the velocity immediately before friction and acceleration are applied. Then the FME is simply
+
+.. math:: \mathbf{v}' = \lambda(\mathbf{v}) + \mu\mathbf{\hat{a}}
+
+Here, :math:`\mathbf{\hat{a}}` is called the *unit acceleration vector*, given by
+
+.. math:: \mathbf{\hat{a}} = \frac{F\mathbf{\hat{f}} + S\mathbf{\hat{s}}}{M}
+
+A few notes to be made here. First, the :math:`F` and :math:`S` are the forwardmove and sidemove respectively, described in :ref:`FSU`. Second, :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}` are the unit forward and side view vectors described in :ref:`view vectors`. But more importantly, they are obtained by assuming :math:`\varphi = 0`, regardless of the player's actual pitch. Consequently, they do not have a component in the :math:`z` axis. Third, assuming :math:`U = 0`, the :math:`M` has the value of
+
+.. math:: M = \min\left( \mathtt{sv\_maxspeed}, \sqrt{F^2 + S^2} \right)
+
+Observe that :math:`M` is always capped by ``sv_maxspeed``. Observe also that if :math:`F` and :math:`S` are not sufficiently large, one can end up with a smaller value of :math:`M` below ``sv_maxspeed``, which is bad as will be seen later.
+
+In the FME, we also have the :math:`\mu` coefficient. This coefficient may be written as
+
+.. math:: \mu =
+   \begin{cases}
+   \min(\gamma_1, \gamma_2) & \gamma_2 > 0 \\
+   0 & \gamma_2 \le 0
+   \end{cases}
+
+where
+
+.. math:: \gamma_1 = k_e \tau MA \quad\quad
+   \gamma_2 = L - \lambda(\mathbf{v}) \cdot \mathbf{\hat{a}} = L - \lVert\lambda(\mathbf{v})\rVert \cos\theta
+
+Recall that :math:`k_e` is the entity friction described in :ref:`player friction`. :math:`A` is the value of either ``sv_accelerate`` or ``sv_airaccelerate``, used for ground and air movement respectively. :math:`L` is either :math:`M` or :math:`\min(30, M)`, for ground and air movement respectively. :math:`\theta` is the shortest angle between :math:`\mathbf{v}` and :math:`\mathbf{\hat{a}}`.
+
+We can observe that if :math:`\gamma_2 \le 0`, there will be no acceleration at all. This occurs when
+
+.. math:: \cos\theta \ge \frac{L}{\lVert\lambda(\mathbf{v})\rVert}
+
+Now observe that if :math:`\lVert\lambda(\mathbf{v})\rVert < L`, then this condition will never hold because the maximum value of :math:`\cos\theta` is :math:`1`. That is to say, at lower speeds, the player will be able to accelerate regardless of :math:`\theta` (barring a few zero points). With speeds beyond :math:`L`, acceleration will not occur with angles
+
+.. math:: \lvert\theta\rvert \le \arccos \frac{L}{\lVert\lambda(\mathbf{v})\rVert}
+
+This is just one of the consequences of the FME. Exploitations of this equation will be detailed in :ref:`strafing`.
 
 Water movements
 ---------------

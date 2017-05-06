@@ -33,6 +33,8 @@ Hitboxes
 
 .. TODO: hitboxes briefly but refer reader to damage chapter
 
+.. _collision:
+
 Collision
 ---------
 

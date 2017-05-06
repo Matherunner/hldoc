@@ -15,6 +15,8 @@ Despite the wealth of strategy guides for Half-Life, it is next to impossible to
 
 Thus, this documentation strives to detail all aspects of the physics in a way that would help any curious minds to gain a much deeper appreciation for Half-Life and its speedruns. The potential tool developers will also find this documentation a helpful guide. This documentation aims to serve as a definitive reference material for Half-Life physics.
 
+.. _notations:
+
 Notations Used
 --------------
 
@@ -73,6 +75,7 @@ Contents
    movement
    duckjump
    strafing
+   surfing
    damage
    explosions
    ladder

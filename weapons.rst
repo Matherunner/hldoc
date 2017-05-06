@@ -17,10 +17,10 @@ The secondary mode is more interesting. In single-player mode, the weapon consum
 
 Observe that the damage caps at 200 after charging for 4 seconds. The secondary fire produces a physical recoil, which is manifested by a change in the player velocity. If :math:`\mathbf{v}` is the current player velocity, and :math:`\mathbf{\hat{f}}` is the forward view, then the new velocity is given by
 
-.. math:: \mathbf{v}' = \mathbf{v} - 5D\mathbf{\hat{f}} \cdot \langle 1, 1, 0\rangle
+.. math:: \mathbf{v}' = \mathbf{v} - 5D\mathbf{\hat{f}} \operatorname{diag}(1,1,0}
    :label: gauss velocity
 
-Observe that the vertical velocity never changes. To maximise horizontal speed change, the player must fire from zero pitch. The maximum speed change would be 1000 ups, which is one of the greatest practical speed boosts available in Half-Life.
+where :math:`\operatorname{diag}(1,1,0)` refers to the diagonal matrix with 1, 1, and 0 as the entries on the diagonal. Observe that the vertical velocity never changes. To maximise horizontal speed change, the player must fire from zero pitch. The maximum speed change would be 1000 ups, which is one of the greatest practical speed boosts available in Half-Life.
 
 The behaviour of gauss beams is relatively complex compared to other Half-Life weapons, and it deserves a detailed description. Intuitively, players recognise that gauss beams have a tendency to reflect off surfaces. Gauss beams can also "punch" through walls and damage entities at the opposite side, through a mechanism that is not obvious at first sight. Gauss beams can even inflict damage onto the attacker in the right circumstances. What is more, the damage from gauss beams can get seemingly amplified when fired through particular geometries.
 

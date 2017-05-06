@@ -82,6 +82,8 @@ Since :math:`0 \le r = a \bmod 2^{16} < 2^{16}`, this simplifies to
 
 Anglemod introduces a loss of precision in setting angles. This can result in a loss of optimality in strafing. There are two ways to reduce the effects of anglemod, namely by the *simple anglemod compensation* and the more advanced *vectorial compensation*. These techniques will be described in :ref:`strafing`.
 
+.. _view vectors:
+
 View vectors
 ------------
 
