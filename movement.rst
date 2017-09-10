@@ -81,7 +81,7 @@ Since time is discretised in the Half-Life universe, we have :math:`t = \tau n`.
 
 .. math:: \lVert\mathbf{v}_t\rVert = (1 - \tau k)^{t/\tau} \lVert\mathbf{v}_0\rVert
 
-From this equation, it can be shown that the lower the friction, the greater the geometric friction. However, the difference in friction between different frame rates is so minute that one can hardly notice it.
+From this equation, it can be shown that the lower the frame rate, the greater the geometric friction. However, the difference in friction between different frame rates is so minute that one can hardly notice it.
 
 Assuming :math:`\tau Ek \le \lVert\mathbf{v}\rVert < E`, the type of friction may be called *arithmetic friction*, because the speeds form an arithmetic series. Namely, we have
 

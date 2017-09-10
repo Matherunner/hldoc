@@ -1,3 +1,5 @@
+.. _entities:
+
 Entities
 ========
 
@@ -24,6 +26,8 @@ Gravity
 -------
 
 .. TODO: player gravity is computed differently, with leapfrog integration
+
+.. _friction:
 
 Friction
 --------

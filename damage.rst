@@ -147,6 +147,8 @@ The constant of proportionality :math:`25/111` is defined to be ``DAMAGE_FOR_FAL
 
 Observe that :math:`v_z = 1024` gives :math:`D = 100`. Assuming a gravitational acceleration of :math:`g = 800`, the maximum safe height is 210.25 units and the fatal height (assuming a health of 100) is 655.36 units. These values can help the speedrunner to make estimates in the plans, and possibly utilise one of the methods to bypass fall damage such as jumpbug (see :ref:`jumpbug`).
 
+.. _damage boosting:
+
 Damage boosting
 ---------------
 
@@ -227,5 +229,7 @@ as one would have guessed.
 
 We want to remark that this model makes the assumption that the speed is constant after boosting. This is normally not true in practice. However, consider that the speed after a damage boost is typically very high, and recall from strafing physics that the acceleration at higher speeds is noticeably lower.
 
-Upward diagonal boosts
-~~~~~~~~~~~~~~~~~~~~~~
+Upward diagonal boost
+~~~~~~~~~~~~~~~~~~~~~
+
+It is fairly common in Half-Life to be faced with the situation where we need to reach a certain height.
