@@ -137,7 +137,7 @@ At the end of the second iteration, the gauss beam will no longer ignore the non
 
 ================== ============
 Iteration          Damage
------------------- ------------
+================== ============
 First              :math:`D`
 Second             :math:`\le D \cos\phi`
 Third              :math:`D (1 - \cos\phi)`
