@@ -14,7 +14,7 @@ Hitgroup
    :name: hitboxes
    :scale: 50%
    :align: center
-   
+
    The hitboxes of a vortigaunt and alien grunts.
 
 When damageable entity receives damage, the damage is inflicted onto one of the *hitboxes* if they exist. Hitboxes are a series of cuboids that approximate the entity model. For example, the hitboxes of a scientist are arranged to look like cuboids attached to the scientist's skeleton.
@@ -48,13 +48,16 @@ where
 
 If the damage type is ``DMG_FALL`` or ``DMG_DROWN``, then the armour value will remain the same, with :math:`\Delta\mathcal{H} = \operatorname{int}(D)`.
 
+.. note::
+   Note that :math:`D = 0` is not equivalent to not taking damage. Rather, it means some damage is still taken, and the ``TakeDamage`` function is still called, but with a value of zero. This will be important when :math:`\mathcal{A} < 0`, which is impossible in the game but mathematically possible.
+
 Observe that even though the player health is stored as a 32-bit floating point number, in practice it will almost always have an integer value. This is because any change in health :math:`\Delta\mathcal{H}` due to damage is always an integer. This property is unique to the player entity. However, the armour value will often have a nonzero fractional part.
 
 .. figure:: static/player_hp.png
    :name: player_hp
    :scale: 40%
    :align: center
-   
+
    A typical player health and armour against damage plot. This plot assumes an initial health and armour of 100 and 40 respectively, showing the new health and armour after a given damage.
 
 In :numref:`player_hp` we observe that when the armour is nonzero, the health decreases with a smaller slope with increasing damage. But once the damage is sufficiently large that the armour gets to zero, the subsequent slope of the health line is much larger. The zigzag pattern of the health line is due to the integer truncation of damage.
@@ -169,6 +172,45 @@ we have
           \end{cases}
 
 We can immediately see that if the duckstate is 2 the change in velocity is greater.  It is sad to see that the maximum possible boost given by a single damage is 1000 ups and not infinite.
+
+The role of armour
+~~~~~~~~~~~~~~~~~~
+
+Armour is strictly never needed for damage boosting. The only function of armour is to cut the health loss :math:`\Delta\mathcal{H}` ultimately inflicted onto the player given the same damage :math:`D`. Theoretically, we do not need to use the armour to control the health loss at all. Instead, it can be done by simply moving the explosion origin away so that the damage falls off to match the desired health loss (see :ref:`explosions` for more details). In practice, however, this may be hard to achieve in confined spaces or awkward positions, especially when a small health loss is desired despite large source damage, which implies a large distance is required between the player and the explosion origin.
+
+Suppose we have calculated the exact :math:`\Delta\mathbf{v}` boost needed for a damage boost, and determined that a health loss of :math:`\Delta\mathcal{H}` is desired. However, the damage inflicted :math:`D > \Delta\mathcal{H}`. Therefore, some amount of armour is needed to cut the damage, preferably as little as possible since the armour is a relatively scarce resource. We will assume :math:`\Delta\mathcal{H} \ge 0` and :math:`\mathcal{A}' = 0`, which implies the necessary condition
+
+.. math:: \mathcal{A}' = \max(0, \mathcal{A} - 2D/5) \le 0 \implies \mathcal{A} \le \frac{2}{5} D
+
+On the other hand, :math:`\mathcal{A}' = 0` also implies the health loss is related to the damage and armour by
+
+.. math:: \Delta\mathcal{H} = \operatorname{int}(D - 2\mathcal{A}) \implies \frac{1}{2} \left( D - \Delta\mathcal{H} - 1 \right) < \mathcal{A} \le \frac{1}{2} \left( D - \Delta\mathcal{H} \right)
+   :label: A=0_A_range
+
+Combining the two inequalities, we can eliminate :math:`\mathcal{A}` and obtain the new inequality
+
+.. math:: \frac{1}{2} \left( D - \Delta\mathcal{H} - 1 \right) < \frac{2}{5} D
+   \implies D < 5 \left( \Delta\mathcal{H} + 1 \right)
+   :label: A=0_D_range
+
+In other words, the initial assumption of :math:`\mathcal{A}' = 0` is contingent upon the truth value of this inequality. This inequality sets an upper bound on the damage value for this approach to work. Assuming this inequality is true, then the requisite :math:`\mathcal{A}` value can be picked from the small range given by the second inequality.
+
+If the necessary conditions mentioned above do not hold, then the assumption of :math:`\mathcal{A}' = 0` is false, implying :math:`\mathcal{A}' > 0`. This further implies that the armour value has the lower bound
+
+.. math:: \mathcal{A} > \frac{2}{5} D
+
+Furthermore, this assumption also implies the equality
+
+.. math:: \Delta\mathcal{H} = \operatorname{int}\left( \frac{D}{5} \right)
+
+Using the same analysis technique of replacing the integer truncation with a range, we obtain the equivalent range
+
+.. math:: 5 \Delta\mathcal{H} \le D < 5 \left( \Delta\mathcal{H} + 1 \right)
+   :label: A>0_D_range
+
+Observe that this range overlaps with the range :eq:`A=0_D_range`. In fact, we need not consider the :math:`\mathcal{A}' > 0` case at all. This is because if :math:`\mathcal{A}' = 0` is not true, then the :math:`\mathcal{A}' > 0` case is not going to help us. If :math:`\mathcal{A}' > 0`, then this implies the upper bound on :math:`D` in :eq:`A=0_D_range`, and therefore :eq:`A>0_D_range` also fails. Therefore, we conclude that there exists no :math:`\mathcal{A}` that can produce the required health loss.
+
+A small note to make is that if :math:`D` satisfies :eq:`A>0_D_range`, then it means that we can pick any value of :math:`A` to give the same :math:`\Delta\mathcal{H}`, as long as the lower bound in :eq:`A=0_A_range` is satisfied.
 
 .. We'll keep this distribution thing here in health and damage, and not in explosions, because these are applicable for other kinds of damage as well
 
