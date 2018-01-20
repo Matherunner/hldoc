@@ -68,10 +68,10 @@ With :math:`v_{i,x}` known, we can simply compute the horizontal time :math:`t_x
 The calculated initial vertical speed is guaranteed to reach the final position in the same time. However, the trajectory may take a different shape. That is, the path might either be strictly increasing or ends with a decreasing curve. To check this, we check the sign of the final vertical velocity. If the path is strictly increasing, we have
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    v_{f,z} = v_{i,z} - gt_x = \frac{gt_x^2 + 2z_f}{2t_x} - gt_x &\ge 0 \\
    \implies 2z_f &\ge gt_x^2
-   \end{align*}
+   \end{aligned}
 
 Observe that if :math:`t_x` increases while all else kept constant, the inequality will eventually be violated, resulting in a inverted bell shaped path. In addition, if :math:`z_f < 0`, that is when the final position is below the starting position, then the inequality will always be violated regardless of :math:`t_x`.
 

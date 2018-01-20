@@ -69,12 +69,12 @@ where :math:`\alpha` is the angle between :math:`\mathbf{u}` and
 into the positive direction of :math:`y`-axis. Expanding
 :math:`\lVert\mathbf{v}'\rVert = \sqrt{\mathbf{v}' \cdot \mathbf{v}'}`,
 
-.. math:: \begin{align*}
+.. math:: \begin{aligned}
           \lVert\mathbf{v}'\rVert &= \lVert\mathbf{u}\rVert \sqrt{1 - 2\sqrt{2} \cos\alpha \cos(\alpha - \pi/4) + 2 \cos^2\alpha} \\
           &= \sqrt{\mathcal{F}^2 + \mathcal{S}^2} \sqrt{1 - 2\sqrt{2} \cos^2\alpha \cos(\pi/4) -
           2\sqrt{2} \cos\alpha \sin\alpha \sin(\pi/4) + 2\cos^2\alpha} \\
           &= \sqrt{\mathcal{F}^2 + \mathcal{S}^2} \sqrt{1 - \sin(2\alpha)}
-          \end{align*}
+          \end{aligned}
 
 We conclude that :math:`\alpha = 3\pi/4` maximises
 :math:`\lVert\mathbf{v}'\rVert`. If :math:`\lvert\mathcal{F}\rvert =
@@ -207,18 +207,18 @@ positive. Hence, equivalently we need
 And further,
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \operatorname{sgn}(v'_z) &= -\operatorname{sgn}(\mathcal{F} \cos(\vartheta - \theta)) \\
    \operatorname{sgn}(v'_z) &= -\operatorname{sgn}(\mathcal{S} \sin(\vartheta - \theta))
-   \end{align*}
+   \end{aligned}
 
 And thus,
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \operatorname{sgn}(\sin(\vartheta - \theta)) &= -\operatorname{sgn}(\mathcal{F} v'_z) \\
    \operatorname{sgn}(\cos(\vartheta - \theta)) &= -\operatorname{sgn}(\mathcal{S} v'_z)
-   \end{align*}
+   \end{aligned}
 
 Observe that the required signs of :math:`\sin(\vartheta - \theta)` and
 :math:`\cos(\vartheta - \theta)` depends on the chosen signs of

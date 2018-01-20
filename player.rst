@@ -57,14 +57,14 @@ where :math:`\operatorname{int}(x)` denotes the integer part of :math:`x`. Simil
 Observe that :math:`0^\circ \le \mathfrak{A}_d(x) < 360^\circ` and :math:`0 \le \mathfrak{A}_r(x) < 2 \pi`, regardless of :math:`x`. To see this, first assume :math:`x \ge 0`. Then, the ``AND`` operation extracts only the lower 16 bits of the first integer argument. This is mathematically equivalent to modulo :math:`65536`. Now if :math:`x < 0`, then recall from the two's complement representation that the *signed* integer representing some negative value :math:`-a` (with :math:`a > 0`) has a positive value of :math:`2^{32} - a` if interpreted as an *unsigned* integer. Now,
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    (2^{32} - a) \mathbin{\mathtt{AND}} (2^{16} - 1)
    &= (2^{32} - a) \bmod 2^{16} \\
    &= 2^{32} - a - \left\lfloor \frac{2^{32} - a}{2^{16}} \right\rfloor 2^{16} \\
    &= 2^{32} - a - \left\lfloor 2^{16} - \frac{a}{2^{16}} \right\rfloor 2^{16} \\
    &= 2^{32} - a - 2^{32} + \left\lceil \frac{a}{2^{16}} \right\rceil 2^{16} \\
    &= \left\lceil \frac{a}{2^{16}} \right\rceil 2^{16} - a
-   \end{align*}
+   \end{aligned}
 
 To proceed further, write :math:`a = q 2^{16} + r` where :math:`q` and :math:`r` are integers and :math:`0 \le r < 2^{16}` is the integer remainder when :math:`a` is divided by :math:`2^{16}` (remember that :math:`a \ge 0`). Then
 
@@ -90,20 +90,20 @@ View vectors
 There are two vectors associated with the player's viewangles. These are called the *view vectors*. For discussions in 3D space, they are defined to be
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \mathbf{\hat{f}} &:= \langle \cos\vartheta \cos\varphi, \sin\vartheta \cos\varphi, -\sin\varphi \rangle \\
    \mathbf{\hat{s}} &:= \langle \sin\vartheta, -\cos\vartheta, 0 \rangle
-   \end{align*}
+   \end{aligned}
 
 We will refer to the former as the *unit forward vector* and the latter as the *unit right vector*. The negative sign for :math:`f_z` is an idiosyncrasy of the GoldSrc engine inherited from Quake. This is the consequence of the fact that looking up gives negative pitch angles and looking down gives positive pitch angles.
 
 We sometimes restrict our discussions to the horizontal plane, such as in the description of strafing. In this case we assume :math:`\varphi = 0` and define
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \mathbf{\hat{f}} &:= \langle \cos\vartheta, \sin\vartheta \rangle \\
    \mathbf{\hat{s}} &:= \langle \sin\vartheta, -\cos\vartheta \rangle
-   \end{align*}
+   \end{aligned}
 
 Such restriction is equivalent to projecting the :math:`\mathbf{\hat{f}}` vector onto the :math:`xy` plane, provided the original vector is not vertical.
 

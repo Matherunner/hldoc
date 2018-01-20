@@ -53,10 +53,10 @@ Let :math:`\mathbf{r}` be the origin of a contact grenade moving in space. Assum
 Then, the start and end points of the line trace are given by
 
 .. math::
-	\begin{align*}
+	\begin{aligned}
 	A &:= \mathbf{r} - 32 \mathbf{\hat{v}} \\
 	B &:= \mathbf{r} + 32 \mathbf{\hat{v}}
-	\end{align*}
+	\end{aligned}
 
 Here, :math:`A` is 32 units away from the position of the grenade at collision, in the opposite direction of its velocity. And :math:`B` is 32 units away from that position, but in the direction of the velocity. It is easy to imagine that, more often than not, the end position of the line trace will coincide with the grenade position. This line trace will also rarely be startsolid. This is because the grenade has to pass through open space before hitting the plane, and :math:`A` is approximately one of the grenade's past positions.
 
@@ -68,10 +68,10 @@ Timed grenades are grenades that detonate after a specific amount of time. This 
 Denote :math:`\mathbf{r}` the origin of a timed grenade. At detonation, the grenade may or may not be lying on a plane. Since the grenade could well be resting on the ground with zero velocity, it does not make sense to use the velocity in computing the start and end points for the line trace. Instead, Valve decided to use :math:`\mathbf{\hat{k}}` to offset those points from the grenade origin. So, we have
 
 .. math::
-	\begin{align*}
+	\begin{aligned}
 	A &:= \mathbf{r} + 8 \mathbf{\hat{k}} \\
 	B &:= \mathbf{r} - 32 \mathbf{\hat{k}}
-	\end{align*}
+	\end{aligned}
 
 Now, :math:`A` is simply 8 units above the grenade and :math:`B` is 32 units below the grenade. This means that there is a greater chance that this line trace is startsolid and also that the trace fraction is 1. The former can occur if there is a solid entity above the grenade, while the latter can occur if the grenade is sufficiently high above the ground.
 

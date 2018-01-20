@@ -32,7 +32,6 @@ import datetime
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
-    #'sphinx.ext.imgmath',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

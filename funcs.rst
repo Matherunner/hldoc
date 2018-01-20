@@ -49,10 +49,10 @@ Observe that if we ignore :math:`\Delta\mathbf{v}_\mathrm{PM}`, and assume :math
 To observe the behaviour of :math:`\mathbf{u}_j`, we first ignore the velocity clip :math:`\mathfrak{C}` for a moment, and assume :math:`f = 1`, :math:`j \ge 1` and :math:`\lambda_\mathrm{obj} = \lambda = 1 - \tau k`. Then the equations may be written as
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \mathbf{u}_{j + 1} &= 1.3 (1 - \tau k) \mathbf{u}_j \\
    \mathbf{v}_{j + 1} &= 0.3 \mathbf{u}_j
-   \end{align*}
+   \end{aligned}
 
 Here we immediately see that the growth of the object speed :math:`\lVert\mathbf{u}\rVert` is exponential, and so is the growth of the player speed, albeit at a slower rate and much lower speed than the corresponding object speed. This is why when one holds ``+use`` on an object for too long, the object will quickly move past the player until it is out of the use radius, due to it very high speed relative to the player.
 

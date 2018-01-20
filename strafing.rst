@@ -24,11 +24,11 @@ This is a very common line of attack that quickly yields an expression for the m
 From the scalar FME, we can further write down the equations when assuming :math:`\mu = \gamma_1` or :math:`\mu = \gamma_2`. These can be found by expanding :math:`\mu`, giving
 
 .. math::
-   \begin{align*}
+   \begin{aligned}
    \lVert\mathbf{v}'\rVert_{\mu = \gamma_1} &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 +
    k_e \tau MA \left( k_e \tau MA + 2 \lVert\lambda(\mathbf{v})\rVert \cos\theta \right)} \\
    \lVert\mathbf{v}'\rVert_{\mu = \gamma_2} &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 \sin^2 \theta + L^2}
-   \end{align*}
+   \end{aligned}
    :label: nextspeed gammas
 
 These equations will be important in the exploitative analyses of the FME.
