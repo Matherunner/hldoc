@@ -16,9 +16,6 @@
 import sys
 import os
 import datetime
-import sphinx_rtd_theme
-
-on_readthedocs = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -35,6 +32,7 @@ on_readthedocs = os.environ.get('READTHEDOCS', None) == 'True'
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
+    #'sphinx.ext.imgmath',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Half-Life Physics'
+project = 'HLPR'
 copyright = '2014—{}, Chong Jiang Wei'.format(datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
@@ -100,23 +98,27 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+# Warn about all 
+nitpicky = True
+
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme' if on_readthedocs else 'hldoc_theme'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    'description': 'An attempt to document all aspects of Half-Life game physics and how to exploit them.',
+    'font_size': '13pt',
+    'base_bg': '#fafaf4',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
-if on_readthedocs:
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-else:
-    html_theme_path = ['.']
+#html_theme_path = ['.']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -137,7 +139,7 @@ html_title = 'Half-Life Physics Reference'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -148,12 +150,14 @@ html_static_path = ['_static']
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-html_use_smartypants = True
-
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'searchbox.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -168,11 +172,13 @@ html_use_index = True
 # If true, the index is split into individual pages for each letter.
 #html_split_index = False
 
+html_copy_source = False
+
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 html_show_copyright = True
@@ -188,13 +194,13 @@ html_show_copyright = True
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'HalfLifePhy'
 
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML'
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'
 
 # Enable figure numbering.
 numfig = True
 
 numfig_format = {
-    'figure': 'Fig. %s.' if on_readthedocs else 'Fig. %s'
+    'figure': 'Fig. %s.',
 }
 
 

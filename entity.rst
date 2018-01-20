@@ -129,7 +129,7 @@ be the number of walls and let :math:`\beta` be the angle subtended by the arc
 joining the midpoints of every wall.  For example, with :math:`\beta = \pi/2`
 the first and the last walls will be perpendicular, and with :math:`\beta =
 \pi` the they will be opposite and parallel instead.  Let :math:`\mathbf{v}_i`
-be the velocity immediatley after colliding with the :math:`i`-th wall, and
+be the velocity immediately after colliding with the :math:`i`-th wall, and
 assuming :math:`\mathbf{v}_0` is parallel to and coincident with the first
 wall.  Assume also that :math:`0 \le \beta / (n-1) \le \pi/2`, which means that
 the angle between adjacent planes cannot be acute.  If the velocity does not

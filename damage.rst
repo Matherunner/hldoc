@@ -178,7 +178,7 @@ The role of armour
 
 Armour is strictly never needed for damage boosting. The only function of armour is to cut the health loss :math:`\Delta\mathcal{H}` ultimately inflicted onto the player given the same damage :math:`D`. Theoretically, we do not need to use the armour to control the health loss at all. Instead, it can be done by simply moving the explosion origin away so that the damage falls off to match the desired health loss (see :ref:`explosions` for more details). In practice, however, this may be hard to achieve in confined spaces or awkward positions, especially when a small health loss is desired despite large source damage, which implies a large distance is required between the player and the explosion origin.
 
-Suppose we have calculated the exact :math:`\Delta\mathbf{v}` boost needed for a damage boost, and determined that a health loss of :math:`\Delta\mathcal{H}` is desired. However, the damage inflicted :math:`D > \Delta\mathcal{H}`. Therefore, some amount of armour is needed to cut the damage, preferably as little as possible since the armour is a relatively scarce resource. We will assume :math:`\Delta\mathcal{H} \ge 0` and :math:`\mathcal{A}' = 0`, which implies the necessary condition
+Suppose we have calculated the exact :math:`\Delta\mathbf{v}` boost needed for a damage boost, and determined that a health loss of :math:`\Delta\mathcal{H}` is desired. However, the damage inflicted :math:`D > \Delta\mathcal{H}`. Therefore, some amount of armour is needed to cut the damage, preferably as little armour as possible since the armour is a scarce resource. We will assume :math:`\Delta\mathcal{H} \ge 0` and :math:`\mathcal{A}' = 0`, which implies the necessary condition
 
 .. math:: \mathcal{A}' = \max(0, \mathcal{A} - 2D/5) \le 0 \implies \mathcal{A} \le \frac{2}{5} D
 
@@ -274,4 +274,42 @@ We want to remark that this model makes the assumption that the speed is constan
 Upward diagonal boost
 ~~~~~~~~~~~~~~~~~~~~~
 
-It is fairly common in Half-Life to be faced with the situation where we need to reach a certain height.
+TODO TODO TODO
+
+Minimal health loss
+~~~~~~~~~~~~~~~~~~~
+
+.. note::
+   TODO TODO proper cross references
+
+Damage boosting is often used to reach a less accessible location that is hard to achieve by strafing alone. The downside of damage boosting is health loss. Health is typically a much more constrained resource than time, because the available health is often limited. It can be useful to calculate the *minimum health loss* needed to boost to a particular location.
+
+Before calculating the health loss, we must determine if it is possible to reach the final position by strafing alone. If pure strafing is sufficient, then we do not need any damage boosting at all. This assumes knowledge of the initial velocity :math:`\mathbf{v}_i` in full.
+
+.. TODO: TODO: link to motion under gravity!!!!!!!
+
+Assuming strafing is not sufficient to reach the final position. The damage boost results in a change in velocity :math:`\Delta\mathbf{v}`. The "initial velocity" given to the equations of motion is now the velocity after damage boosting. This requires the mappings
+
+.. math:: v_{i,x} \mapsto v_{i,x} + \Delta v_x \qquad v_{i,z} \mapsto v_{i,z} + \Delta v_z
+
+in all equations of motion, including the time constraint equation. Now recall that the health loss :math:`\Delta\mathcal{H}` is proportional to the magnitude :math:`\lVert\Delta\mathbf{v}\rVert`. This gives the optimisation problem of minimising :math:`f(\Delta v_x, \Delta v_z) = \Delta v_x^2 + \Delta v_z^2` subject to the time constraint equation :math:`t_x = t_z`.
+
+While this optimisation problem can be solved by Lagrange multipliers, the derivatives of the time constraint equations are fairly unwieldy, and they are unlikely to yield closed form solutions anyway. A direct numerical attack is likely the most practical solution method. We start by writing the equation
+
+.. math:: \Delta v_y = \frac{gt_x^2 + 2z_f}{2t_x} - v_{i,z}
+
+which is slightly modified from the original by the variable mapping mentioned above. We then eliminate :math:`\Delta v_y` from the objective function to obtain a univariate function in :math:`\Delta v_x`,
+
+.. math:: f(\Delta v_x) = \Delta v_x^2 + \left( \frac{gt_x^2 + 2z_f}{2t_x} - v_{i,z} \right)^2
+
+where :math:`t_x = t_x(\Delta v_x)`. By converting the objective function to a single-variable function, the process of minimising the function is made easier and more numerically tractable. There are many numerical algorithms available to solve this optimisation problem.
+
+From numerical experimentations, we frequently found that the solution obtained produces a path that has a decreasing curve at the end.
+
+Timing of horizontal boosts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The timing of horizontal boosts can have a outsized effect on the overall time taken to travel a given distance. Specifically, delaying a damage boost slightly after strafing started may result in respectable time saves. This may be surprising to some, as it does not match the experience in real life. In real life, accelerations are typically fairly constant, and under such circumstances it is indeed better to perform damage boosts at the very beginning without hesitance. However, the acceleration due to strafing, especially starting from low speeds with a combination of ground and air strafing, is highly non-linear and varies drastically over a short amount of time. The usual human intuition thus breaks down when strafing is introduced.
+
+For experienced speedrunners, however, this may not come as a surprise. In general, when starting off with a low speeds, it is better to build up some speed by strafing and then perform a boost. One way to understand this is to observe that the acceleration at low speeds is extremely high. The time it takes to gain 100 ups is much shorter at lower speeds than that when the player is already moving very fast. Suppose a boost provides a speed boost of 1000 ups. If a player receives such a boost at 300 ups, then the player speed should end up at 1300 ups. Now if the player decides to strafe a little before boosting instead, and then receives the boost at 500 ups, the final speed after the boost will be 1500 ups. Now the key is to understand that gaining speed from 300 ups to 500 ups takes much shorter time than gaining the same speed from 1300 ups to 1500 ups. Therefore, the *average* speed in the latter case would be higher.
+

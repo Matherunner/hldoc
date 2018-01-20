@@ -60,7 +60,7 @@ Contact
 
 This documentation is currently a one-man project. `Contact me`_.
 
-.. _Contact me: randolphchong@gmail.com
+.. _Contact me: me@jwchong.com
 
 Contents
 --------
@@ -75,6 +75,7 @@ Contents
    movement
    duckjump
    strafing
+   gravitymotion
    surfing
    damage
    explosions
@@ -84,4 +85,5 @@ Contents
    triggers
    funcs
    snippets
+   casestudies
    glossary
