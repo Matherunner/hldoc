@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+postprocess() {
+	file="$1"
+	tmpfile=$(mktemp) || exit 1
+	printf "Processing mathjax for $file...\n"
+	mjpage --output=CommonHTML < "$file" > "$tmpfile"
+	gsed -i '/<script.*MathJax\.js/d' "$tmpfile"
+	cp -f "$tmpfile" "$file"
+	rm -f "$tmpfile"
+}
+export -f postprocess
+
+/bin/ls _build/html/*.html | parallel --will-cite postprocess
+exec rsync -avP --delete _build/html/ $NFSNUSER@$NFSNHOST:/home/public/hl

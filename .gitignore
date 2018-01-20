@@ -2,5 +2,4 @@ _build/
 .DS_Store
 plots/
 latex/
-deploy
 *.swp
