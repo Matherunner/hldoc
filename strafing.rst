@@ -299,15 +299,47 @@ It is natural to ask exactly how this limit can be quantified for the benefit of
 90 degrees turns
 ~~~~~~~~~~~~~~~~
 
-Passageways in Half-Life commonly bend perpendicularly, so we frequently make 90 degrees turns by strafing. We can imagine how the width of a passage limits the maximum radius of curvature one can sustain without colliding with the walls. This implies that the speed is limited as well. When planning for speedruns, it can prove useful to be able to estimate this limit for a given turn without running a simulation or strafing by hand. In particular, we want to compute the maximum speed for a given passage width. We start by making some simplifying assumptions that will greatly reduce the difficulty of analysis while closely modelling actual situations in practice. Refer to the figure below.
+Passageways in Half-Life commonly bend perpendicularly, so we frequently make 90
+degrees turns by strafing. We intuitively understand how the width of a passage
+limits the maximum radius of curvature one can sustain without colliding with
+the walls. This implies that the speed is limited as well. When planning for
+speedruns, it can prove useful to be able to estimate this limit for a given
+turn without running a simulation or strafing by hand. In particular, we want to
+compute the maximum speed for a given passage width.
+
+.. figure:: static/90-degrees-bend-c2a2e.jpg
+   :name: 90 degrees c2a2e
+   :align: center
+
+   A common 90 degrees bend in the On A Rail chapter in Half-Life. Shown in this
+   figure is one such example in the map ``c2a2e``. In an optimised speedrun,
+   the player would be moving extremely fast in this section due to an earlier
+   boost.
 
 .. figure:: static/90-degrees-strafe-radius.png
-   :height: 800px
-   :width: 754px
+   :name: 90 degrees strafe radius
    :scale: 50%
    :align: center
 
-The first assumption we make is that the width of the corridor is the same before and after the turn. This width is denoted as :math:`d`, as one can see in the figure. This assumption is justified because this is often true or approximately true in Half-Life maps. The second assumption is that the path is circular. The centre of this circle, also named the *centre of curvature*, is at point :math:`C`. As noted earlier, the strafing path is in general a spiral with varying radius of curvature. Nevertheless, the total time required to make such a turn is typically very small. Within such short time frame, the radius would not have changed significantly. Therefore it is not absurd to assume that the radius of curvature is constant while making the turn. The third assumption is that the positions of the player before and after making the turn coincide with the walls. This assumption is arguably less realistic, but the resulting path is the larger circular arc one can fit in this space.
+   Simplifying model of a common scenario similar to the one shown in
+   :numref:`90 degrees c2a2e`.
+
+We start by making some simplifying assumptions that will greatly reduce the
+difficulty of analysis while closely modelling actual situations in practice.
+Referring to :numref:`90 degrees strafe radius`, the first assumption we make is
+that the width of the corridor is the same before and after the turn. This width
+is denoted as :math:`d`, as one can see in the figure. This assumption is
+justified because this is often true or approximately true in Half-Life maps.
+The second assumption is that the path is circular. The centre of this circle,
+also named the *centre of curvature*, is at point :math:`C`. As noted earlier,
+the strafing path is in general a spiral with varying radius of curvature.
+Nevertheless, the total time required to make such a turn is typically very
+small. Within such short time frame, the radius would not have changed
+significantly. Therefore it is not absurd to assume that the radius of curvature
+is constant while making the turn. The third assumption is that the positions of
+the player before and after making the turn coincide with the walls. This
+assumption is arguably less realistic, but the resulting path is the larger
+circular arc one can fit in this space.
 
 By trivial applications of the Pythagorean theorem, it can be shown that the relationship between the radius of curvature :math:`r` and the width of the corridor :math:`d` is given by
 

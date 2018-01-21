@@ -12,7 +12,6 @@ Hitgroup
 
 .. figure:: static/hitboxes-2.jpg
    :name: hitboxes
-   :scale: 50%
    :align: center
 
    The hitboxes of a vortigaunt and alien grunts.

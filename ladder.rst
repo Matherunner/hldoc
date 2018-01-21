@@ -10,6 +10,13 @@ could pull it off. A sloped ladder is much rarer, and the viewangles to optimise
 the climbing speed is less obvious. In this chapter, we derive these viewangles
 for the general case of a sloped ladder.
 
+.. figure:: static/ladder-sloped.jpg
+   :align: center
+
+   A sloped ladder section in the Blast Pit map of ``c1a4e``, connected to a
+   perfectly vertical section above. What would the optimal climbing viewangles
+   be for this ladder?
+
 Preliminaries
 ~~~~~~~~~~~~~
 

@@ -121,19 +121,27 @@ Speed preserving circular walls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In Half-Life we can sometimes find concave walls made out of multiple planes to
-approximate an arc.  Examples can be found in the ``c2a1`` map.  Circular walls
-can be a blessing for speedrunners because they allow making sharp turns
-without losing too much speed.  In fact, if the number of planes increases, the
-approximation will improve, and so the speed loss will decrease.  Let :math:`n`
-be the number of walls and let :math:`\beta` be the angle subtended by the arc
-joining the midpoints of every wall.  For example, with :math:`\beta = \pi/2`
-the first and the last walls will be perpendicular, and with :math:`\beta =
-\pi` the they will be opposite and parallel instead.  Let :math:`\mathbf{v}_i`
-be the velocity immediately after colliding with the :math:`i`-th wall, and
-assuming :math:`\mathbf{v}_0` is parallel to and coincident with the first
-wall.  Assume also that :math:`0 \le \beta / (n-1) \le \pi/2`, which means that
-the angle between adjacent planes cannot be acute.  If the velocity does not
-change due to other external factors throughout the collisions, then
+approximate an arc.  Examples can be found in some Office Complex maps.
+Circular walls can be a blessing for speedrunners because they allow making
+sharp turns without losing too much speed.  In fact, if the number of planes
+increases, the approximation will improve, and so the speed loss will decrease.
+
+.. figure:: static/speed-preserving-c1a2.jpg
+   :align: center
+
+   An example of a "speed preserving" wall in the Office Complex map of
+   ``c1a2``, which is made up of multiple planes to approximate an arc.
+
+Let :math:`n` be the number of walls and let :math:`\beta` be the angle
+subtended by the arc joining the midpoints of every wall.  For example, with
+:math:`\beta = \pi/2` the first and the last walls will be perpendicular, and
+with :math:`\beta = \pi` the they will be opposite and parallel instead.  Let
+:math:`\mathbf{v}_i` be the velocity immediately after colliding with the
+:math:`i`-th wall, and assuming :math:`\mathbf{v}_0` is parallel to and
+coincident with the first wall.  Assume also that :math:`0 \le \beta / (n-1) \le
+\pi/2`, which means that the angle between adjacent planes cannot be acute.  If
+the velocity does not change due to other external factors throughout the
+collisions, then
 
 .. math:: \lVert\mathbf{v}_{i+1}\rVert = \lVert\mathbf{v}_i\rVert \cos \left(
           \frac{\beta}{n - 1} \right)
