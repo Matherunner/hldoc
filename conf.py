@@ -209,15 +209,13 @@ if on_readthedocs:
 .. raw:: html
 
     <script type="text/javascript">
-    window.onload = function () {
-        var url = window.location.href;
-        var substr = '/en/latest/';
-        var idx = url.search(substr);
-        var path = idx === -1 ?
-            url.substring(url.lastIndexOf('/') + 1) :
-            url.substring(idx + substr.length);
-        window.location.replace('https://www.jwchong.com/hl/' + path);
-    };
+    var url = window.location.href;
+    var substr = '/en/latest/';
+    var idx = url.search(substr);
+    var path = idx === -1 ?
+        url.substring(url.lastIndexOf('/') + 1) :
+        url.substring(idx + substr.length);
+    window.location.replace('https://www.jwchong.com/hl/' + path);
     </script>
 '''
 
