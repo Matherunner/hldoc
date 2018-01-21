@@ -17,6 +17,8 @@ import sys
 import os
 import datetime
 
+on_readthedocs = os.environ.get('READTHEDOCS', None) == 'True'
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -201,6 +203,23 @@ numfig = True
 numfig_format = {
     'figure': 'Fig. %s.',
 }
+
+if on_readthedocs:
+    rst_prolog = '''
+.. raw:: html
+
+    <script type="text/javascript">
+    window.onload = function () {
+        var url = window.location.href;
+        var substr = '/en/latest/';
+        var idx = url.search(substr);
+        var path = idx === -1 ?
+            url.substring(url.lastIndexOf('/') + 1) :
+            url.substring(idx + substr.length);
+        window.location.replace('https://www.jwchong.com/hl/' + path);
+    };
+    </script>
+'''
 
 
 # -- Options for LaTeX output ---------------------------------------------
