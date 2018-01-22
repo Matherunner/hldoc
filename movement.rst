@@ -42,9 +42,7 @@ which is the correct expression for position. Finally, the velocity is computed 
 
 The velocity at the end of the frame is related to the velocity at the beginning of the frame by :math:`v_z' = v_z - g\tau`, which is also the correct expression according to classical mechanics.
 
-It can be shown that the player locus is indeed independent of the frame rate, that is they fit the parabolic curve generated from classical mechanics perfectly. Consequently, the jump height is also independent of frame rate. Vertically launching from a ladder, however, does result in frame rate-dependent heights (see :ref:`ladder physics`).
-
-.. note:: TODO: update ladder chapter
+It can be shown that the player locus is indeed independent of the frame rate, that is they fit the parabolic curve generated from classical mechanics perfectly. Consequently, the jump height is also independent of frame rate. Vertically launching from a ladder, however, does result in frame rate-dependent heights (see :ref:`ladder exit`).
 
 .. _basevelocity:
 

@@ -17,6 +17,8 @@ for the general case of a sloped ladder.
    perfectly vertical section above. What would the optimal climbing viewangles
    be for this ladder?
 
+.. _ladder preliminaries:
+
 Preliminaries
 ~~~~~~~~~~~~~
 
@@ -345,4 +347,68 @@ Ladder exit
 ~~~~~~~~~~~
 
 We call "exiting a ladder" to mean moving out of a ladder so that the player is
-no longer on the ladder (as determined by ``PM_Ladder``) without jumping.
+no longer on the ladder (as determined by ``PM_Ladder``). This is different from
+ladder jumping, where the player jumps off a ladder, which has been described in
+:ref:`ladder preliminaries`. In some speedrunning context, ladder exit may be
+referred to as ladder jumping, though for the purpose of this documentation we
+do not adopt this meaning.
+
+.. figure:: static/ladder-exit-c1a0e.jpg
+   :name: ladder exit c1a0e
+   :align: center
+
+   A common and old trick in the ``c1a0e`` test chamber map, where the player
+   jumps onto the lamp above by exiting the ladder at full speed at a lower
+   frame rate.
+
+:numref:`ladder exit c1a0e` illustrates a common use of ladder exit strategy in
+speedrunning. In the test chamber map, it is desirable to avoid getting
+teleported to Xen, and one way to avoid this is to jump onto the lamp above to
+avoid a big ``trigger_transition`` below. Interestingly, the lamp is unreachable
+at higher frame rates, but easily accessible at lower frame rates. This runs
+counter to the intuition of jumping in Half-Life where the normal jumping height
+is frame rate independent as explained in :ref:`player gravity`.
+
+To understand this trick, first recall that the ``movetype`` is assigned to be
+``MOVETYPE_FLY`` while on the ladder, which prevents the gravity to act on the
+player. Suppose in a frame, the player starts off on the ladder with vertical
+position :math:`z_0` and is moving away to exit the ladder at some vertical
+climbing speed :math:`v_0`. The player position will be updated as per usual by
+``PM_FlyMove``.
+
+.. math:: v_1 = v_0 \qquad z_1 = z_0 + v_1 \tau = z_0 + v_0 \tau
+
+Suppose the new position :math:`z_1` is no longer on the ladder and is in the
+air. Despite this, the new vertical velocity is the same as before and no
+gravity will be applied until the next frame!
+
+Now consider the next frame. Since the ``movetype`` is no longer
+``MOVETYPE_FLY``, gravity will act on the player like normal. The game thus
+computes
+
+.. math:: v_2 = v_1 - g\tau = v_0 - g\tau \qquad
+   z_2 = z_1 + v_1 \tau - \frac{1}{2} g\tau^2
+   = z_0 + 2 v_0 \tau - \frac{1}{2} g\tau^2
+
+And at frame :math:`n`, it can be shown that
+
+.. math:: v_n = v_0 - g(n - 1)\tau \qquad
+   z_n = z_0 + v_0 (n + 1) \tau - \frac{1}{2} g(n\tau)^2
+
+Or writing in terms of time :math:`t`,
+
+.. math:: v_t = v_0 - gt + g\tau \qquad
+   z_t = z_0 + v_0 t - \frac{1}{2} gt^2 + v_0\tau
+
+Observe that at any time :math:`t`, the vertical velocity is always higher than
+expected by normal jumping physics by a constant :math:`g\tau`. In addition, the
+vertical position higher than expected by :math:`v_0\tau`. This is why the
+ladder exit strategy in the test chamber works. By lowering the frame rate, the
+jump height can be increased. For example, at 1000 fps and :math:`v_0 = 400`,
+the extra height is only :math:`400 \cdot 0.001 = 0.4`. At 20 fps, however, the
+extra height is :math:`400 \cdot 0.05 = 20`. The extra 20 units can make a
+noticeable difference.
+
+In general, if it is desired to attain as much height as possible by exiting a
+ladder, possibly with damage boosting immediately afterwards, it is always more
+optimal to exit the ladder at a lower frame rate.
