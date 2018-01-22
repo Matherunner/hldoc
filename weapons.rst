@@ -73,7 +73,7 @@ One of the simplest tricks for the gauss weapon is simple gauss boosting. Namely
 
 A common task in speedrunning is to get from one point to another in the shortest time possible using simple gauss boosting. From :eq:`gauss velocity` we know that, assuming zero pitch, the horizontal speed boost is proportional to the charging time. On the other hand, the minimum charging time is 0.5 seconds. What is the optimal way to perform gauss boosts? Or, what is the boosting scheme for maximising the average speed (total distance travelled in a given time)? Should one repeatedly charge the gauss for 1s and firing, or repeatedly charge the gauss for 0.5s and firing? There is a simple way to answer this.
 
-.. figure:: static/simple_gauss_boosts.gif
+.. figure:: images/simple_gauss_boosts.gif
    :scale: 90%
    :name: simple gauss boosts
    :align: center
@@ -122,7 +122,7 @@ Multigauss
 
 Multigauss refers to the gauss beam hitting a non-gauss-reflectable entity, reflecting on some adjacent gauss-reflectable entity, and then hitting the same entity again with the reflected beam. In addition, a small radius damage is inflicted onto the entity as the beam reflects. Multigauss is useful for getting double the normal damage out of gauss beams for free.
 
-.. figure:: static/multigauss-1.png
+.. figure:: images/multigauss-1.png
    :scale: 50%
    :name: multigauss figure
    :align: center
@@ -152,7 +152,7 @@ Entity punch
 
 As explained in :ref:`gauss mechanism`, a secondary gauss beam can punch through a GR entity if it does not meet the criterion for reflection. The damage produced by an entity punch is dependent on :math:`\ell`. This quantity is typically the thickness of the wall, but this is not always the case. In particular, the position :math:`\mathbf{e}_{i,2}` is found by tracing a line from the *inside* an entity. It is not always obvious what the line can "see" and end up under these circumstances. Sometimes, the trace line can ignore (unrelated to ``pentIgnore``) and not able to detect certain entities, and therefore the line tracing may end at a further point, skipping these undetected entities along the way. And sometimes, if the thickness of an entity is too high, the game may wrongly determine that the trace is all solid.
 
-.. figure:: static/entitypunch-1.png
+.. figure:: images/entitypunch-1.png
    :scale: 50%
    :align: center
 
@@ -221,7 +221,7 @@ Gauss rapid fire is useful in situations where gibbing damageable entities as qu
 Reflection bypass
 ~~~~~~~~~~~~~~~~~
 
-.. figure:: static/reflectionbypass-1.png
+.. figure:: images/reflectionbypass-1.png
    :scale: 50%
    :align: center
 
@@ -269,7 +269,7 @@ And if :math:`\mathbf{v}_g` is its initial velocity and
 To visualise this equation, we plotted a graph of the handgrenade's horizontal
 speed and vertical velocity relative to the player against the player pitch.
 
-.. image:: static/handgrenade-vel.png
+.. image:: images/handgrenade-vel.png
 
 TODO
 

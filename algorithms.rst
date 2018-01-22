@@ -234,7 +234,7 @@ higher strafing accuracy.
 
 Have a look at the illustration below.
 
-.. image:: static/veccom-1.png
+.. image:: images/veccom-1.png
 
 The :math:`\mathbf{a}` in the figure is the *intended* :math:`\mathbf{a}`.  The
 actual :math:`\mathbf{a}` being computed by the game will likely be an

@@ -10,7 +10,7 @@ could pull it off. A sloped ladder is much rarer, and the viewangles to optimise
 the climbing speed is less obvious. In this chapter, we derive these viewangles
 for the general case of a sloped ladder.
 
-.. figure:: static/ladder-sloped.jpg
+.. figure:: images/ladder-sloped.jpg
    :align: center
 
    A sloped ladder section in the Blast Pit map of ``c1a4e``, connected to a
@@ -353,7 +353,7 @@ ladder jumping, where the player jumps off a ladder, which has been described in
 referred to as ladder jumping, though for the purpose of this documentation we
 do not adopt this meaning.
 
-.. figure:: static/ladder-exit-c1a0e.jpg
+.. figure:: images/ladder-exit-c1a0e.jpg
    :name: ladder exit c1a0e
    :align: center
 

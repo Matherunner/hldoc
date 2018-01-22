@@ -16,7 +16,7 @@ with a fiery visual effect. We may describe an explosion in terms of three
 fundamental properties. Namely, as illustrated in :numref:`explosion terms`, an
 explosion has an *origin*, a *source damage*, and a *radius*.
 
-.. figure:: static/explosion-terms.png
+.. figure:: images/explosion-terms.png
    :name: explosion terms
    :align: center
    :scale: 50%
@@ -156,7 +156,7 @@ Nuking
 
 Nuking refers to the trick of placing explosives in locations confined in a particular way so as to disable damage attenuation computed by :eq:`damage attenuation`. The result is that the original damage :math:`D` will inflict onto all entities found within the sphere of radius :math:`R`, as though the entities coincide with the explosion origin (effectively :math:`\ell = 0`). The usefulness of this trick is obvious. It is important to keep in mind that the explosion radius does not change when nuking. Entities outside the sphere will remain untouched by the explosion.
 
-.. figure:: static/explosion-nuking.png
+.. figure:: images/explosion-nuking.png
    :align: center
    :scale: 50%
 

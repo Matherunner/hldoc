@@ -91,7 +91,7 @@ To see why, suppose :math:`\zeta` exists and :math:`0 < \zeta < \pi/2`. This imp
 
 Now suppose :math:`\zeta \ge \pi/2`, the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` curve intersects the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` curve at the point where the latter is decreasing. :math:`0 \le \theta \le \zeta` is the domain of the latter curve which contains the maximum point at :math:`\pi/2`. Have a look at :numref:`maxaccel theta graphs` which illustrates these two cases.
 
-.. figure:: static/optang-1.png
+.. figure:: images/optang-1.png
    :name: maxaccel theta graphs
    :align: center
 
@@ -307,7 +307,7 @@ speedruns, it can prove useful to be able to estimate this limit for a given
 turn without running a simulation or strafing by hand. In particular, we want to
 compute the maximum speed for a given passage width.
 
-.. figure:: static/90-degrees-bend-c2a2e.jpg
+.. figure:: images/90-degrees-bend-c2a2e.jpg
    :name: 90 degrees c2a2e
    :align: center
 
@@ -316,7 +316,7 @@ compute the maximum speed for a given passage width.
    the player would be moving extremely fast in this section due to an earlier
    boost.
 
-.. figure:: static/90-degrees-strafe-radius.png
+.. figure:: images/90-degrees-strafe-radius.png
    :name: 90 degrees strafe radius
    :scale: 50%
    :align: center
@@ -352,7 +352,7 @@ Radius-speed relationship
 
 The following figure depicts the positions of the player at times :math:`t = 0`, :math:`t = \tau` and :math:`t = 2\tau`. The initial speed is :math:`\lVert\mathbf{v}\rVert`. All other symbols have their usual meaning.
 
-.. image:: static/radius-estimate-xy.png
+.. image:: images/radius-estimate-xy.png
    :height: 775px
    :width: 1135px
    :scale: 50%

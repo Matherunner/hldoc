@@ -10,7 +10,7 @@ Understanding the health and damage system of the game can be important for prec
 Hitgroup
 --------
 
-.. figure:: static/hitboxes-2.jpg
+.. figure:: images/hitboxes-2.jpg
    :name: hitboxes
    :align: center
 
@@ -52,7 +52,7 @@ If the damage type is ``DMG_FALL`` or ``DMG_DROWN``, then the armour value will 
 
 Observe that even though the player health is stored as a 32-bit floating point number, in practice it will almost always have an integer value. This is because any change in health :math:`\Delta\mathcal{H}` due to damage is always an integer. This property is unique to the player entity. However, the armour value will often have a nonzero fractional part.
 
-.. figure:: static/player_hp.png
+.. figure:: images/player_hp.png
    :name: player_hp
    :scale: 40%
    :align: center

@@ -4,7 +4,7 @@ Half-Life Physics Reference
 .. caution::
    This documentation is work in progress!
 
-.. image:: static/gordon-scientist.jpg
+.. image:: images/gordon-scientist.jpg
 
 This is an unofficial documentation for the physics governing the Half-Life_ universe. There have been many very comprehensive wikis for games in the Half-Life series, such as the `Half-Life Wikia`_ and the `Combine OverWiki`_. These wikis focus on the storyline and casual gaming aspects of the Half-Life series video games. There is also a wiki for the practical speedrunning aspects of these games, namely the `SourceRuns Wiki`_. Even years after Half-Life's release, one can still find casual gaming or speedrunning communities centred around the game.
 

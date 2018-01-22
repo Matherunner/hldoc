@@ -126,7 +126,7 @@ Circular walls can be a blessing for speedrunners because they allow making
 sharp turns without losing too much speed.  In fact, if the number of planes
 increases, the approximation will improve, and so the speed loss will decrease.
 
-.. figure:: static/speed-preserving-c1a2.jpg
+.. figure:: images/speed-preserving-c1a2.jpg
    :align: center
 
    An example of a "speed preserving" wall in the Office Complex map of

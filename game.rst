@@ -38,7 +38,7 @@ The code for the non-shared RNG is not publicly available. Nevertheless, the Xas
 Frame rates
 -----------
 
-.. figure:: static/frame_rate_unsync.png
+.. figure:: images/frame_rate_unsync.png
    :name: frame rate unsync
    :align: center
 

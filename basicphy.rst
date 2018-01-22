@@ -315,7 +315,7 @@ any ground.  The downside of jumpbug is that a jump must be made, which may be
 undesirable under certain circumstances.  For example, when the player jumps
 the bunnyhop cap will be triggered.
 
-.. image:: static/jumpbug.png
+.. image:: images/jumpbug.png
 
 To begin a jumpbug sequence, suppose that the player is initially not onground
 (as determined by the first onground check) and that the duckstate is 2, as
