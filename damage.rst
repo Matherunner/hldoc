@@ -59,16 +59,14 @@ Observe that even though the player health is stored as a 32-bit floating point 
 
 In :numref:`player_hp` we observe that when the armour is nonzero, the health decreases with a smaller slope with increasing damage. But once the damage is sufficiently large that the armour gets to zero, the subsequent slope of the health line is much larger. The zigzag pattern of the health line is due to the integer truncation of damage.
 
+.. _damage system:
+
 Damage system
 -------------
 
-.. caution:: Rewording needed
+Damage to an entity is typically not inflicted immediately. Consider firing the shotgun at some entity. If the damage of each bullet is applied immediately and separately, the performance will suffer. Instead, the game accumulates a series of damages, and then apply them all at once in one single combined damage to the entity. This is done via the *multidamage* mechanism.
 
-Often, damages in Half-Life are not inflicted immediately.  Instead, a series
-of damages may be accumulated by the *multidamage* mechanism.  There are three
-important functions associated with this mechanism: ``ClearMultiDamage``,
-``AddMultiDamage`` and ``ApplyMultiDamage``.  Each of these functions works on
-a global variable called ``gMultiDamage`` which has the following type
+There are three important operations associated with the multidamage mechanism. We may refer to them as *clear*, *add*, and *apply*. These operations correspond to the functions ``ClearMultiDamage``, ``AddMultiDamage``, and ``ApplyMultiDamage`` respectively, all of which are defined in ``weapons.cpp``. The multidamage mechanism operates on a single global state, stored as ``gMultiDamage`` in the code. This global variable has the type
 
 .. code-block:: cpp
 
@@ -79,51 +77,56 @@ a global variable called ``gMultiDamage`` which has the following type
      int type;
    } MULTIDAMAGE;
 
-The ``pEntity`` field is the entity on which damages are inflicted while the
-``amount`` field is the accumulated damage.  The ``type`` field is not
-important.
+The ``pEntity`` field stores a pointer to the entity on which damages are inflicted. The ``amount`` field stores the accumulated damage. The ``type`` field is not important for our purposes.
 
-``ClearMultiDamage`` is the simplest function out of the three.  It simply
-assigns ``NULL`` to ``gMultiDamage->pEntity`` and zeros out
-``gMultiDamage->amount`` and ``gMultiDamage->type``.  This function accepts no
-parameter.
+.. code-block:: cpp
 
-``ApplyMultiDamage`` is straightforward.  When called, it will invoke
-``gMultiDamage->pEntity->TakeDamage`` with the damage specified by
-``gMultiDamage->amount``.  As the name suggests, ``TakeDamage`` simply
-subtracts the entity's health by the given damage.  When the entity is a
-breakable crate and its health is reduced to below zero, it will turn into a
-``SOLID_NOT``, which renders itself invisible to any tracing functions.  Then,
-the crate will fire any associated targets, schedule its removal from memory
-after 0.1s, then spawn its associated item.  At this point you may be confused:
-if the crate becomes ``SOLID_NOT``, then how can any further damages be dealt
-to it if the crate cannot be found by tracing functions?  Continue reading.
+   void ClearMultiDamage(void)
+   {
+     gMultiDamage.pEntity = NULL;
+     gMultiDamage.amount = 0;
+     gMultiDamage.type = 0;
+   }
 
-``AddMultiDamage`` is slightly trickier.  One of the parameters accepted by
-this function is the target entity on which damages are to be inflicted.  When
-this function is invoked, it checks whether the current
-``gMultiDamage->pEntity`` differs from the supplied entity.  If so, it will
-call ``ApplyMultiDamage`` to deal the currently accumulated damages on the
-current ``gMultiDamage->pEntity``.  After that, it assigns the supplied entity
-to ``gMultiDamage->pEntity`` and the supplied damage to
-``gMultiDamage->amount``.  On the other hand, if the supplied entity is the
-same as the current ``gMultiDamage->pEntity``, then the supplied damage will
-simply be added to ``gMultiDamage->amount``.
+The *clear* operation corresponding to ``ClearMultiDamage`` is the simplest operation out of the three. It simply nullifies the ``pEntity`` pointer and zeros out the ``amount`` and ``type`` fields. This function accepts no inputs.
 
-When an explosive crate detonates, damage is dealt to the surrounding entities.
-The function responsible of inflicting this blast damage is ``RadiusDamage``.
-This function looks for entities within a given radius.  For each entity, it
-usually does a ``ClearMultiDamage``, followed by ``TraceAttack`` (which simply
-calls ``AddMultiDamage`` on the target entity) and then ``ApplyMultiDamage``.
+.. code-block:: cpp
 
-Finally, we come to the final building block toward understanding the trick:
-``FireBulletsPlayer``.  This function is called whenever a shotgun is fired.
-At the very beginning of this function, ``ClearMultiDamage`` is called,
-followed by a loop in which each pellet is randomly assigned a direction to
-simulate spread, then a tracing function is called for each pellet to determine
-what entity has been hit.  Then, this entity's ``TraceAttack`` is called.
-After the loop ends, the function concludes with a call to
-``ApplyMultiDamage``.
+   void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker )
+   {
+     Vector          vecSpot1;//where blood comes from
+     Vector          vecDir;//direction blood should go
+     TraceResult     tr;
+
+     if ( !gMultiDamage.pEntity )
+       return;
+
+     gMultiDamage.pEntity->TakeDamage(pevInflictor, pevAttacker, gMultiDamage.amount, gMultiDamage.type );
+   }
+
+The *apply* operation corresponding to ``ApplyMultiDamage`` is also straightforward. It invokes the ``TakeDamage`` method associated with ``pEntity``, and a damage amount of ``amount`` will be input to ``TakeDamage``. If ``pEntity`` is ``NULL``, then nothing will be done.
+
+.. code-block:: cpp
+
+   void AddMultiDamage( entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType)
+   {
+     if ( !pEntity )
+       return;
+
+     gMultiDamage.type |= bitsDamageType;
+
+     if ( pEntity != gMultiDamage.pEntity )
+     {
+       ApplyMultiDamage(pevInflictor,pevInflictor); // UNDONE: wrong attacker!
+       gMultiDamage.pEntity = pEntity;
+       gMultiDamage.amount = 0;
+     }
+
+     gMultiDamage.amount += flDamage;
+   }
+
+
+The *add* operation is slightly trickier. The corresponding ``AddMultiDamage`` accepts the target entity as an input. It first checks if the target entity is the same as ``pEntity`` in the global state. If the target entity is different from that in the global state, then the *apply* operation will be done, followed by zeroing out the damage amount and storing the target entity to ``pEntity``. Regardless of whether the target entity is the same, this function adds the input damage to the ``amount`` field.
 
 Damage types
 ------------

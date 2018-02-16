@@ -268,18 +268,8 @@ intersects several times, depending even on the initial speed itself. A more
 practical solution in practice is to simply use Equation :eq:`nextspeed` to
 compute the new airstrafe and groundstrafe speeds then comparing them.
 
-Bunnyhop cap
-------------
-
-We must introduce :math:`M_m`, which is the value of ``sv_maxspeed``.  It is
-not always the case that :math:`M_m = M`, since :math:`M` can be affected by
-duckstate and the values of :math:`F`, :math:`S` and :math:`U`.
-
-All Steam versions of Half-Life have an infamous "cap" on bunnyhop speed which
-is triggered only when jumping with player speed greater than :math:`1.7M_m`.
-Note that the aforementioned speed is not horizontal speed, but rather, the
-magnitude of the entire :math:`\mathbb{R}^3` vector.  When this mechanism is
-triggered, the new velocity will become :math:`1.105 M_m \mathbf{\hat{v}}`.
+Effects of bunnyhop cap
+-----------------------
 
 It is impossible to avoid this mechanism when jumping.  In speedruns a
 workaround would be to ducktap instead, but each ducktap requires the player to
