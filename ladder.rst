@@ -105,6 +105,13 @@ Let :math:`\mathbf{\hat{n}} = \langle n_x, n_y, n_z\rangle` with the constraint
           {\lVert\langle 0,0,1\rangle \times \mathbf{\hat{n}}\rVert} =
           \langle N_x, N_y, N_z\rangle
 
+where
+
+.. math::
+   N_x = n_x \left( 1 - \frac{n_z}{\sqrt{n_x^2 + n_y^2}} \right) \quad
+   N_y = n_y \left( 1 - \frac{n_z}{\sqrt{n_x^2 + n_y^2}} \right) \quad
+   N_z = n_z + \sqrt{n_x^2 + n_y^2}
+
 We are concerned with the vertical velocity, :math:`v'_z`. Written in full and
 simplifying,
 

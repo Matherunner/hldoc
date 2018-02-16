@@ -152,7 +152,6 @@ rest of this document without much pain.
    :ref:`ducking-phy` which must be read before moving on.
 
 #. The game will now call ``PM_LadderMove`` if the player is on some ladder.
-   The ladder physics is described in :ref:`ladder-phy`.
 
 #. If ``+use`` and the player is onground, then :math:`\mathbf{v}` will be
    scaled down by 0.3.  This is the basis of USE braking.
