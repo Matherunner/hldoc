@@ -7,7 +7,6 @@ func_pushable
 -------------
 
 .. figure:: images/movable-box.jpg
-   :align: center
 
    A movable box (func_pushable).
 

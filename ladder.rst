@@ -11,7 +11,6 @@ the climbing speed is less obvious. In this chapter, we derive these viewangles
 for the general case of a sloped ladder.
 
 .. figure:: images/ladder-sloped.jpg
-   :align: center
 
    A sloped ladder section in the Blast Pit map of ``c1a4e``, connected to a
    perfectly vertical section above. What would the optimal climbing viewangles
@@ -355,7 +354,6 @@ do not adopt this meaning.
 
 .. figure:: images/ladder-exit-c1a0e.jpg
    :name: ladder exit c1a0e
-   :align: center
 
    A common and old trick in the ``c1a0e`` test chamber map, where the player
    jumps onto the lamp above by exiting the ladder at full speed at a lower

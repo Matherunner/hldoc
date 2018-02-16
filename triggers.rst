@@ -9,7 +9,6 @@ removes the associated BSP model. If the associated model is present, then they
 can be made visible in a speedrunning mod to make planning and routing easier.
 
 .. figure:: images/triggers-c3a2c.jpg
-   :align: center
 
    trigger_once and trigger_hurt in c3a2c displayed using a custom mod.
 

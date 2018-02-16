@@ -76,7 +76,6 @@ A common task in speedrunning is to get from one point to another in the shortes
 .. figure:: images/simple_gauss_boosts.gif
    :scale: 90%
    :name: simple gauss boosts
-   :align: center
 
    Animation of horizontal speed against time with boosting schemes of different charging time :math:`T`, so that the final speed always ends up to be 2000 ups.
 
@@ -125,7 +124,6 @@ Multigauss refers to the gauss beam hitting a non-gauss-reflectable entity, refl
 .. figure:: images/multigauss-1.png
    :scale: 50%
    :name: multigauss figure
-   :align: center
 
    Multigauss in action, depicted by a single gauss beam in three iterations (red, green, and blue) hitting a non-gauss-reflectable entity (i.e. damageable) twice. A radius damage is also produced at the point of reflection, though it is not depicted here.
 
@@ -154,7 +152,6 @@ As explained in :ref:`gauss mechanism`, a secondary gauss beam can punch through
 
 .. figure:: images/entitypunch-1.png
    :scale: 50%
-   :align: center
 
    A secondary gauss beam can punch through a GR entity and create an explosion 8 units away from the exit point, with a damage magnitude proportional to :math:`\ell`.
 
@@ -223,7 +220,6 @@ Reflection bypass
 
 .. figure:: images/reflectionbypass-1.png
    :scale: 50%
-   :align: center
 
    A gauss beam reflecting and bypassing a thin entity. The entity that lies within the purple dashed line remains undetected and untouched by the gauss beam.
 

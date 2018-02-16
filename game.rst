@@ -40,7 +40,6 @@ Frame rates
 
 .. figure:: images/frame_rate_unsync.png
    :name: frame rate unsync
-   :align: center
 
    Frame rate dependent slow-down of player movement in older Half-Life engines.
 

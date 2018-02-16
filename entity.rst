@@ -129,7 +129,6 @@ will improve, and so the speed will be better preserved.
 
 .. figure:: images/speed-preserving-c1a2.jpg
    :name: arc wall c1a2
-   :align: center
 
    An example of a "speed preserving" wall in the Office Complex map of
    ``c1a2``, which is made up of multiple planes to approximate an arc.

@@ -12,7 +12,6 @@ Hitgroup
 
 .. figure:: images/hitboxes-2.jpg
    :name: hitboxes
-   :align: center
 
    The hitboxes of a vortigaunt and alien grunts.
 
@@ -55,7 +54,6 @@ Observe that even though the player health is stored as a 32-bit floating point 
 .. figure:: images/player_hp.png
    :name: player_hp
    :scale: 40%
-   :align: center
 
    A typical player health and armour against damage plot. This plot assumes an initial health and armour of 100 and 40 respectively, showing the new health and armour after a given damage.
 

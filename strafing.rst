@@ -24,7 +24,6 @@ This may be interpreted geometrically as putting the acceleration arrow after th
 .. figure:: images/strafing-intuition-1.png
    :name: strafing intuition 1
    :scale: 50%
-   :align: center
 
    Depiction of how strafing increases speed (i.e. the length of the velocity
    vector). On the left, the directions of the vectors have significance. On the
@@ -127,7 +126,6 @@ Now suppose :math:`\zeta \ge \pi/2`, the :math:`\lVert\mathbf{v}'\rVert_{\mu=\ga
 
 .. figure:: images/optang-1.png
    :name: maxaccel theta graphs
-   :align: center
 
    Graphs of new speed against :math:`\theta` when :math:`\zeta < \pi/2` and when :math:`\zeta > \pi/2`. The green curve represents the new speed if :math:`\mu = \gamma_1` throughout regardless of :math:`\theta`, while the blue curve represents the new speed :math:`\mu = \gamma_2` throughout. The red curve is the actual curve of the new speed by taking :math:`\mu = \min(\gamma_1, \gamma_2)` as per the FME. From these graphs, it becomes clear where the maximum points are in each case.
 
@@ -343,7 +341,6 @@ compute the maximum speed for a given passage width.
 
 .. figure:: images/90-degrees-bend-c2a2e.jpg
    :name: 90 degrees c2a2e
-   :align: center
 
    A common 90 degrees bend in the On A Rail chapter in Half-Life. Shown in this
    figure is one such example in the map ``c2a2e``. In an optimised speedrun,
@@ -353,7 +350,6 @@ compute the maximum speed for a given passage width.
 .. figure:: images/90-degrees-strafe-radius.png
    :name: 90 degrees strafe radius
    :scale: 50%
-   :align: center
 
    Simplifying model of a common scenario similar to the one shown in
    :numref:`90 degrees c2a2e`.
@@ -390,7 +386,6 @@ The following figure depicts the positions of the player at times :math:`t = 0`,
    :height: 775px
    :width: 1135px
    :scale: 50%
-   :align: center
 
 Based on the figure, the radius of curvature may be approximated as the :math:`y`-intercept, or :math:`c`. Obviously, a more accurate approximation may be achieved by averaging :math:`c` and :math:`\mathit{BC}`. However, this results in a clumsy formula with little benefit. Empirically, the approximation by calculating :math:`c` is sufficiently accurate in practice. In consideration of this, it can be calculated that
 
