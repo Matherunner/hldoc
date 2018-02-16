@@ -7,6 +7,14 @@ Strafing
 
 Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. This applies to TASes as well: we want to optimise strafing as much as possible so that we can pretty much forget about it when TASing, allowing us to concentrate on the "general picture" and specific tricks.
 
+While this is not the first mathematical treatment of this topic, this documentation strives to be more precise and less ad hoc. Other attempts at mathematical treatments like `this by injx`_, `this by flafla2`_, `this by Kared13`_, `this by ZdrytchX`_, and `this by jrsala`_, have flaws that make them less suited for further analyses (e.g. surfing analysis, speed-preserving strafing, curvature analysis, minimal-time paths) or indeed for implementation.
+
+.. _`this by injx`: http://www.funender.com/quake/articles/
+.. _`this by flafla2`: http://flafla2.github.io/2015/02/14/bunnyhop.html
+.. _`this by Kared13`: https://steamcommunity.com/sharedfiles/filedetails/?id=184184420
+.. _`this by ZdrytchX`: https://sites.google.com/site/zdrytchx/how-to/strafe-jumping-physics-the-real-mathematics
+.. _`this by jrsala`: https://gamedev.stackexchange.com/a/45656
+
 .. caution:: Before venturing further in this chapter, be sure to familiarise
              yourself with the fundamentals of player movement described in
              :ref:`player movement`. Without the prerequisite knowledge, this
@@ -32,6 +40,8 @@ This may be interpreted geometrically as putting the acceleration arrow after th
    magnitude).
 
 In Half-Life physics, the magnitude or length of the acceleration vector :math:`\mathbf{a}` may be depend on the current speed and the angle between the velocity and itself, which in turn is controlled by the viewangles, as explained in :ref:`player air ground`. The task of finding the right angles is the topic of this chapter.
+
+.. _strafe building blocks:
 
 Building blocks
 ---------------
@@ -87,28 +97,32 @@ When written in the form of :eq:`newvelmat`, positive :math:`\theta` gives *cloc
 Maximum acceleration
 --------------------
 
-One of the primary goals of strafing is to accelerate the player horizontal speed as much as possible. It is of no surprise that one of the earliest inquiries into the Half-Life physics is the question of maximum acceleration strafing, when research began circa 2012 by the author of this documentation.
+Airstrafing to continuously gain speed is one of the oldest speedrunning tricks. It is of no surprise that one of the earliest inquiries into Half-Life physics has to do with the question of how to strafe with the maximum acceleration, when research began circa 2012 by the author of this documentation. In this section, we will provide precise mathematical descriptions of how maximum-acceleration strafing works in a way that can readily be implemented in TAS tools.
 
 Arguments of the maxima
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-It turns out that maximising the acceleration per frame gives rise to the global optimum. This is perhaps owing to good luck, because it is by no means a universal rule that this holds in other instances. To maximise acceleration is to maximise the per-frame quantity
+Let :math:`\mathbf{v}` be the current player velocity, :math:`\mathbf{v}'` the velocity after strafing, and :math:`\tau` the frame time. Maximising the acceleration means to maximise the per-frame acceleration
 
 .. math:: \frac{\lVert\mathbf{v}'\rVert - \lVert\mathbf{v}\rVert}{\tau}
 
-Firstly, we will assume constant :math:`\tau`. Therefore, the task of maximising acceleration boils down to maximising the new speed :math:`\lVert\mathbf{v}'\rVert`. Looking at :eq:`nextspeed gammas`, observe that the speed is invariant to the transformation :math:`\theta \mapsto -\theta`. Therefore, for simplicity, we will consider only :math:`0 \le \theta \le \pi`. Now let us quickly define :math:`\zeta` such that :math:`\theta = \zeta` implies :math:`\mu = \gamma_1 = \gamma_2`, or
+It turns out that maximising the per-frame acceleration gives rise to the global optimum. In other words, optimising only the individual frames result in the optimal "overall" acceleration as well. This is perhaps owing to good luck, because it is by no means a universal rule that local maxima yield a global maximum in other instances.
+
+Now, we will assume the frame time :math:`\tau` is independent of any other variables. Therefore, we can ignore the :math:`\tau` factor, and the task of maximising acceleration boils down to maximising the new speed :math:`\lVert\mathbf{v}'\rVert`. Looking at :eq:`nextspeed gammas`, observe that the speed is invariant to the transformation :math:`\theta \mapsto -\theta`, because both :math:`\cos\theta` and :math:`\sin^2\theta` are `even functions`_. Therefore, for simplicity, we will consider only :math:`0 \le \theta \le \pi`. Define :math:`\zeta` such that :math:`\theta = \zeta` implies :math:`\mu = \gamma_1 = \gamma_2`, or
+
+.. _`even functions`: https://en.wikipedia.org/wiki/Even_and_odd_functions
 
 .. math:: \cos\zeta = \frac{L - k_e\tau MA}{\lVert\lambda(\mathbf{v})\rVert}
 
-Then observe that
+Here, the symbols have already been defined earlier in :ref:`player air ground`. Now, we make a few critical observations.
 
-1. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}` and :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}` intersects only at :math:`\theta = \zeta` if :math:`\zeta` exists.
+1. The curves :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}(\theta)` and :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}(\theta)` against :math:`\theta` intersect only at :math:`\theta = \zeta`, provided :math:`\zeta` exists. That is, the two equations for new speed in :eq:`nextspeed gammas` only equal each other when :math:`\theta = \zeta`.
 
-2. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}` is decreasing in :math:`0 \le \theta \le \pi`
+2. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}(\theta)` is decreasing in :math:`0 \le \theta \le \pi`. This is because :math:`\cos\theta` is decreasing in this range.
 
-3. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}` is increasing in :math:`0 \le \theta \le \pi/2` and decreasing in :math:`\pi/2 \le \theta \le \pi`
+3. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}(\theta)` is increasing in :math:`0 \le \theta \le \pi/2` and decreasing in :math:`\pi/2 \le \theta \le \pi`. This is because :math:`\sin^2\theta` behaves as such.
 
-4. :math:`\mu = \gamma_2` if :math:`0 \le \theta \le \zeta`, and :math:`\mu = \gamma_1` if :math:`\zeta < \theta \le \pi`. If :math:`\zeta` does not exist, then :math:`\mu = \gamma_1` throughout.
+4. If :math:`\zeta` exists, :math:`\mu = \gamma_2` if :math:`0 \le \theta \le \zeta`, and :math:`\mu = \gamma_1` if :math:`\zeta < \theta \le \pi`. If :math:`\zeta` does not exist, then for all :math:`0 \le \theta \le \pi`, :math:`\mu = \gamma_1` if :math:`\cos\zeta > 1`, or :math:`\mu = \gamma_2` if :math:`\cos\zeta < -1`.
 
 Therefore, we claim that to maximise :math:`\lVert\mathbf{v}'\rVert` we have optimal angle :math:`\theta = \Theta` such that
 
@@ -120,18 +134,54 @@ Therefore, we claim that to maximise :math:`\lVert\mathbf{v}'\rVert` we have opt
           \end{cases}}
    :label: maxaccel theta
 
-To see why, suppose :math:`\zeta` exists and :math:`0 < \zeta < \pi/2`. This implies the second case in :eq:`maxaccel theta`. When this is the case, the always decreasing curve of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` intersects that of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` at :math:`\theta = \zeta` where the latter curve is still increasing (remember that the latter curve is increasing until :math:`\theta = \pi/2`). To the left of the :math:`\theta = \zeta` point is the domain of the latter curve, which is increasing, while beyond the point is the domain of the former curve, which is decreasing. Therefore the optimal angle is simply at the peak: the point of intersection of the two curves.
+We can immediately see that there are three distinct cases for the optimal strafing angle.
 
-Now suppose :math:`\zeta \ge \pi/2`, the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` curve intersects the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` curve at the point where the latter is decreasing. :math:`0 \le \theta \le \zeta` is the domain of the latter curve which contains the maximum point at :math:`\pi/2`. Have a look at :numref:`maxaccel theta graphs` which illustrates these two cases.
+Case 2
+++++++
+
+To see the justification for case 2, suppose :math:`\zeta` exists and :math:`0 < \zeta < \pi/2`. This implies the second case in :eq:`maxaccel theta`. By observation 1 and 2, the always decreasing curve of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` intersects that of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` at :math:`\theta = \zeta`. But crucially, the intersection point lies in the increasing part of the latter curve, keeping in mind that the latter curve is increasing for :math:`0 \le \theta \le \pi/2` due to observation 3. On top of that, to the left of the intersection point where :math:`0 \le \theta \le \zeta` is the domain of the latter curve, which is increasing, while to the right of the intersection point :math:`\zeta < \theta \le \pi` is the domain of the former curve, which is decreasing. Therefore the optimal angle is simply at the point of intersection of the two curves, which happens to be the maximum or the peak within :math:`0 \le \theta \le \pi`.
+
+These deductions assume :math:`\zeta` exists. In order for case 2 in :eq:`maxaccel theta` to hold true, we must have :math:`\lvert\zeta\rvert \le 1` because the cosine of numbers larger than one is undefined in real numbers. This implies
+
+.. math:: 0 < \frac{L - k_e\tau MA}{\lVert\lambda(\mathbf{v})\rVert} \le 1
+
+Note that the lower bound is :math:`0` instead of :math:`-1` because we are assuming :math:`0 \le \zeta \le \pi/2`. This inequality may be simplified to
+
+.. math:: 0 < L - k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+
+which is exactly the condition for case 2 in :eq:`maxaccel theta`.
+
+Case 1
+++++++
+
+What if this condition for case 2 fails? Then it can fail in three different ways as one of the following failure conditions:
+
+1. :math:`-\lVert\lambda(\mathbf{v})\rVert \le L - k_e\tau MA \le 0`
+2. :math:`L - k_e\tau MA < -\lVert\lambda(\mathbf{v})\rVert`
+3. :math:`L - k_e\tau MA > \lVert\lambda(\mathbf{v})\rVert`
+
+Suppose the condition fails the first way. We have :math:`\zeta \ge \pi/2`, thus breaking our earlier assumption about :math:`\zeta \le \pi/2` in the previous discussions. By observation 3, the two speed curves intersect when the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` curve is decreasing. This means that the maximum of this curve is also the global maximum, which occurs at :math:`\theta = \pi/2`, thus the case 1 in :eq:`maxaccel theta`. Now suppose the condition fails the second way. Then by observation 4, we see that the :math:`\mu = \gamma_2` for all :math:`0 \le \theta \le \pi`. Therefore, again, the global maximum occurs at :math:`\theta = \pi/2`. Since the optimal angle under both failure conditions is the same, we can merge failure conditions 1 and 2 to form the condition for case 1, given simply as
+
+.. math:: L - k_e\tau MA \le 0
+
+which is seen in :eq:`maxaccel theta`.
+
+Case 3
+++++++
+
+Now, suppose the third failure condition holds. Then, by observation 4 again, we simply have :math:`\mu = \gamma_1` for all :math:`0 \le \theta \le \pi`. Since the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` curve is decreasing in this range, the maximum occurs at :math:`\theta = 0`. This is seen in case 3 in :eq:`maxaccel theta`.
+
+Have a look at :numref:`maxaccel theta graphs` which illustrates cases 1 and 2.
 
 .. figure:: images/optang-1.png
    :name: maxaccel theta graphs
 
    Graphs of new speed against :math:`\theta` when :math:`\zeta < \pi/2` and when :math:`\zeta > \pi/2`. The green curve represents the new speed if :math:`\mu = \gamma_1` throughout regardless of :math:`\theta`, while the blue curve represents the new speed :math:`\mu = \gamma_2` throughout. The red curve is the actual curve of the new speed by taking :math:`\mu = \min(\gamma_1, \gamma_2)` as per the FME. From these graphs, it becomes clear where the maximum points are in each case.
 
-What if :math:`\zeta` does not exist? We then take the third case in :eq:`maxaccel theta`. Recall from our observations that :math:`\mu = \gamma_1` throughout in this case, and since this curve is decreasing, the maximum point is at :math:`\theta = 0`.
+Speed equations
+~~~~~~~~~~~~~~~
 
-Knowing the formulae for optimal :math:`\Theta`, it is a matter of simple substitutions into :eq:`nextspeed gammas` to obtain
+Knowing the formulae for optimal :math:`\Theta`, it is a matter of simple substitutions into :eq:`nextspeed gammas` to obtain the new speed after one frame of strafing as
 
 .. math:: \lVert\mathbf{v}'\rVert =
           \begin{cases}
@@ -156,6 +206,12 @@ These equations can be quite useful in planning.  For example, to calculate the 
 .. math:: 1000^2 = 320^2 + n \cdot 0.001 \cdot 320 \cdot 10 \cdot (60 - 0.001 \cdot 320 \cdot 10)
           \implies n \approx 4938
 
+In addition, under airstrafing again, we can integrate the speed equations to obtain distance-time equations. Before doing this, we must make a change of variables by assuming continuous time and writing :math:`t = n\tau`. Then we compute
+
+.. math:: d_t = \int_0^{t} \lVert\mathbf{v}_{t'}\rVert \; dt'
+
+for each case.
+
 For groundstrafing, however, the presence of friction means simple substitutions may not work. In more complex cases, it may be desirable to simply calculate the speeds frame by frame using the scalar FME.
 
 Effects of frame rate
@@ -170,7 +226,7 @@ One can immediately see that the lower the :math:`\tau` (that is, the higher the
 Effects of friction
 ~~~~~~~~~~~~~~~~~~~
 
-There is a limit to the speed achievable by perfect groundstrafing alone. There will be a critical speed such that the increase in speed exactly cancels the friction, so that :math:`\lVert\mathbf{v}_{k + 1}\rVert = \lVert\mathbf{v}_k\rVert`, that is the speed reaches steady state. For example, suppose optimal :math:`\theta = \zeta` and geometric friction (see :ref:`player friction`) is at play. Then by substituting into :eq:`nextspeed` we have
+There is a limit to the speed achievable by perfect groundstrafing alone. There will be a critical speed such that the increase in speed exactly cancels the friction, so that :math:`\lVert\mathbf{v}_{k + 1}\rVert = \lVert\mathbf{v}_k\rVert`, that is the speed reaches steady state. For example, suppose the optimal angle is :math:`\Theta = \pm\zeta` and geometric friction (see :ref:`player friction`) is at play. Then from the second case of :eq:`maxaccel speed` we write
 
 .. math:: \lVert\mathbf{v}\rVert^2 = (1 - \tau k)^2 \lVert\mathbf{v}\rVert^2 + k_e \tau M^2 A (2 - k_e \tau A)
 
@@ -182,29 +238,33 @@ Take the case of default Half-Life settings at 1000 fps, we calculate
 
 .. math:: 320 \sqrt{\frac{1 \cdot 10 \cdot (2 - 0.001 \cdot 1 \cdot 10)}{4 \cdot (2 - 0.001 \cdot 4)}} \approx 505.2
 
-This is then the absolute maximum speed achievable by groundstrafing alone in vanilla Half-Life. At another common frame rate of 100 fps, we instead obtain the steady state speed of :math:`\approx 498.2`.
+This is then the absolute maximum speed achievable by groundstrafing alone in vanilla Half-Life. At another common frame rate of 100 fps, we instead obtain the steady state speed of :math:`\approx 498.2`. There is nothing we can do to groundstrafe beyond this speed!
 
 Growth of speed
 ~~~~~~~~~~~~~~~
 
-By obtaining :eq:`air maxaccel speed`, we can immediately make a few important observations. In the absence of friction and if :math:`\Theta \ne 0`, the speed over time grows sublinearly, or :math:`O(\sqrt{n})`. This implies that the acceleration gradually decreases over time, but never reaches zero. It is notable that the acceleration at lower speeds can be substantial (more than linear acceleration) compared to that at higher speeds.
+By obtaining :eq:`air maxaccel speed`, we can immediately make a few important observations. In the absence of friction and if :math:`\Theta \ne 0`, the speed over time grows sublinearly, or :math:`O(\sqrt{n})`. This implies that the acceleration gradually decreases over time, but never reaches zero. It is notable that the acceleration at lower speeds can be substantial (more than linear acceleration) compared to that at higher speeds. To see why, write new speed :math:`v_t = \sqrt{v_0^2 + tK}`, then taking the derivative with respective to :math:`t` to obtain acceleration, yielding
+
+.. math:: a_t = \frac{dv_t}{dt} = \frac{K}{2 \sqrt{v_0^2 + tK}}
+
+for some :math:`K`. Now observe that, at :math:`t = 0`, the acceleration :math:`a_t \to \infty` as initial speed decreases :math:`v_0 \to 0`.
 
 .. TODO: ground strafe linear growth until v > E
 
 Air-ground speed threshold
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The acceleration of groundstrafe is usually greater than that of airstrafe.  It
+The acceleration of groundstrafe is usually greater than that of airstrafe. It
 is for this reason that groundstrafing is used to initiate bunnyhopping.
 However, once the speed increases beyond :math:`E` the acceleration will begin
-to decrease, as the friction grows proportionally with the speed.  There will
-be a critical speed beyond which the acceleration of airstrafe exceeds that of
-groundstrafe.  This is called the *air-ground speed threshold* (AGST),
-admittedly a rather non-descriptive name.
+to decrease, as the friction grows proportionally with the speed. There will be
+a critical speed beyond which the acceleration of airstrafe exceeds that of
+groundstrafe. This is called the *air-ground speed threshold* (AGST), admittedly
+a rather non-descriptive name.
 
 Analytic solutions for AGST are always available, but they are cumbersome to
-write and code.  Sometimes the speed curves for airstrafe and groundstrafe
-intercepts several times, depending even on the initial speed itself.  A more
+write and code. Sometimes the speed curves for airstrafe and groundstrafe
+intersects several times, depending even on the initial speed itself. A more
 practical solution in practice is to simply use Equation :eq:`nextspeed` to
 compute the new airstrafe and groundstrafe speeds then comparing them.
 
