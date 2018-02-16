@@ -88,4 +88,5 @@ Contents
    funcs
    snippets
    casestudies
+   practical
    glossary

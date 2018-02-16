@@ -19,35 +19,50 @@ Like other entities in the Half-Life universe, the player experiences gravity. W
 where :math:`g_e` is may be called the *entity gravity*, which is a modifier that scales the default gravity. Typically, :math:`g_e = 1`, though it can take a fractional value in Xen, for example. The consequence of a constant acceleration is that the velocity and position of the object at time :math:`t` is
 
 .. math:: v_t = v_0 - gt, \quad s_t = s_0 + v_0 t - \frac{1}{2} g t^2
+   :label: gravity kinematics
 
-Recall that the Half-Life universe runs at quantised time, that is assuming constant frame rate we may write :math:`t = n\tau`. Or, :math:`t = \tau` after one frame. In Half-Life physics, the position is not calculated directly using the position equation above, but rather, it is obtained by integrating the velocity, namely :math:`\mathbf{r}' = \mathbf{r} + \tau \mathbf{v}`. Therefore, simply changing :math:`t` to :math:`\tau` in the equations to calculate the velocity and position in the next frame will not work well, because in essence that is equivalent to Euler's method. Not only will the errors accumulate over time, but also the jump height will be dependent on the frame rate. To see this, suppose the game calculates new vertical velocity :math:`v_z' = v_z - g\tau` in each frame, and uses :math:`v_z'` to calculate the position. Then
+Recall that the Half-Life universe runs at quantised time, that is assuming constant frame rate we may write :math:`t = n\tau`. Or, :math:`t = \tau` after one frame. In Half-Life physics, the new position is not updated directly using the position equation above, but rather, it is obtained by integrating the velocity, namely :math:`\mathbf{r}' = \mathbf{r} + \tau \mathbf{v}'`. This position update step is done in the ``PM_FlyMove`` function in ``pm_shared.c``.
 
-.. math:: r_z' = r_z + v_z' \tau = r_z + v_z \tau - g \tau^2 \ne r_z + v_z \tau - \frac{1}{2} g \tau^2
-
-As one can see, this method does not give the correct expression for the vertical position after one frame.
-
-To avoid these pitfalls from Euler's method, the game instead integrates the velocity using a form of the leapfrog_ method. Namely, by separating the gravitational computation into two stages: ``PM_AddCorrectGravity`` and ``PM_FixupGravityVelocity``, which are respectively called before and after updating the position. Ignoring :ref:`basevelocity` and entity gravity, the first function computes
-
-.. _leapfrog: https://en.wikipedia.org/wiki/Leapfrog_integration
+Looking closely at the code of ``PM_PlayerMove``, we see that the game applies *half gravity* to the player *before* position update by ``PM_AddCorrectGravity``, and another half gravity *after* by ``PM_FixupGravityVelocity``. To see why, ignoring :ref:`basevelocity`, we write the vertical velocity after the first half of gravity as
 
 .. math:: \tilde{v}_z' = v_z - \frac{1}{2} g\tau
 
-This velocity is then used for computing the new player position
+The position update step follows from there, by computing the new vertical position
 
 .. math:: r_z' = r_z + \tilde{v}_z' \tau = r_z + v_z \tau - \frac{1}{2} g\tau^2
 
-which is the correct expression for position. Finally, the velocity is computed by
+After this, the second half of gravity is applied to compute the correct final vertical velocity
 
-.. math:: v_z' = \tilde{v}_z' - \frac{1}{2} g\tau
+.. math:: v_z' = \tilde{v}_z' - \frac{1}{2} g\tau = v_z - g\tau
 
-The velocity at the end of the frame is related to the velocity at the beginning of the frame by :math:`v_z' = v_z - g\tau`, which is also the correct expression according to classical mechanics.
+Now observe that both :math:`r_z'` and :math:`v_z'` are correct in accordance to classical mechanics in :eq:`gravity kinematics`. Had the gravity been calculated in any other way, the final vertical position and velocity would be incorrect. This technique of breaking up the acceleration is a variant of the `leapfrog integration`_ in the study of numerical integration. It can be shown that trajectory of player motion is indeed parabolic and independent of the frame rate. That is, the trajectory fits the parabolic curve generated using classical mechanics perfectly. Consequently, the jump height is also independent of frame rate. Vertically launching from a ladder, however, does result in frame rate-dependent heights (see :ref:`ladder exit`).
 
-It can be shown that the player locus is indeed independent of the frame rate, that is they fit the parabolic curve generated from classical mechanics perfectly. Consequently, the jump height is also independent of frame rate. Vertically launching from a ladder, however, does result in frame rate-dependent heights (see :ref:`ladder exit`).
+.. _leapfrog integration: https://en.wikipedia.org/wiki/Leapfrog_integration
+
+On the other hand, the straightforward way of integrating gravity is to calculate the full (as opposed to half) gravity :math:`v_z' = v_z - g\tau`, followed by the position update :math:`r_z' = r_z + v_z' \tau`. Notice that this means
+
+.. math:: r_z' = r_z + v_z \tau - \color{red}{g\tau^2}
+
+In other words, the new vertical position :math:`r_z'` is incorrect, because the term in red is incorrect compared to :eq:`gravity kinematics`. Essentially, this approach is equivalent to the `Euler's method`_ of integrating a differential equation. Not only would the errors accumulate over time, but also that the jump height will be dependent on the frame rate.
+
+.. _Euler's method: https://en.wikipedia.org/wiki/Euler_method
 
 .. _basevelocity:
 
 Basevelocity
 ------------
+
+The basevelocity :math:`\mathbf{b}` is an extra velocity added to the player velocity only during the position update step of :math:`\mathbf{r}' = \mathbf{r} + \mathbf{v}'\tau`. That is, the correct position update equation is actually
+
+.. math:: \mathbf{r}' = \mathbf{r} + \left( \mathbf{v}' + \mathbf{b} \right) \tau
+
+This extra velocity is usually provided by a push trigger (see :ref:`trigger_push`) or a conveyor belt.
+
+TODO
+
+TODO
+
+TODO
 
 .. _player friction:
 
@@ -68,34 +83,39 @@ which is usually 4 and where :math:`k_e` is called the *entity friction*. The en
    \mathbf{v} - \tau Ek \mathbf{\hat{v}} & \max(0.1, \tau Ek) \le \lVert\mathbf{v}\rVert < E \\
    \mathbf{0} & \lVert\mathbf{v}\rVert < \max(0.1, \tau Ek)
    \end{cases}
+   :label: general friction
 
-Assuming :math:`\lVert\mathbf{v}\rVert \ge E`. Now observe that the player speed is scaled by a constant factor (assuming :math:`k` and :math:`\tau` are constant) each frame, resulting in an exponential decrease. This may be called *geometric friction*, because the series of speeds forms a geometric series. At higher horizontal speeds this type of friction can be devastating, because higher speeds are harder to achieve and maintain (owing to the sublinear growth of speed by pure strafing, see :ref:`strafing`).
+Assuming :math:`\lVert\mathbf{v}\rVert \ge E`. Now observe that the player speed is scaled by a constant factor (assuming :math:`k` and :math:`\tau` are constant) each frame, resulting in an exponential decrease. This may be called *geometric friction*, because the series of speeds in consecutive frames forms a geometric series. At higher horizontal speeds this type of friction can be devastating, because higher speeds are harder to achieve and maintain (owing to the sublinear growth of speed by pure strafing, see :ref:`strafing`), but the factor scales down the speed by an amount proportional to it.
 
-At frame :math:`n`, the speed due to geometric friction is
+Assuming no other influences and the condition for geometric friction is always satisfied. At frame :math:`n`, the speed due to geometric friction is
 
-.. math:: \lVert\mathbf{v}_n\rVert = \lVert\lambda^n(\mathbf{v})\rVert = (1 - \tau k)^n \lVert\mathbf{v}_0\rVert
+.. math:: \lVert\mathbf{v}_n\rVert = \lVert\lambda^n(\mathbf{v}_0)\rVert = (1 - \tau k)^n \lVert\mathbf{v}_0\rVert
 
 Since time is discretised in the Half-Life universe, we have :math:`t = \tau n`. Therefore,
 
 .. math:: \lVert\mathbf{v}_t\rVert = (1 - \tau k)^{t/\tau} \lVert\mathbf{v}_0\rVert
 
-From this equation, it can be shown that the lower the frame rate, the greater the geometric friction. However, the difference in friction between different frame rates is so minute that one can hardly notice it.
+From this equation, it can be shown, assuming sensible positive values for :math:`k` and :math:`tau`, that the lower the frame rate, the greater the geometric friction. However, the difference in friction between different frame rates is so minute that it does not make much practical difference.
 
-Assuming :math:`\tau Ek \le \lVert\mathbf{v}\rVert < E`, the type of friction may be called *arithmetic friction*, because the speeds form an arithmetic series. Namely, we have
+In the second case in :eq:`general friction`, the type of friction being applied may be called *arithmetic friction*, because the speeds of consecutive frames form an arithmetic series. Namely, at frame :math:`n`, we have
 
 .. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert - n\tau Ek, \quad
    \lVert\mathbf{v}_t\rVert = \lVert\mathbf{v}_0\rVert - tEk
 
-This type of friction is straightforward and independent of the frame rate.
+This type of friction is independent of the frame rate, unlike the geometric friction.
+
+In the third case of :eq:`general friction`, where the speed is very low, the speed is simply set to zero. This case makes little practical difference.
 
 Edgefriction
 ~~~~~~~~~~~~
 
 Edgefriction is a an extra friction applied to the player when the player is sufficiently close to an edge that is sufficiently high above from a lower ground.
 
-.. note:: TODO: maths descriptions
+.. admonition:: TODO
 
-Although doubling :math:`k` seems minor at the first glance, the effect is *devastating*. Prolonged groundstrafing towards an edge can drastically reduce the horizontal speed, which in turn affects the overall acceleration from airstrafing after jumping off the edge. One way to avoid edgefriction is to jump or ducktap before reaching an edge and start airstrafing. However, this is sometimes impractical. The most optimal way to deal with edgefriction is highly dependent on the circumstances. Extensive offline simulations may be desirable.
+   Add maths descriptions
+
+Although doubling :math:`k` seems minor at first glance, the effect is *devastating*. Prolonged groundstrafing towards an edge can drastically reduce the horizontal speed, which in turn affects the overall airstrafing acceleration after jumping off the edge. One way to avoid edgefriction is to jump or ducktap before reaching an edge and start airstrafing. In human speedrunning terms, the technique of ducktapping before an edge is sometimes called *countjump*. However, this is sometimes infeasible due to space or other constraints. The most optimal way to deal with edgefriction is highly dependent on the circumstances. Extensive offline simulations may be desirable.
 
 .. _player air ground:
 

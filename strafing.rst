@@ -5,23 +5,53 @@ Strafing
 
 *Strafing* in the context of Half-Life physics refers to the act of pressing the correct movement keys and moving the mouse in a precise way, typically with the aim of gradually increasing the horizontal speed or cornering without losing too much speed. Strafing is commonly accompanied by a series of jumps intended to keep the player off the ground, as ground movements are subject to friction. This combination of techniques is simply *bunnyhopping*. Since the strafing part of bunnyhopping is much more interesting than the jumping part, we will focus only on the former in this chapter.
 
-Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. This applies to TASes as well: we want to optimise strafing as much as possible so that we can pretty much forget about it when TASing, allowing us to concentrate on the "general picture".
+Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. This applies to TASes as well: we want to optimise strafing as much as possible so that we can pretty much forget about it when TASing, allowing us to concentrate on the "general picture" and specific tricks.
 
-.. tip:: Before venturing further in this chapter, be sure to familiarise yourself with the fundamentals (:ref:`player movement`).
+.. caution:: Before venturing further in this chapter, be sure to familiarise
+             yourself with the fundamentals of player movement described in
+             :ref:`player movement`. Without the prerequisite knowledge, this
+             chapter can be hard to follow.
+
+Basic intuition
+---------------
+
+Before delving into the mathematics, it may be helpful to have a geometric intuition of how strafing works. In Half-Life, and indeed in real-life classical mechanics, the velocity and acceleration are defined as Euclidean vectors with a length (or magnitude) and a direction, typically drawn as an arrow in the Euclidean space. In the strafing context, we are only interested in vectors drawn on a 2D space. When a body in Half-Life accelerates in a frame, the acceleration vector, scaled by frame time, is added to the velocity vector to obtain a new velocity vector,
+
+.. math:: \mathbf{v}' = \mathbf{v} + \tau\mathbf{a}
+
+This may be interpreted geometrically as putting the acceleration arrow after the velocity arrow to obtain a new velocity arrow. The diagram looks like a triangle, as seen in :numref:`strafing intuition 1`. Now, notice that the new velocity arrow is *longer* than the previous velocity arrow. This means that the *speed* (represented by the arrow length) has been increased.
+
+.. figure:: images/strafing-intuition-1.png
+   :name: strafing intuition 1
+   :scale: 50%
+   :align: center
+
+   Depiction of how strafing increases speed (i.e. the length of the velocity
+   vector). On the left, the directions of the vectors have significance. On the
+   right, we have rotated the vectors to that they line up, but therefore do not
+   point to the correct direction (though having the correct length or
+   magnitude).
+
+In Half-Life physics, the magnitude or length of the acceleration vector :math:`\mathbf{a}` may be depend on the current speed and the angle between the velocity and itself, which in turn is controlled by the viewangles, as explained in :ref:`player air ground`. The task of finding the right angles is the topic of this chapter.
 
 Building blocks
 ---------------
 
-Before exploiting the fundamental movement equation (FME) for our own gains, there are a few mathematical building blocks we should be aware of to make analyses easier. Firstly, write :math:`\lVert\mathbf{v}'\rVert = \sqrt{\mathbf{v}' \cdot \mathbf{v}'}`. Expanding yields
+Before exploiting the fundamental movement equation (FME) for our own gains, there are a few mathematical building blocks we should be aware of to make analyses easier. Firstly, write :math:`\lVert\mathbf{v}'\rVert = \sqrt{\mathbf{v}' \cdot \mathbf{v}'}`, where :math:`\mathbf{v}'` is already given in :ref:`player air ground`. Expanding each :math:`\mathbf{v}'` yields
 
 .. math:: \lVert\mathbf{v}'\rVert
    = \sqrt{(\lambda(\mathbf{v}) + \mu\mathbf{\hat{a}}) \cdot (\lambda(\mathbf{v}) + \mu\mathbf{\hat{a}})}
    = \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + \mu^2 + 2 \lVert\lambda(\mathbf{v})\rVert \mu \cos\theta}
    :label: nextspeed
 
-This is a very common line of attack that quickly yields an expression for the magnitude of vectorial outputs without explicit vectorial computations or geometric analyses. Half-Life physicists ought to learn this technique well. Equation :eq:`nextspeed` is sometimes called the *scalar FME*, often used in practical applications as the most general way to compute new speeds given :math:`\theta`.
+This can be done because the dot product satisfies the distributive law. Equation :eq:`nextspeed` is sometimes called the *scalar FME*, often used in practical applications as the most general way to compute new speeds given :math:`\theta`.
 
-From the scalar FME, we can further write down the equations when assuming :math:`\mu = \gamma_1` or :math:`\mu = \gamma_2`. These can be found by expanding :math:`\mu`, giving
+.. tip:: This is a very common and useful trick that can be used to quickly
+         yield an expression for the magnitude of vectorial outputs without
+         explicit vectorial computations or geometric analyses. Half-Life
+         physicists ought to learn this technique well.
+
+From equation :eq:`nextspeed`, we can further write down the equations by assuming :math:`\mu = \gamma_1` and :math:`\mu = \gamma_2` respectively, to eliminate :math:`\mu`. These new equations can be found by expanding :math:`\mu`, again already given previously. We get
 
 .. math::
    \begin{aligned}
@@ -31,9 +61,13 @@ From the scalar FME, we can further write down the equations when assuming :math
    \end{aligned}
    :label: nextspeed gammas
 
-These equations will be important in the exploitative analyses of the FME.
+These equations will be important in the exploitative analyses of the FME shortly.
 
-However, computing speeds is sometimes not sufficient. It may be desirable to compute velocity *vectors* given :math:`\theta` without worrying about viewangles and :math:`\mathbf{\hat{a}}`. We can achieve this by parameterising :math:`\mathbf{\hat{a}}` by a rotation of :math:`\mathbf{\hat{v}}` by an angle of :math:`\theta`, expressed as :math:`\mathbf{\hat{v}} R_z(\theta)` which is a matrix multiplication by a rotation matrix.
+However, computing speeds is sometimes not sufficient. We sometimes want to also compute velocity *vectors* endowed with both directionality and magnitude, but without worrying about player viewangles and :math:`\mathbf{\hat{a}}`. We can achieve this by parametrising :math:`\mathbf{\hat{a}}` in terms of a rotation of :math:`\mathbf{\hat{v}}` by an angle of :math:`\theta`. This may be expressed as
+
+.. math:: \mathbf{\hat{a}} = \mathbf{\hat{v}} R_z(\theta)
+
+This is a matrix multiplication of :math:`\mathbf{\hat{v}}` by a rotation matrix. The benefit of writing the FME in this form is that we no longer need to worry about calculating :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}`, which, recalling from :ref:`view vectors`, depend on the yaw angle :math:`\vartheta` in the 2D case. We also no longer need to worry about :math:`F`, :math:`S`, and :math:`M` needed to compute :math:`\mathbf{\hat{a}}`. All we need to know is the angle :math:`\theta` between velocity and acceleration vectors. This can make efficient computations easier as well, because the angle :math:`\theta` is easily computed (as we will see shortly) in just a few lines of code.
 
 .. caution:: Remember from :ref:`notations` that vectors in this documentation are *row vectors*. Therefore, the order of multiplication is different from those in standard linear algebra textbooks. In fact, the components in :math:`R_z(\theta)` are also ordered differently.
 
@@ -47,7 +81,7 @@ With this idea in mind, we can rewrite the FME as
    \quad\quad (\mathbf{v} \ne \mathbf{0})
    :label: newvelmat
 
-Note that the precaution :math:`\mathbf{v} \ne \mathbf{0}` is needed so that the unit vector :math:`\mathbf{\hat{v}} = \mathbf{v} / \lVert\mathbf{v}\rVert` is well defined. This is one downside of :eq:`newvelmat`, where the special case of zero velocity must be dealt with separately by redefining :math:`\mathbf{\hat{v}} = \mathbf{\hat{f}}` (with :math:`\varphi = 0` as usual), thereby involving the viewangles.
+Note that the precaution :math:`\mathbf{v} \ne \mathbf{0}` is needed so that the unit vector :math:`\mathbf{\hat{v}} = \mathbf{v} / \lVert\mathbf{v}\rVert` is well defined. This is one downside of this form of parametrisation, where the special case of zero velocity must be handled separately by replacing :math:`\mathbf{\hat{v}} = \mathbf{\hat{f}}` (and assuming :math:`\varphi = 0` as usual) in :eq:`newvelmat`, thereby involving the viewangles in the computations.
 
 When written in the form of :eq:`newvelmat`, positive :math:`\theta` gives *clockwise* rotations, while negative :math:`\theta` gives *anticlockwise* rotations. If this convention is inconvenient for a particular application, one can easily reverse the directionality by reversing the signs of the :math:`\sin\theta` elements in the rotation matrix.
 
@@ -390,5 +424,10 @@ We cannot simplify this equation further. In fact, solving for :math:`\lVert\mat
 Implementation notes
 --------------------
 
+Anglemod compensation
+~~~~~~~~~~~~~~~~~~~~~
+
 Vectorial compensation
 ~~~~~~~~~~~~~~~~~~~~~~
+
+Due to the anglemod,

@@ -3,3 +3,4 @@ _build/
 plots/
 latex/
 *.swp
+*~

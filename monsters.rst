@@ -21,9 +21,9 @@ A scientist can heal the player if the player health is less than or equal to 50
 
 .. _squeak grenade monster:
 
-Squeak grenade
---------------
+Snarks
+------
 
-As monsters, squeak grenades do not attack the player under any circumstances until it has bounced off some entity at least once. For example, a squeak grenade that is freshly tossed will never seek out the player mid-air until it has landed and bounced off the ground.
+As monsters, snarks do not attack the player under any circumstances until it has bounced off some entity at least once. For example, a snarks that is freshly tossed will never seek out the player mid-air until it has landed and bounced off the ground.
 
-Squeak grenades have friction and gravitational modifiers of 0.5, and a health of 2. Snarks are set to ``MOVETYPE_BOUNCE`` in each ``HuntThink``, which occurs once every 2 seconds. This implies that the overbounce factor is :math:`b = 2 - 1/2 = 3/2`.
+Snarks have friction and gravitational modifiers of 0.5, and a health of 2. Snarks are set to ``MOVETYPE_BOUNCE`` in each ``HuntThink``, which occurs once every 2 seconds. This implies that the overbounce factor is :math:`b = 2 - 1/2 = 3/2`. The overbounce factor can affect how snarks bounce off any surface, as dictated by the general collision equation in :ref:`collision`.

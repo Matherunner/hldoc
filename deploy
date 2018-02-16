@@ -14,4 +14,4 @@ postprocess() {
 export -f postprocess
 
 /bin/ls _build/html/*.html | parallel --will-cite postprocess
-rsync -avP --delete _build/html/ $NFSNUSER@$NFSNHOST:/home/public/hl
+rsync -zavP --exclude '.buildinfo' --delete-excluded --delete _build/html/ $NFSNUSER@$NFSNHOST:/home/public/hl

@@ -120,41 +120,54 @@ verify that :math:`\mathbf{v}' \cdot \mathbf{\hat{n}} = 0` is indeed true.
 Speed preserving circular walls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In Half-Life we can sometimes find concave walls made out of multiple planes to
-approximate an arc.  Examples can be found in some Office Complex maps.
-Circular walls can be a blessing for speedrunners because they allow making
-sharp turns without losing too much speed.  In fact, if the number of planes
-increases, the approximation will improve, and so the speed loss will decrease.
+In Half-Life, we can sometimes find concave walls made out of multiple planes
+that approximate a circular arc. Examples can be found in some Office Complex
+maps such as the wall shown in :ref:`arc wall c1a2`. Circular walls can be a
+blessing for speedrunners because they allow making sharp turns without losing
+too much speed. In fact, if the number of planes increases, the approximation
+will improve, and so the speed will be better preserved.
 
 .. figure:: images/speed-preserving-c1a2.jpg
+   :name: arc wall c1a2
    :align: center
 
    An example of a "speed preserving" wall in the Office Complex map of
    ``c1a2``, which is made up of multiple planes to approximate an arc.
 
 Let :math:`n` be the number of walls and let :math:`\beta` be the angle
-subtended by the arc joining the midpoints of every wall.  For example, with
+subtended by the arc joining the midpoints of every wall. For example, with
 :math:`\beta = \pi/2` the first and the last walls will be perpendicular, and
-with :math:`\beta = \pi` the they will be opposite and parallel instead.  Let
+with :math:`\beta = \pi` the they will be opposite and parallel instead. Let
 :math:`\mathbf{v}_i` be the velocity immediately after colliding with the
 :math:`i`-th wall, and assuming :math:`\mathbf{v}_0` is parallel to and
-coincident with the first wall.  Assume also that :math:`0 \le \beta / (n-1) \le
-\pi/2`, which means that the angle between adjacent planes cannot be acute.  If
+coincident with the first wall. Assume also that :math:`0 \le \beta / (n-1) \le
+\pi/2`, which means that the angle between adjacent planes cannot be acute. If
 the velocity does not change due to other external factors throughout the
 collisions, then
 
 .. math:: \lVert\mathbf{v}_{i+1}\rVert = \lVert\mathbf{v}_i\rVert \cos \left(
           \frac{\beta}{n - 1} \right)
 
-The general equation is simply
+The general equation at frame :math:`n` is simply
 
 .. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert \cos^{n-1} \left(
           \frac{\beta}{n-1} \right)
 
-It can be verified that :math:`\lim_{n \to \infty} \lVert\mathbf{v}_n\rVert =
-\lVert\mathbf{v}_0\rVert`, hence the speed preserving property of circular
-walls.  Observe also that the final speed is completely independent of the
-radius of the arc.  Perfectly circular walls are impossible in Half-Life due to
-the inherent limitations in the map format, so some amount of speed loss is
-unavoidable.  Nevertheless, even with :math:`n = 3` and :math:`\beta = \pi/2`
-we can still preserve half of the original speed.
+It can be verified that
+
+.. math:: \lim_{n \to \infty} \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert
+
+This demonstrates the speed preserving property of circular walls. Observe also
+that the final speed is completely independent of the radius of the arc.
+Perfectly circular walls are impossible in Half-Life due to the inherent
+limitations in the map format, so some amount of speed loss is unavoidable.
+Nevertheless, even with :math:`n = 3` and :math:`\beta = \pi/2` we can still
+preserve half of the original speed.
+
+This is somewhat analogous to uniform circular motion in the real world. In the
+real world, an object rotating around a point in a circular path experiences
+centripetal acceleration :math:`a_c = \omega^2 r` with constant angular speed
+:math:`\omega`. The velocity of the rotating body changes its *direction*
+continuously to keep up with the circular arc, but crucially, the *magnitude* or
+*speed* remains constant throughout. In theory, there is no restriction on how
+small the radius of curvature :math:`r` can be.
