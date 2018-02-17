@@ -53,7 +53,7 @@ Observe that even though the player health is stored as a 32-bit floating point 
 
 .. figure:: images/player_hp.png
    :name: player_hp
-   :scale: 40%
+   :scale: 50%
 
    A typical player health and armour against damage plot. This plot assumes an initial health and armour of 100 and 40 respectively, showing the new health and armour after a given damage.
 
@@ -167,11 +167,13 @@ we have
 
 .. math:: \mathbf{v}' = \mathbf{v} +
           \begin{cases}
-          \min(1000, 10\Delta\mathcal{H}) \mathbf{\hat{d}} & \text{if duckstate} = 2 \\
-          \min(1000, 5\Delta\mathcal{H}) \mathbf{\hat{d}} & \text{otherwise}
+          \min(1000, 10\Delta\mathcal{H}) \mathbf{\hat{d}} & \text{ducked} \\
+          \min(1000, 5\Delta\mathcal{H}) \mathbf{\hat{d}} & \text{standing or in-duck}
           \end{cases}
 
-We can immediately see that if the duckstate is 2 the change in velocity is greater.  It is sad to see that the maximum possible boost given by a single damage is 1000 ups and not infinite.
+We can immediately see that if the duckstate is *ducked* then the change in
+velocity is greater. It is unfortunate that the maximum possible boost given by
+a single damage is bounded by 1000 ups and not infinite.
 
 The role of armour
 ~~~~~~~~~~~~~~~~~~

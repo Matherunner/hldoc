@@ -52,11 +52,11 @@ In other words, the new vertical position :math:`r_z'` is incorrect, because the
 Basevelocity
 ------------
 
-The basevelocity :math:`\mathbf{b}` is an extra velocity added to the player velocity only during the position update step of :math:`\mathbf{r}' = \mathbf{r} + \mathbf{v}'\tau`. That is, the correct position update equation is actually
+The basevelocity :math:`\mathbf{b}` is an extra velocity added to the player velocity for certain physics computations. For air and ground movement, the basevelocity is added only during the position update step of :math:`\mathbf{r}' = \mathbf{r} + \mathbf{v}'\tau`. That is, the correct position update equation is actually
 
 .. math:: \mathbf{r}' = \mathbf{r} + \left( \mathbf{v}' + \mathbf{b} \right) \tau
 
-This extra velocity is usually provided by a push trigger (see :ref:`trigger_push`) or a conveyor belt.
+This extra velocity is usually provided by a push trigger (see :ref:`trigger_push`) or a conveyor belt. For water movement, however, the basevelocity is added during both the acceleration step *and* position update step.
 
 TODO
 
@@ -134,15 +134,18 @@ Here, the new velocity :math:`\mathbf{v}'` is given by the *fundamental movement
 
 .. math:: \mathbf{v}' = \lambda(\mathbf{v}) + \mu\mathbf{\hat{a}}
 
-Here, :math:`\mathbf{\hat{a}}` is called the *unit acceleration vector*, given by
+Here, :math:`\mathbf{\hat{a}}` is called the *unit acceleration vector*, such that
 
-.. math:: \mathbf{\hat{a}} = \frac{F\mathbf{\hat{f}} + S\mathbf{\hat{s}}}{M}
+.. math:: \mathbf{a} = F \mathbf{\hat{f}} + S \mathbf{\hat{s}} \implies
+          \mathbf{\hat{a}} = \frac{F\mathbf{\hat{f}} + S\mathbf{\hat{s}}}{\sqrt{F^2 + S^2}}
 
-A few notes to be made here. First, the :math:`F` and :math:`S` are the forwardmove and sidemove respectively, described in :ref:`FSU`. Second, :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}` are the unit forward and side view vectors described in :ref:`view vectors`. But more importantly, they are obtained by assuming :math:`\varphi = 0`, regardless of the player's actual pitch. Consequently, they do not have a component in the :math:`z` axis. Third, assuming :math:`U = 0`, the :math:`M` has the value of
+A few notes to be made here. First, the :math:`F` and :math:`S` are the forwardmove and sidemove respectively, described in :ref:`FSU`. Second, :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}` are the unit forward and side view vectors described in :ref:`view vectors`. But more importantly, they are obtained by assuming :math:`\varphi = 0`, regardless of the player's actual pitch. Consequently, they do not have a component in the :math:`z` axis.
 
-.. math:: M = \min\left( \mathtt{sv\_maxspeed}, \sqrt{F^2 + S^2} \right)
+Define :math:`M` such that
 
-Observe that :math:`M` is always capped by ``sv_maxspeed``. Observe also that if :math:`F` and :math:`S` are not sufficiently large, one can end up with a smaller value of :math:`M` below ``sv_maxspeed``, which is bad as will be seen later.
+.. math:: M = \min\left( M_m, \lVert\mathbf{a}\rVert \right) = \min\left( M_m, \sqrt{F^2 + S^2} \right)
+
+where :math:`M_m` is ``sv_maxspeed``. Observe that :math:`M` is always capped by ``sv_maxspeed``. Observe also that if :math:`F` and :math:`S` are not sufficiently large, one can end up with a smaller value of :math:`M` below ``sv_maxspeed``, which results in lower accelerations, as we will see later. In addition, if :math:`U \ne 0`, then :math:`F` and :math:`S` will be smaller compared to that when :math:`U = 0`, and so :math:`M` will also be smaller. Therefore, it is undesirable to have any :math:`U` at all if we want as much horizontal acceleration as possible.
 
 In the FME, we also have the :math:`\mu` coefficient. This coefficient may be written as
 
@@ -172,5 +175,85 @@ This is just one of the consequences of the FME. Exploitations of this equation 
 Water movements
 ---------------
 
+Water movement in Half-Life cannot be exploited to move faster than intended.
+Nevertheless, we will describe the physics here for completeness. Here, we
+assumes all vectors to be three dimensional.
+
+.. TODO: talk about waterlevel
+
+Assuming a waterlevel of 2 or above. In player water physics, the acceleration
+vector is such that
+
+.. math:: \mathbf{a} =
+          \begin{cases}
+          F \mathbf{\hat{f}} + S \mathbf{\hat{s}} + \langle 0, 0, U\rangle & F \ne 0 \lor S \ne 0 \lor U \ne 0 \\
+          \langle 0, 0, -60 \rangle & F = 0 \land S = 0 \land U = 0
+          \end{cases}
+
+And similar but not identical to that in the air or ground movement physics,
+:math:`M` is defined to be
+
+.. math:: M = 0.8 \min\left( M_m, \lVert\mathbf{a}\rVert \right)
+
+The only difference is the presence of the :math:`0.8` factor. Then, the new
+velocity after water movement is given by
+
+.. math:: \mathbf{v}' = (1 - k_e k \tau) (\mathbf{v} + \mathbf{b}) + \mu \mathbf{\hat{a}}
+
+where :math:`\mathbf{b}` is the basevelocity (see :ref:`basevelocity`) and
+
+.. math:: \mu =
+          \begin{cases}
+          \min(\gamma_1, \gamma_2) & \gamma_2 > 0 \land M \ge 0.1\\
+          0 & \gamma_2 \le 0 \lor M < 0.1
+          \end{cases}
+
+and let :math:`A` be ``sv_accelerate``,
+
+.. math:: \gamma_1 = k_e \tau MA \qquad \gamma_2 = M - (1 - k_e k\tau) \lVert\mathbf{v} + \mathbf{b}\rVert
+
+Note that, unlike air and ground movement, the basevelocity is added *before*
+acceleration, rather than after.
+
+To see why it is impossible to accelerate beyond a certain speed, observe that
+when the speed is sufficiently high, then regardless of view angles or other
+inputs, :math:`\gamma_2` will become negative. This always sets :math:`\mu = 0`,
+resulting in zero acceleration. In the absence of acceleration, the friction
+will reduce the speed rapidly.
+
 Waterjump
 ~~~~~~~~~
+
+Pressing the jump key in water has interested physics behaviour in Half-Life,
+though not one we can exploit to great effect for speedrunning. When the
+waterlevel is 2, and the jump key is held, then ``PM_Jump`` sets the vertical
+velocity to 100 ups, and leaving the horizontal components intact. This means
+that :math:`F` and :math:`S` will not be scaled down unlike the case where
+:math:`U \ne 0`. A good thing about pressing the jump key instead of ``+moveup``
+to swim up is that the jump key *sets* the vertical velocity upwards
+instantaneously, while ``+moveup`` takes time to accelerate the player up.
+
+When the jump key is held while the waterlevel is bordering between 1 and 2, the
+player will likely be less submerged in the water, and therefore getting a
+waterlevel of 1. Suppose a frame :math:`k` such that, at the end of the frame,
+the waterlevel changes from 2 to 1 due to holding down the jump key. Despite
+leaving the water at the end of frame, the normal water physics would still be
+run, because the game does not detect the change until a
+``PM_CatagorizePosition`` or ``PM_CheckWater`` is called. There is no such call
+between ``PM_Jump`` and ``PM_WaterMove``.
+
+After leaving the water, the normal air movement physics will take over, and
+gravity will be exerted onto the player. Due to the small vertical speed
+resulting from jumping, gravity will quickly bring the player back into water
+again. Suppose at some frame :math:`m`, the player falls back into the water.
+Then, the ``PM_CatagorizePosition`` immediately after ``PM_FlyMove`` will set
+the waterlevel to 2 or above. In the next frame :math:`m + 1`, ``PM_Jump`` will
+set the player vertical velocity again, and normal water physics will run, which
+applies some amount of water friction to the player. It is likely that at frame
+:math:`m + 2`, the player will be back in air again. The cycle will repeat, and
+this is sometimes called "sharking" in speedrunning.
+
+When the player is close a ground, a different kind of "jumping" physics takes
+place.
+
+TODO

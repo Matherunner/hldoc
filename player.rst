@@ -129,13 +129,21 @@ When a saveload is performed, the punchangles will be added to the viewangles pe
 Forwardmove, sidemove, and upmove
 ---------------------------------
 
-When the movement keys are held, there exists three values, :math:`F`, :math:`S`, and :math:`U`, that are set. These values are called the *forwardmove*, *sidemove*, and *upmove* respectively, or *FSU* for short, and are used in player movement physics (see :ref:`player movement`).
+When the movement keys are held, there exists three values, :math:`F`, :math:`S`, and :math:`U`, that are set. These values are called the *forwardmove*, *sidemove*, and *upmove* respectively, or *FSU* for short, and are used in player movement physics (see :ref:`player movement`). In the beginning of player movement physics, the FSU values are computed in the following way. First, define client side analogues of :math:`\tilde{F}`, :math:`\tilde{S}`, and :math:`\tilde{U}`. Then,
 
 ``+forward`` and ``+back``
-   Assigns the positive or negative ``cl_forwardspeed`` to :math:`F`
+   Assigns the positive or negative ``cl_forwardspeed`` to :math:`\tilde{F}`
 
 ``+moveright`` and ``+moveleft``
-   Assigns the positive or negative ``cl_sidespeed`` to :math:`S`
+   Assigns the positive or negative ``cl_sidespeed`` to :math:`\tilde{S}`
 
 ``+moveup`` and ``+movedown``
-   Assigns the positive or negative ``cl_upspeed`` to :math:`U`
+   Assigns the positive or negative ``cl_upspeed`` to :math:`\tilde{U}`
+
+This is done at client side. Before sending these values to the server, however, they will be truncated to integers and clamped to :math:`[-2047, 2047]`. Let :math:`M_m` the value of ``sv_maxspeed``. Then, ``PM_CheckParamters`` [*sic*] computes the final server side FSU values such that, assuming not all of FSU are zero,
+
+.. math:: F = \frac{\tilde{F}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}} \quad
+          S = \frac{\tilde{S}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}} \quad
+          U = \frac{\tilde{U}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}}
+
+If all of FSU are zero, then nothing is done and they remain zero.
