@@ -60,6 +60,7 @@ Here we immediately see that the growth of the object speed :math:`\lVert\mathbf
 func_breakable
 --------------
 
+.. _item duplication:
 
 Item duplication
 ~~~~~~~~~~~~~~~~
@@ -157,6 +158,19 @@ func_rotating
 func_friction
 -------------
 
-The func_friction entity is associated with the ``CFrictionModifier`` class defined in ``triggers.cpp``. However, it is not a typical trigger because it inherits from ``CBaseEntity`` and not ``CBaseTrigger`` or ``CBaseToggle``. This entity sets the friction modifier of any entity that touches it to a value specified by the map designer. This entity ignores entities of ``MOVETYPE_BOUNCEMISSILE`` and ``MOVETYPE_BOUNCE``, however. As a result, the friction modifier of many common entities is left unchanged on touch, including all grenades, snarks, and gibs.
+The func_friction entity is associated with the ``CFrictionModifier`` class
+defined in ``triggers.cpp``. However, it is not a typical trigger because it
+inherits from ``CBaseEntity`` and not ``CBaseTrigger`` or ``CBaseToggle``. This
+entity sets the friction modifier of any entity that touches it to a value
+specified by the map designer. This entity ignores entities of
+``MOVETYPE_BOUNCEMISSILE`` and ``MOVETYPE_BOUNCE``, however. As a result, the
+friction modifier of many common entities is left unchanged on touch, including
+all grenades, snarks, and gibs.
 
-The func_friction entity serves two purposes. The obvious one is to change the friction value of entities touching it. For example, a slippery wet floor may be simulated by placing a func_friction on the floor with a fractional friction modifier. The second less obvious purpose is to make the player bounce off other solid entities when touching it. Indeed, recall from :ref:`collision` that the overbounce factor is affected by the player friction modifier. Sometimes, the increased bounce may be an unintended side effect.
+The func_friction entity serves two purposes. The obvious one is to change the
+friction value of entities touching it. For example, a slippery wet floor may be
+simulated by placing a func_friction on the floor with a fractional friction
+modifier. The second less obvious purpose is to make the player bounce off other
+solid entities when touching it. Indeed, recall from :ref:`collision` that the
+bounce coefficient :math:`b` is affected by the player friction modifier.
+Sometimes, the increased bounce may be an unintended side effect.

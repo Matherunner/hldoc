@@ -230,49 +230,136 @@ This trick is useful for getting the beam to hit some entity on the other side o
 Hornet gun
 ----------
 
-Handgrenades
+The hornets created in primary fire has initial velocity
+
+.. math:: \mathbf{v}_h = 300 \mathbf{\hat{f}}
+
+where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. Hornets
+created in second fire has initial velocity
+
+.. math:: \mathbf{v}_h = 1200 \mathbf{\hat{f}}
+
+In both cases, the initial velocity is independent of the player velocity.
+
+TODO
+
+TODO
+
+.. _handgrenade:
+
+Hand grenade
 ------------
 
 The handgrenade is one of the most useful weapons for damage boosting in
-Half-Life.  It is versatile and can be used in many situations.  Interestingly,
-the initial speed and direction of the grenade when it is tossed depend on the
-player pitch in a subtle way.  For example, when :math:`\varphi = \pi/2`
-(i.e. the player is facing straight down) the initial speed and direction are
-:math:`0` and :math:`\pi/2` respectively.  However, when :math:`\varphi = 0`
+Half-Life. It is versatile and can be used in many situations. However, making a
+handgrenade land and explode at the right location can be tricky due to its
+bouncy nature and the delayed detonation.
+
+The handgrenade experiences entity gravity :math:`g_e = 0.5` and entity friction
+:math:`k_e = 0.8`, and moves with type ``MOVETYPE_BOUNCE``. As a result, the
+handgrenade experiences only half of the gravity experienced by the player. In
+addition, recall from :ref:`collision` that, if the entity friction is not 1,
+then a ``MOVETYPE_BOUNCE`` entity has bounce coefficient :math:`b = 2 - k_e`,
+which, in the case of the handgrenade, is numerically :math:`b = 1.2`. This is
+why a handgrenade bounces off surfaces unlike other entities.
+
+Interestingly, the initial speed and direction of the grenade when it is tossed
+depend on the player pitch in a subtle way. For example, when :math:`\varphi =
+\pi/2` (i.e. the player is facing straight down) the initial speed and direction
+are :math:`0` and :math:`\pi/2` respectively. However, when :math:`\varphi = 0`
 the initial speed and direction now become :math:`400` and :math:`-\pi/18 =
--10^\circ` respectively.  Another notable aspect of handgrenades is that its
-initial velocity depends on the player velocity at the instant of throwing.
-This is unlike MP5 grenades.
+-10^\circ` respectively. Another notable aspect of handgrenades is that its
+initial velocity depends on the player velocity at the instant of throwing. This
+is unlike MP5 grenades.
 
 In general, we can describe the initial velocity and direction of handgrenades
-in the following way.  **Assuming all angles are in degrees**.  First of all,
-the player pitch will be clamped within :math:`(-180^\circ, 180^\circ]`.  Let
+in the following way. **Assuming all angles are in degrees**. First of all, the
+player pitch will be clamped within :math:`(-180^\circ, 180^\circ]`. Let
 :math:`\varphi_g` be the handgrenade's initial pitch, then we have
 
 .. math:: \varphi_g = -10^\circ +
           \begin{cases}
-          (8/9) \varphi & \text{if } \varphi < 0 \\
-          (10/9) \varphi & \text{otherwise}
+          8\varphi/9 & \varphi < 0 \\
+          10\varphi/9 & \varphi \ge 0
           \end{cases}
 
-And if :math:`\mathbf{v}_g` is its initial velocity and
-:math:`\mathbf{\hat{f}}_g` is the unit forward vector constructed using
-:math:`\varphi_g`, then
+And if :math:`\mathbf{v}` is the current player velocity, :math:`\mathbf{v}_g`
+is the grenade's initial velocity, and :math:`\mathbf{\hat{f}}_g` is the unit
+forward vector computed using :math:`\varphi_g` and player's :math:`\vartheta`,
+then
 
 .. math:: \mathbf{v}_g = \mathbf{v} + \min(500, 360 - 4\varphi_g)
           \mathbf{\hat{f}}_g
 
-To visualise this equation, we plotted a graph of the handgrenade's horizontal
-speed and vertical velocity relative to the player against the player pitch.
+To visualise this equation, we plotted :numref:`handgrenade vel 1` which depicts
+how the handgrenade's relative horizontal speed and vertical velocities vary
+with player pitch.
 
-.. image:: images/handgrenade-vel.png
+.. figure:: images/handgrenade-vel-1.png
+   :name: handgrenade vel 1
+   :scale: 50%
 
-TODO
+   Plot of the relationship between relative horizontal and vertical velocities
+   by varying the player pitch :math:`-180^\circ < \varphi \le 180^\circ`.
+
+From :numref:`handgrenade vel 1`, we can make a few observations to understand
+the handgrenade throwing angles better. Firstly, player pitch within :math:`-180
+< \varphi \le -28.125^\circ`, the curve is a circular arc. This is because the
+relative speed of the full 3D relative velocity vector is exactly :math:`500`,
+since in this range :math:`500 \le 360 - 4 \varphi_g`. Player pitch beyond the
+non-smooth point at :math:`\varphi = -28.125^\circ` corresponds to a less
+trivial curve, however, as the relative speed itself varies with the pitch. A
+second observation we can make is that, for the vast majority of player pitch,
+the relative vertical velocity is positive or pointing upward. There exist some
+pitch angles that result in downward vertical velocity, and these angles may be
+useful under certain circumstances. A third observation is that, there is a
+difference between throwing backwards by rotating :math:`\vartheta` by 180
+degrees and keeping :math:`\varphi` the same, versus keeping :math:`\vartheta`
+the same and setting :math:`\varphi \mapsto 360^\circ - \varphi`. For example,
+although the player's unit forward vector :math:`\mathbf{\hat{f}} = \langle -1,
+0, 0\rangle` is exactly the same when :math:`\vartheta = 0^\circ` and
+:math:`\varphi = -180^\circ`, and when :math:`\vartheta = 180^\circ` and
+:math:`\varphi = 0^\circ`, observe that the throw velocity is quite different.
+Indeed, by having :math:`\varphi = -180^\circ` we obtain the maximum possible
+horizontal throwing velocity not attainable with the "normal" player pitch range
+in :math:`[-90^\circ, 90^\circ]`. A fourth observation is that, assuming the
+player pitch lies within :math:`[0^\circ, 180^\circ]`, the relative *horizontal
+velocity* is invariant under the transformation :math:`\varphi \mapsto
+180^\circ - \varphi`. For example, the relative horizontal velocity at
+:math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ -
+60^\circ` is equal.
 
 MP5
 ---
 
-The bullets are spread in similar ways to shotgun bullets, except there is only one bullet per ammo. See :ref:`shotgun` for a description of how bullet spreads are computed.
+The bullets are spread in similar ways to shotgun bullets, except there is only
+one bullet per ammo. See :ref:`shotgun` for a description of how bullet spreads
+are computed.
+
+The MP5 is a fairly versatile weapon due to its ability to shoot 10 contact
+grenades. A contact grenade has an entity gravity :math:`g_e = 0.5`. Therefore,
+an MP5 experiences only half of the gravity experienced by the player.
+
+The MP5 grenade is unique in how its launch velocity is independent of current
+player velocity. This runs counter to real life physics, where an object
+initially stationary relative to a moving reference frame must have the same
+velocity as that of the reference frame, and therefore any additional velocity
+imparted onto the object must add to that. The MP5 grenade, on the contrary,
+always launches at velocity
+
+.. math:: \mathbf{v}_g = 800 \mathbf{\hat{f}}
+
+where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. This
+peculiar behaviour can be advantageous in certain situations. For instance, we
+might want to "outrun" the grenade so that it explodes adjacent or behind us
+some time later.
+
+It is possible to have two MP5 grenades touch each other and explode together.
+
+Crowbar
+-------
+
+The crowbar is
 
 .. _shotgun:
 
@@ -284,6 +371,30 @@ The shotgun is a very powerful weapon in Half-Life.
 The primary attack of the shotgun fires 6 bullets and consumes 1 shell. The delay between shots is 0.75 seconds. The secondary attack fires 12 bullets and consumes 2 shells. The delay between shots is 1.5 seconds. Both the primary and the secondary attacks fire off multiple bullets, which is unique among Half-Life weapons. A special function called ``FireBulletsPlayer`` in ``combat.cpp`` is used to compute the damage tracings for shotguns and a few other weapons.
 
 For each bullet, the game computes a pseudorandom direction vector which is then used for tracing attacks. The direction vector is randomised using the shared RNG (see :ref:`shared rng`), with the seed increased successively in a predictable way as the game iterates through all bullets. As there are only 256 possible ways to seed the shared RNG, so are there only 256 possible shotgun spread patterns.
+
+Satchel charge
+--------------
+
+Similar to the hand grenade (:ref:`handgrenade`), a satchel charge experiences
+entity gravity :math:`g_e = 0.5` and entity friction :math:`k_e = 0.8`, and has
+move type ``MOVETYPE_BOUNCE``. One difference from hand grenades is that the
+entity gravity gets reset to 1 in the ``SatchelSlide`` touch function upon
+touching. Also, satchel charges float in water when its waterlevel is 3.
+
+A satchel charge, when thrown, is created at the player origin rather than at
+the player's view. The initial velocity is
+
+.. math:: \mathbf{v}_g = \mathbf{v} + 274\mathbf{\hat{f}}
+
+where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. The satchel
+charge has an owner property that remembers who created it. The satchel charge
+will pass through the owner, but will collide with any other entity. The owner
+property is saved across save loads. It is also saved across map changes,
+provided the satchel charge does not disappear across transition. If it does
+disappear, the charge will lose information about who the owner is, and so will
+not be detonate and will collide with the original owner.
+
+.. TODO: explain why
 
 Squeak grenade
 --------------

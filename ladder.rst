@@ -292,6 +292,19 @@ write out the complete formula for the optimal pitch as follows:
           \arccos\sqrt{2 n_z \sqrt{n_x^2 + n_y^2}}
    :label: ladder-varphi
 
+The equations :eq:`ladder-vartheta` and :eq:`ladder-varphi` can be trivially
+implemented in code to compute the best ladder climbing viewangles. Note that,
+since the ladder normal is a unit vector, the :math:`n_x^2 + n_y^2` that appears
+in both of these equations can alternatively be written as :math:`1 - n_z^2`.
+
+.. figure:: images/ladder-angles-1.png
+   :scale: 50%
+
+   Plot of the relationship between yaw and pitch by varying ladder slope angle
+   :math:`0 < \alpha \le \pi/2` such that :math:`\mathbf{\hat{n}} = \langle
+   \cos\alpha, 0, \sin\alpha\rangle`. The free variables have values :math:`S =
+   1`, :math:`F = 1`, and :math:`v_z = 1`.
+
 Optimal yaw and pitch when :math:`n_z < 0`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
