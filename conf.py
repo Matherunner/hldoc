@@ -113,7 +113,8 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'description': 'An attempt to document all aspects of Half-Life game physics and how to exploit them.',
+    'logo': 'hlprlogo.png',
+    'description': 'An attempt to document most aspects of Half-Life game physics and how to exploit them.',
     'font_size': '13pt',
     'font_family': '"minion pro", georgia, serif',
     'code_font_size': '85%',
