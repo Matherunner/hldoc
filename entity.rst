@@ -22,6 +22,97 @@ Movement
 
 .. TODO: how position, velocity is stepped through time
 
+All entities in Half-Life has an associated movement type, or *movetype*. These
+are all the possible movetypes in Half-Life:
+
+``MOVETYPE_NONE``
+   The entity never moves and not subjected to gravity. Examples of entities
+   using this movetype are triggers, RPG laser spots, ``env_explosion``, etc. In
+   the engine code, ``SV_Physics_None`` handles the physics of this movetype.
+   This function simply calls the ``Think`` function associated with the entity
+   and returns.
+
+``MOVETYPE_WALK``
+   This movetype is only used by the player and gives rise to the familiar air
+   and ground movement physics of the player (see :ref:`player movement`).
+
+``MOVETYPE_STEP``
+   This is the primary movetype used by monsters, analogous to ``MOVETYPE_WALK``
+   for the player. ``SV_Physics_Step`` handles this movetype, and it computes
+   water buoyancy physics, gravity by Euler's method (see :ref:`gravity`),
+   friction, position update, and also runs the entity's ``Think`` function.
+
+``MOVETYPE_FLY``
+   This movetype is used by entities that do not experience gravity, but has
+   collision. For example, the Nihilanth (:ref:`nihilanth`) uses this movetype,
+   so does the tripmine (:ref:`tripmine`), crossbow bolt, and many others.
+   Notably, this movetype is also used by the player on a ladder (:ref:`ladder
+   physics`). The ``SV_Physics_Toss`` is responsible of this movetype. It runs
+   the ``Think`` function, perform other checks, and compute position update and
+   collisions.
+
+   .. TODO talk about the SV_AngularMove somewhere, also in MOVETYPE_FLY there
+      is no friction, but other movetypes within SV_Physics_Toss does have it.
+
+``MOVETYPE_TOSS``
+   This movetype is used by gibs, dead monsters, and certain pickup items such
+   as the battery and suit. Similar to ``MOVETYPE_FLY``, the ``SV_Physics_Toss``
+   function handles this movetype, though with gravity.
+
+``MOVETYPE_PUSH``
+   This movetype is used by entities that can push and crush other entities, but
+   does not clip to worldspawn. These are buttons, doors, func_breakable
+   (:ref:`func_breakable`, but not func_pushable), func_rotating, func_wall,
+   func_pendulum, etc. ``SV_Physics_Pusher`` runs the physics for this movetype,
+   which calls either ``SV_PushRotate`` or ``SV_PushMove`` at some point, and
+   calls the ``Think`` function of the entity.
+
+``MOVETYPE_NOCLIP``
+   Entities with this movetype does not experience gravity, and does not clip
+   with any other entity. ``SV_Physics_Noclip`` is responsible of the physics,
+   which consists of running the ``Think`` function, computing position and
+   angle update, and ``SV_LinkEdict``.
+
+``MOVETYPE_FLYMISSILE``
+   This movetype is not found to be used by any entity in vanilla Half-Life. The
+   ``SV_Physics_Toss`` function is responsible of its physics.
+
+``MOVETYPE_BOUNCE``
+   This movetype is used by entities that can bounce off other entities. A
+   prominent example is the hand grenade (:ref:`handgrenade`), but satchel
+   charges (:ref:`satchel`), MP5 greandes, and others use this movetype as well.
+   Similar to ``MOVETYPE_TOSS``, ``SV_Physics_Toss`` is called for this
+   movetype, but with the bounce coefficient (see :ref:`collision`) computed by
+   :math:`b = 2 - k_e`.
+
+``MOVETYPE_BOUNCEMISSILE``
+   Just like ``MOVETYPE_FLYMISSILE``, this movetype does not seem to be used by
+   any entity in the unmodded Half-Life. ``SV_Physics_Toss`` is also called for
+   this movetype, and the bounce coefficient (see :ref:`collision`) is set to be
+   :math:`b = 2`, independent of entity gravity.
+
+``MOVETYPE_FOLLOW``
+   Entities of this movetype tracks the movement of the entity given by
+   ``pev->aiment``. For example, the ``CBasePlayerItem`` class, subclassed by
+   all player weapons, follows the player and is set to this movetype. Entities
+   of this movetype does not experience gravity or collision.
+   ``SV_Physics_Follow`` runs its physics code, and consists of calling
+   ``Think`` and copying the ``aiment`` origin and angles, along with
+   ``SV_LinkEdict``.
+
+``MOVETYPE_PUSHSTEP``
+   This entity seems to only be used by func_pushable. The physics of this
+   movetype is very similar to that of ``MOVETYPE_PUSH``, except that
+   ``MOVETYPE_PUSHSTEP`` uses a slightly different way to collide with other
+   entities.
+
+   TODO
+
+``MOVETYPE_COMPOUND``
+   This movetype does not seem to be used.
+
+.. _gravity:
+
 Gravity
 -------
 
@@ -122,7 +213,7 @@ Speed preserving circular walls
 
 In Half-Life, we can sometimes find concave walls made out of multiple planes
 that approximate a circular arc. Examples can be found in some Office Complex
-maps such as the wall shown in :ref:`arc wall c1a2`. Circular walls can be a
+maps such as the wall shown in :numref:`arc wall c1a2`. Circular walls can be a
 blessing for speedrunners because they allow making sharp turns without losing
 too much speed. In fact, if the number of planes increases, the approximation
 will improve, and so the speed will be better preserved.
@@ -136,7 +227,7 @@ will improve, and so the speed will be better preserved.
 Let :math:`n` be the number of walls and let :math:`\beta` be the angle
 subtended by the arc joining the midpoints of every wall. For example, with
 :math:`\beta = \pi/2` the first and the last walls will be perpendicular, and
-with :math:`\beta = \pi` the they will be opposite and parallel instead. Let
+with :math:`\beta = \pi` they will be opposite and parallel instead. Let
 :math:`\mathbf{v}_i` be the velocity immediately after colliding with the
 :math:`i`-th wall, and assuming :math:`\mathbf{v}_0` is parallel to and
 coincident with the first wall. Assume also that :math:`0 \le \beta / (n-1) \le

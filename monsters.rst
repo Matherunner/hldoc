@@ -7,10 +7,20 @@ Barney
 Gonarch
 -------
 
+.. _nihilanth:
+
 Nihilanth
 ---------
 
-Nihilanth is one of the more complex monsters in Half-Life. As a high level description, the nihilanth begins with 20 floating energy spheres around its head. There are three crystals around the big cylindrical chamber. Nihilanth has an initial health :math:`\mathcal{H}_n` of 800 in easy and medium modes, and 1000 in hard mode. When its health gets reduced below the starting health, it will absorb energy spheres, each sphere giving a health of :math:`\mathcal{H}_n / 20`.
+Nihilanth is one of the more complex monsters in Half-Life. As a high level
+description, the nihilanth begins with 20 floating energy spheres around its
+head. There are three crystals around the big cylindrical chamber. Nihilanth has
+an initial health :math:`\mathcal{H}_n` of 800 in easy and medium modes, and
+1000 in hard mode. When its health gets reduced below the starting health, it
+will absorb energy spheres, with each sphere giving a health of
+:math:`\mathcal{H}_n / 20`. Effectively, the nihilanth starts off with twice the
+designated health.
+
 
 Scientist
 ---------

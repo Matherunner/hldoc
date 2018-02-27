@@ -43,6 +43,8 @@ One way to change the yaw and pitch is by moving the mouse. This is not useful f
 
 .. TODO: should we talk about anglemod in the discussion about client-server in Game fundamentals?
 
+.. _anglemod:
+
 Anglemod
 ~~~~~~~~
 

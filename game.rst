@@ -15,7 +15,7 @@ Tracing is one of the most important computations done by the game. Tracing is d
 Randomness
 ----------
 
-The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. There are two sources of random generation, the *shared RNG* and the *non-shared RNG*. The shared RNG is named so because it is computed serverside, while the non-shared RNG is computed clientside. The shared RNG is usually more important because entities that require RNG in behaviour tend to use shared RNG. On the other hand, the non-shared RNG is typically used for sound and cosmetics.
+The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. There are two sources of random generation, the *shared RNG* and the *non-shared RNG*. The shared RNG is named so because it is computed serverside, while the non-shared RNG is computed at both sides with no synchronisation between them. The shared RNG is usually more important because entities that require RNG in behaviour tend to use shared RNG. On the other hand, the non-shared RNG is typically used for sound and cosmetics.
 
 .. _shared rng:
 
@@ -29,6 +29,8 @@ To seed the RNG, the code would call ``U_Srand``, which is likely never called d
 The entity code typically call one of two functions to generate random numbers: ``UTIL_SharedRandomLong`` for signed integers and ``UTIL_SharedRandomFloat`` for single precision floating point numbers. The implementations of the two functions can be found in the Half-Life SDK. It is interesting to note that, both of these functions seed the RNG at the very beginning using values dependent solely on their input parameters and nothing else (not even the system time). In fact, these two functions appear to be the only locations in the Half-Life SDK calling the seeding function. Given the observation that there are only 256 possible seeds, it follows that there are only 256 possible values returned by each of these functions. Calling the same function with the same seed repeatedly will result in the same value returned over and over again.
 
 Searching through the Half-Life SDK, the shared RNG is only used for idle weapon animations and randomisation of bullet spread in ``FireBulletsPlayer``. The ``FireBulletsPlayer`` function is called by many conventional weapons such as the MP5, 357, and shotgun (basis of box item duplication, see :ref:`item duplication`). It is not used by the glock, however. The implication is that there are only 256 ways bullets can spread when these weapons are fired. For example, it is feasible to enumerate all of 256 shotgun spread patterns given different seeds and select the ones most suited for a particular purpose.
+
+.. _nonshared rng:
 
 Non-shared RNG
 ~~~~~~~~~~~~~~
@@ -49,6 +51,17 @@ Frame rate
 
 Savestates
 ----------
+
+.. _delta:
+
+DELTA
+-----
+
+The DELTA mechanism is one of the ways Half-Life uses to save bandwidth in
+client-server communication.
+
+TODO
+
 
 Walking through a frame
 -----------------------

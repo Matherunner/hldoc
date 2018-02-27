@@ -27,7 +27,7 @@ Now let us backtrack and assume the player is onground. What if the player relea
 Duckbug
 ~~~~~~~
 
-The duckbug is one of the many ways of cancelling fall damage. Duckbug requires a slope, but otherwise works like a combination of jumpbug (see :ref:`jumpbug`) and edgebug. Similar to the jumpbug, the player must unduck to go from being in the air to onground within a frame, though no jump is required. And similar to the edgebug, the player must be able to exit the onground layer of the slope before the end of the frame by "sliding off" the ground. There is a minimum horizontal speed required to exist the 2 units onground layer. If :math:`v_\mathrm{min}` is the horizontal speed required, :math:`\tau` is the frame time, and :math:`\theta` is the angle of the slope, then the inequality
+The duckbug is one of the many ways of cancelling fall damage. Duckbug requires a slope, but otherwise works like a combination of jumpbug (see :ref:`jumpbug`) and edgebug. Similar to the jumpbug, the player must unduck to go from being in the air to onground within a frame, though no jump is required. And similar to the edgebug, the player must be able to exit the onground layer of the slope before the end of the frame by "sliding off" the ground. There is a minimum horizontal speed required to exit the 2 units onground layer. If :math:`v_\mathrm{min}` is the horizontal speed required, :math:`\tau` is the frame time, and :math:`\theta` is the angle of the slope, then the inequality
 
 .. math:: v_\mathrm{min} \tau > 2 \cot\theta
 

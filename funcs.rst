@@ -55,7 +55,7 @@ To observe the behaviour of :math:`\mathbf{u}_j`, we first ignore the velocity c
 
 Here we immediately see that the growth of the object speed :math:`\lVert\mathbf{u}\rVert` is exponential, and so is the growth of the player speed, albeit at a slower rate and much lower speed than the corresponding object speed. This is why when one holds ``+use`` on an object for too long, the object will quickly move past the player until it is out of the use radius, due to it very high speed relative to the player.
 
-
+.. _func_breakable:
 
 func_breakable
 --------------

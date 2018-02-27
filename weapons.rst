@@ -193,7 +193,7 @@ Selfgauss
 
 Selfgauss is a very well known trick, but probably one of the least understood among speedrunners. Selfgaussing is the result of the beam hitting the player as it is being fired out of the imaginary gun barrel, or specifically the player's gun position. This is due to the origin of the line tracing :math:`\mathbf{s}_i` being *inside the player model*. An analogy from the real world would be firing a pistol from inside one's body, so that the bullet hits the player's internals point blank. The outcome is a perfectly vertical speed boost, as the inflictor origin :math:`\mathbf{r}_\text{inflictor}` and the player origin :math:`\mathbf{r}` coincides, thus giving a perfectly upward :math:`\mathbf{\hat{d}}` vector (see :ref:`damage boosting`).
 
-It is a common misconception that selfgauss occurs because the beam somehow "reflects" backwards onto the player after hitting a wall. It is easy to see that this is a wrong explanation, because the beam cannot reflect when the angle of incidence is less than 60 degrees, and the gauss beam cannot reverse its damage inflicting direction.
+.. caution:: It is a common misconception that selfgauss occurs because the beam somehow "reflects" backwards onto the player after hitting a wall. It is easy to see that this is a wrong explanation, because the beam cannot reflect when the angle of incidence is less than 60 degrees, and the gauss beam cannot reverse its damage inflicting direction.
 
 In the first iteration, the gauss beam will ignore the player, because ``pentIgnore`` is set the be the player entity, as explained in :ref:`gauss mechanism`. Selfgauss will only work in the next iteration if ``pentIgnore`` is set to null, and :math:`\mathbf{s}_i = \mathbf{s}_{i+1}`. Therefore, selfgauss cannot happen if the beam strikes a non-gauss reflectable entity, for it modifies :math:`\mathbf{s}_{i+1}` in the next iteration. Selfgauss cannot happen if the beam reflects, as reflections change :math:`\mathbf{s}_{i+1}` as well.
 
@@ -244,6 +244,13 @@ In both cases, the initial velocity is independent of the player velocity.
 TODO
 
 TODO
+
+.. _tripmine:
+
+Tripmine
+--------
+
+
 
 .. _handgrenade:
 
@@ -329,6 +336,8 @@ velocity* is invariant under the transformation :math:`\varphi \mapsto
 :math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ -
 60^\circ` is equal.
 
+.. _mp5:
+
 MP5
 ---
 
@@ -371,6 +380,8 @@ The shotgun is a very powerful weapon in Half-Life.
 The primary attack of the shotgun fires 6 bullets and consumes 1 shell. The delay between shots is 0.75 seconds. The secondary attack fires 12 bullets and consumes 2 shells. The delay between shots is 1.5 seconds. Both the primary and the secondary attacks fire off multiple bullets, which is unique among Half-Life weapons. A special function called ``FireBulletsPlayer`` in ``combat.cpp`` is used to compute the damage tracings for shotguns and a few other weapons.
 
 For each bullet, the game computes a pseudorandom direction vector which is then used for tracing attacks. The direction vector is randomised using the shared RNG (see :ref:`shared rng`), with the seed increased successively in a predictable way as the game iterates through all bullets. As there are only 256 possible ways to seed the shared RNG, so are there only 256 possible shotgun spread patterns.
+
+.. _satchel:
 
 Satchel charge
 --------------
