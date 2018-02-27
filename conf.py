@@ -116,6 +116,7 @@ html_theme_options = {
     'description': 'An attempt to document all aspects of Half-Life game physics and how to exploit them.',
     'font_size': '13pt',
     'font_family': '"minion pro", georgia, serif',
+    'code_font_size': '85%',
     'base_bg': '#fafaf4',
 }
 
