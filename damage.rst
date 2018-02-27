@@ -187,13 +187,13 @@ Suppose we have calculated the exact :math:`\Delta\mathbf{v}` boost needed for a
 On the other hand, :math:`\mathcal{A}' = 0` also implies the health loss is related to the damage and armour by
 
 .. math:: \Delta\mathcal{H} = \operatorname{int}(D - 2\mathcal{A}) \implies \frac{1}{2} \left( D - \Delta\mathcal{H} - 1 \right) < \mathcal{A} \le \frac{1}{2} \left( D - \Delta\mathcal{H} \right)
-   :label: A=0_A_range
+   :label: zeroA Arange
 
 Combining the two inequalities, we can eliminate :math:`\mathcal{A}` and obtain the new inequality
 
 .. math:: \frac{1}{2} \left( D - \Delta\mathcal{H} - 1 \right) < \frac{2}{5} D
    \implies D < 5 \left( \Delta\mathcal{H} + 1 \right)
-   :label: A=0_D_range
+   :label: zeroA Drange
 
 In other words, the initial assumption of :math:`\mathcal{A}' = 0` is contingent upon the truth value of this inequality. This inequality sets an upper bound on the damage value for this approach to work. Assuming this inequality is true, then the requisite :math:`\mathcal{A}` value can be picked from the small range given by the second inequality.
 
@@ -208,11 +208,11 @@ Furthermore, this assumption also implies the equality
 Using the same analysis technique of replacing the integer truncation with a range, we obtain the equivalent range
 
 .. math:: 5 \Delta\mathcal{H} \le D < 5 \left( \Delta\mathcal{H} + 1 \right)
-   :label: A>0_D_range
+   :label: posA Drange
 
-Observe that this range overlaps with the range :eq:`A=0_D_range`. In fact, we need not consider the :math:`\mathcal{A}' > 0` case at all. This is because if :math:`\mathcal{A}' = 0` is not true, then the :math:`\mathcal{A}' > 0` case is not going to help us. If :math:`\mathcal{A}' > 0`, then this implies the upper bound on :math:`D` in :eq:`A=0_D_range`, and therefore :eq:`A>0_D_range` also fails. Therefore, we conclude that there exists no :math:`\mathcal{A}` that can produce the required health loss.
+Observe that this range overlaps with the range :eq:`zeroA Drange`. In fact, we need not consider the :math:`\mathcal{A}' > 0` case at all. This is because if :math:`\mathcal{A}' = 0` is not true, then the :math:`\mathcal{A}' > 0` case is not going to help us. If :math:`\mathcal{A}' > 0`, then this implies the upper bound on :math:`D` in :eq:`zeroA Drange`, and therefore :eq:`posA Drange` also fails. Therefore, we conclude that there exists no :math:`\mathcal{A}` that can produce the required health loss.
 
-A small note to make is that if :math:`D` satisfies :eq:`A>0_D_range`, then it means that we can pick any value of :math:`A` to give the same :math:`\Delta\mathcal{H}`, as long as the lower bound in :eq:`A=0_A_range` is satisfied.
+A small note to make is that if :math:`D` satisfies :eq:`posA Drange`, then it means that we can pick any value of :math:`A` to give the same :math:`\Delta\mathcal{H}`, as long as the lower bound in :eq:`zeroA Arange` is satisfied.
 
 .. We'll keep this distribution thing here in health and damage, and not in explosions, because these are applicable for other kinds of damage as well
 
