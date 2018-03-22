@@ -128,6 +128,22 @@ The *apply* operation corresponding to ``ApplyMultiDamage`` is also straightforw
 
 The *add* operation is slightly trickier. The corresponding ``AddMultiDamage`` accepts the target entity as an input. It first checks if the target entity is the same as ``pEntity`` in the global state. If the target entity is different from that in the global state, then the *apply* operation will be done, followed by zeroing out the damage amount and storing the target entity to ``pEntity``. Regardless of whether the target entity is the same, this function adds the input damage to the ``amount`` field.
 
+Gibbing
+~~~~~~~
+
+Gibbing monsters in Half-Life is inherently fun from a gameplay point of view,
+but it can be critical for speedrunning as well.
+
+TODO
+
+A damage may contain flags to indicate how it gibs monsters. These flags are
+``DMG_NEVERGIB`` and ``DMG_ALWAYSGIB``. The names are self-explanatory. When the
+damage is inflicted onto a living monster (i.e. not a corpse) and neither of
+these flags are set for the damage, then the monster will only gib if its health
+gets below ``GIB_HEALTH_VALUE``, defined to be :math:`-30` in ``cbase.h``.
+
+.. TODO discuss various ways to gib monsters, like shotgun + crowbar
+
 Damage types
 ------------
 

@@ -57,10 +57,10 @@ in combination with `pre-rendered`_ MathJax_. Sphinx is a really good system for
 generating highly structured documentations. In fact, it is used to document
 most Python modules, including the heavy hitters like numpy_, requests_, etc. In
 addition, reStructuredText is the most extensible and structured markup language
-that is not LaTeX, and it is rivalled only by AsciiDoc or AsciiDoctor. For
-mathematical typesetting, MathJax is by far the most mature for the web which
-runs well on many browsers. Prominent sites such as MathOverflow_ use it. By
-pre-rendering MathJax, the loading times of pages can be dramatically reduced.
+that is not LaTeX, rivalled only by AsciiDoc or AsciiDoctor. For mathematical
+typesetting, MathJax is by far the most mature for the web which runs well on
+many browsers. Prominent sites such as MathOverflow_ use it. By pre-rendering
+MathJax, the loading times of pages can be dramatically reduced.
 
 .. _Sphinx: http://www.sphinx-doc.org/en/master/
 .. _pre-rendered: https://github.com/mathjax/MathJax-node
