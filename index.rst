@@ -139,6 +139,7 @@ Contents
    triggers
    funcs
    snippets
+   automation
    casestudies
    practical
    glossary

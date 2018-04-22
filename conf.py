@@ -119,6 +119,7 @@ html_theme_options = {
     'font_family': '"minion pro", georgia, serif',
     'code_font_size': '85%',
     'base_bg': '#fafaf4',
+    'analytics_id': 'UA-67469786-1',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
