@@ -476,13 +476,17 @@ Computing :math:`\arctan`,
 .. math:: \frac{\pi}{4} - \xi = \frac{\pi}{4} - \arctan\frac{S}{F} = \arctan\frac{F - S}{F + S}
           = \arctan\frac{S'}{F'} = \xi'
 
-Let :math:`\xi` such that :math:`\tilde{\Phi}(\xi) \in P`. Let integers :math:`p
-= kS'` and :math:`q = kF'` for some :math:`k`, where :math:`\gcd(p,q) = 1`.
-Namely, :math:`p/q` is the completely reduced fraction of :math:`S'/F'`. Then if
-:math:`q \le 2047` is satisfied, we have :math:`\tilde{\Phi}(\xi') \in Q`. In
-addition, we also have
+Let :math:`\xi` such that :math:`\tilde{\Phi}(\xi) \in P`. Let integers
+:math:`kp = kS'` and :math:`kq = F'` for some :math:`k`, where :math:`\gcd(p,q)
+= 1`. Namely, :math:`p/q` is the completely reduced fraction of :math:`S'/F'`.
+Then if :math:`q \le 2047` is satisfied, we have :math:`\tilde{\Phi}(\xi') \in
+Q`. In addition, we also have
 
-.. math:: \tilde{\Phi}' = \left\lceil \frac{\xi}{u} \right\rceil - \frac{\xi}{u}
+.. math:: \tilde{\Phi}(\xi') = \frac{\xi'}{u} - \left\lfloor \frac{\xi'}{u}
+          \right\rfloor = \left\lceil \frac{\xi}{u} \right\rceil - \frac{\xi}{u}
+
+Namely, :math:`\tilde{\Phi}(\xi) + \tilde{\Phi}(\xi') = 1` if :math:`\xi/u` is
+not an integer.
 
 Line strafing
 -------------
