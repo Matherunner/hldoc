@@ -1,0 +1,40 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=3]
+  \pgfmathsetmacro{\s}{32}
+  \pgfmathsetmacro{\hS}{72}
+  \pgfmathsetmacro{\hD}{36}
+
+  \tikzset{
+    pics/cuboid/.style args={#1/#2}{
+      code={
+        \coordinate (A) at (0,0,0);
+        \coordinate (B) at (#1,0,0);
+        \coordinate (C) at (#1,0,#1);
+        \coordinate (D) at (0,0,#1);
+        \coordinate (E) at ($ (A) + (0,#2,0) $);
+        \coordinate (F) at ($ (B) + (0,#2,0) $);
+        \coordinate (G) at ($ (C) + (0,#2,0) $);
+        \coordinate (H) at ($ (D) + (0,#2,0) $);
+        
+        \draw[gray50,fill=gray20] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[gray50,fill=gray5] (A) -- (B) -- (F) -- (E) -- cycle;
+        \draw[gray50,fill=gray5] (A) -- (D) -- (H) -- (E) -- cycle;
+        \draw[gray50,fill=gray5,opacity=0.7] (B) -- (C) -- (G) -- (F) -- cycle;
+        \draw[gray50,fill=gray5,opacity=0.7] (E) -- (F) -- (G) -- (H) -- cycle;
+        \draw[gray50,fill=gray5,opacity=0.7] (C) -- (D) -- (H) -- (G) -- cycle;
+
+        \path (E) -- node[midway,above]{$#1$} (F);
+        \path (B) -- node[midway,right]{$#2$} (F);
+        \path (H) -- node[midway,above left=-2]{$#1$} (E);
+      },
+    },
+  }
+
+  \path (0,0,0) pic[scale=3] {cuboid=\s/\hS};
+  \path (70,0,0) pic[scale=3] {cuboid=\s/\hD};
+\end{tikzpicture}
+
+\end{document}

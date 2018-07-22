@@ -1,0 +1,42 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\walldeg}{30}
+  \pgfmathsetmacro{\walllen}{100}
+  
+  \coordinate (O) at (0,0);
+  \coordinate (A) at ($ (O) + (3*\walldeg:\walllen) $);
+  \coordinate (B) at ($ (A) + (2*\walldeg:\walllen) $);
+  \coordinate (C) at ($ (B) + (1*\walldeg:\walllen) $);
+  \coordinate (D) at ($ (C) + (0*\walldeg:\walllen) $);
+  \coordinate (E) at ($ (D) + (-1*\walldeg:\walllen) $);
+
+  \coordinate (mid-O-A) at ($ (O)!0.5!(A) $);
+  \coordinate (mid-A-B) at ($ (A)!0.5!(B) $);
+  \coordinate (mid-B-C) at ($ (B)!0.5!(C) $);
+  \coordinate (mid-C-D) at ($ (C)!0.5!(D) $);
+  \coordinate (mid-D-E) at ($ (D)!0.5!(E) $);
+  \coordinate (center) at (mid-C-D |- mid-O-A);
+
+  \draw (mid-O-A) node[left]{1};
+  \draw (mid-A-B) node[above left]{2};
+  \draw (mid-B-C) node[above left]{3};
+  \draw (mid-C-D) node[above]{4};
+  \draw (mid-D-E) node[above right]{5};
+
+  \path pic[angle radius=40,angle eccentricity=1.1,"$\beta$"] {angle=mid-A-B--center--mid-O-A};
+  \path pic[angle radius=40,angle eccentricity=1.1,"$\beta$"] {angle=mid-B-C--center--mid-A-B};
+  \path pic[angle radius=40,angle eccentricity=1.1,"$\beta$"] {angle=mid-C-D--center--mid-B-C};
+  \path pic[angle radius=40,angle eccentricity=1.1,"$\beta$"] {angle=mid-D-E--center--mid-C-D};
+
+  \foreach \p in {mid-O-A, mid-A-B, mid-B-C, mid-C-D, mid-D-E} {
+    \draw[densely dotted] (\p) -- (center);
+  }
+
+  \fill[black] (center) node[below right]{\emph{C}} circle (3);
+  \draw[thick] (O) -- (A) -- (B) -- (C) -- (D) -- (E);
+\end{tikzpicture}
+
+\end{document}

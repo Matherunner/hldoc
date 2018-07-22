@@ -1,0 +1,70 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\xscale}{60}
+  \pgfmathsetmacro{\tshift}{-20}
+  \pgfmathsetmacro{\cmdshift}{-50}
+  \pgfmathsetmacro{\stateY}{90}
+  \pgfmathsetmacro{\stateshift}{8}
+
+  \tikzset{
+    pics/bboxrect/.style args={#1}{
+      code={
+        \draw (-16,0) rectangle +(32,#1);
+      },
+    },
+  }
+
+  \coordinate (before-ducking) at (-1.5*\xscale,0);
+  \coordinate (start-ducking) at (0,0);
+  \coordinate (mid-ducking-1) at (1*\xscale,0);
+  \coordinate (mid-ducking-2) at (2*\xscale,0);
+  \coordinate (mid-ducking-3) at (3*\xscale,0);
+  \coordinate (start-ducked) at (4*\xscale,0);
+  \coordinate (mid-ducked-1) at (6*\xscale,0);
+  \coordinate (end-ducked) at (7*\xscale,0);
+
+  \coordinate (time-start) at (-120,0);
+  \coordinate (time-end) at (500,0);
+  \coordinate (state-O) at (0,\stateY);
+
+  \draw[thick,->] (time-start) -- (time-end);
+
+  \draw[->] (time-start |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (start-ducking |- state-O);
+  \draw[<->] (start-ducking |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{In-duck}} (start-ducked |- state-O);
+  \draw[<->] (start-ducked |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Ducked}} (end-ducked |- state-O);
+  \draw[<-] (end-ducked |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (time-end |- state-O);
+
+  \foreach \p in {start-ducking |- state-O, start-ducked |- state-O, end-ducked |- state-O} {
+    \draw ($ (\p) - (0,10) $) -- ($ (\p) + (0,10) $);
+  }
+
+  \path (before-ducking) pic {bboxrect=72};
+  \path (start-ducking) pic {bboxrect=72};
+  \path (mid-ducking-1) pic {bboxrect=72};
+  \path (mid-ducking-3) pic {bboxrect=72};
+  \path (start-ducked) pic {bboxrect=36};
+  \path (mid-ducked-1) pic {bboxrect=36};
+  \path (end-ducked) pic {bboxrect=72};
+
+  \node[left] at ($ (start-ducking) + (-16,36) $) {$72$};
+  \node[right] at ($ (start-ducked) + (16,18) $) {$36$};
+
+  \foreach \p in {before-ducking, start-ducking, mid-ducking-1, mid-ducking-3, start-ducked, mid-ducked-1, end-ducked} {
+    \fill[black] (\p) circle (3);
+  };
+
+  \node[yshift=\tshift,anchor=base] at (start-ducking) {$t$};
+  \node[yshift=\tshift,anchor=base] at (mid-ducking-1) {$t + 0.1$};
+  \node[yshift=\tshift,anchor=base] at (mid-ducking-2) {\ldots};
+  \node[yshift=\tshift,anchor=base] at (mid-ducking-3) {$t + 0.3$};
+  \node[yshift=\tshift,anchor=base] at (start-ducked) {$t + 0.4$};
+
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (start-ducking-n) at (start-ducking) {\verb|+duck|};
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (end-ducked-n) at (end-ducked) {\verb|-duck|};
+  \draw[darkBlue50,densely dotted] (start-ducking-n) edge (end-ducked-n);
+\end{tikzpicture}
+
+\end{document}

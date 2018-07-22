@@ -1,0 +1,58 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\xscale}{60}
+  \pgfmathsetmacro{\cmdshift}{-25}
+  \pgfmathsetmacro{\stateY}{115}
+  \pgfmathsetmacro{\stateshift}{8}
+  \pgfmathsetmacro{\hullshift}{55}
+
+  \tikzset{
+    pics/bboxrect/.style args={#1}{
+      code={
+        \draw (-16,-#1*0.5) rectangle +(32,#1);
+      },
+    },
+  }
+
+  \coordinate (before-ducked) at (-1.5*\xscale,0);
+  \coordinate (start-ducked) at (0,0);
+  \coordinate (mid-ducked-1) at (1*\xscale,0);
+  \coordinate (mid-ducked-2) at (1*\xscale,0);
+  \coordinate (mid-ducked-3) at (3*\xscale,0);
+  \coordinate (end-ducked) at (4*\xscale,0);
+
+  \coordinate (time-start) at (-120,0);
+  \coordinate (time-end) at (350,0);
+  \coordinate (state-O) at (0,\stateY);
+
+  \draw[thick,->] (time-start) -- (time-end);
+  \draw[gray50,densely dotted] (time-start |- 0,\hullshift) -- (time-end |- 0,\hullshift);
+
+  \draw[->] (time-start |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (start-ducked |- state-O);
+  \draw[<->] (start-ducked |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Ducked}} (end-ducked |- state-O);
+  \draw[<-] (end-ducked |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (time-end |- state-O);
+
+  \foreach \p in {start-ducked |- state-O, start-ducked |- state-O, end-ducked |- state-O} {
+    \draw ($ (\p) - (0,10) $) -- ($ (\p) + (0,10) $);
+  }
+
+  \path ([yshift=\hullshift]before-ducked) pic {bboxrect=72};
+  \path ([yshift=\hullshift]start-ducked) pic {bboxrect=36};
+  \path ([yshift=\hullshift]mid-ducked-1) pic {bboxrect=36};
+  \path ([yshift=\hullshift]mid-ducked-3) pic {bboxrect=36};
+  \path ([yshift=\hullshift]end-ducked) pic {bboxrect=72};
+
+  \foreach \p in {before-ducked, start-ducked, mid-ducked-1, mid-ducked-3, start-ducked, mid-ducked-1, end-ducked} {
+    \fill[black] (\p |- 0,\hullshift) circle (2);
+    \fill[black] (\p) circle (3);
+  };
+
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (start-ducked-n) at (start-ducked) {\verb|+duck|};
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (end-ducked-n) at (end-ducked) {\verb|-duck|};
+  \draw[darkBlue50,densely dotted] (start-ducked-n) edge (end-ducked-n);
+\end{tikzpicture}
+
+\end{document}

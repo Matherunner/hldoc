@@ -1,0 +1,59 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\ongroundThickness}{15}
+  \pgfmathsetmacro{\groundlen}{400}
+  \pgfmathsetmacro{\groundheight}{50}
+  \pgfmathsetmacro{\bboxscale}{2}
+
+  \tikzset{
+    pics/bboxrect/.style args={#1}{
+      code={
+        \fill[opacity=0.2] (-16*\bboxscale,0) rectangle +(32*\bboxscale,#1*\bboxscale);
+        \draw (-16*\bboxscale,0) rectangle +(32*\bboxscale,#1*\bboxscale);
+        \fill[black] +(0,#1*0.5*\bboxscale) coordinate (bbox-center) circle (2);
+      },
+    },
+  }
+
+  \coordinate (O) at (0,0);
+  \coordinate (O') at (0,\ongroundThickness);
+  \coordinate (P) at (0,-\groundheight);
+  \coordinate (G) at (\groundlen,0);
+  \coordinate (G') at (\groundlen,\ongroundThickness);
+  \coordinate (Q) at (\groundlen,-\groundheight);
+
+  \coordinate (A') at ($ (O)!0.25!(G) $);
+
+  \fill[brown20] (O) -- (G) -- (Q) -- (P) -- cycle;
+  \fill[green20] (O) -- (G) -- (G') -- (O') -- cycle;
+  \draw[thick,brown80] (O) -- (G);
+  \draw[green50] (O') -- (G');
+
+  \draw[<->] (O) -- node[left]{2} (O');
+
+  \draw[gray50] (A') +(0,80) pic {bboxrect=36};
+
+  \coordinate (A) at (bbox-center);
+  \coordinate (B') at ($ (A') + (120,0.5*\ongroundThickness) $);
+  \draw (A) node[above]{\emph{A}};
+  \draw (A) node[above=20*\bboxscale]{\emph{Ducked}};
+
+  \draw[gray50] (B') pic {bboxrect=72};
+
+  \coordinate (B) at (bbox-center);
+  \coordinate (C') at ($ (B' |- O) + (70,0) $);
+  \draw (B) node[above]{\emph{B}};
+  \draw (B) node[above=38*\bboxscale]{\verb|-duck|};
+
+  \draw[->] (A) -- (B);
+
+  \draw[gray50] (C') pic {bboxrect=72};
+  \coordinate (C) at (bbox-center);
+  \draw (C) node[above=38*\bboxscale]{\verb|+jump|};
+  \draw[->] (C) node[below]{\emph{C}} -- +(0,30) node[above]{$v_z$};
+\end{tikzpicture}
+
+\end{document}

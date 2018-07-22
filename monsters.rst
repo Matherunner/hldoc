@@ -14,13 +14,14 @@ General AI
 In this section, we will describe the general AI framework shared by all
 monsters in Half-Life, specifically subclasses of ``CBaseMonster``.
 Understanding the AI system in Half-Life is crucial in comprehending behaviours
-of specific monster types.
+of specific monster types. Keep the Half-Life SDK code opened on the side to aid
+understanding.
 
-For a given monster, all AI behaviour starts with ``RunAI``. This function is
+For a given monster, all AI behaviour starts with ``RunAI`` defined in ``monsterstate.cpp``. This function is
 called by ``MonsterThink`` 10 times per second. This function may be overridden
 by subclasses. In vanilla Half-Life, only the human assassin, bullsquid, and
 controller monster classes do so. As a high level overview, this function checks
-for enemies and ensure the *schedules* are running.
+for enemies and ensures the *schedules* are running.
 
 A *schedule* composes a series of *tasks* to represent a complex behaviour. Each
 task represents an atomic, basic, predefined action, along with a floating point

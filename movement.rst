@@ -256,4 +256,6 @@ this is sometimes called "sharking" in speedrunning.
 When the player is close a ground, a different kind of "jumping" physics takes
 place.
 
+.. TODO talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
+
 TODO

@@ -1,0 +1,41 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\axisLength}{200}
+  \pgfmathsetmacro{\viewLength}{300}
+  \pgfmathsetmacro{\thetaAng}{-40}
+  \pgfmathsetmacro{\phiAng}{45}
+  
+  \coordinate (O) at (0,0,0);
+  \coordinate (Ax) at (\axisLength,0,0);
+  \coordinate (Ay) at (0,\axisLength,0);
+  \coordinate (Az) at (0,0,\axisLength);
+
+  \draw[<->] (Ay) node[above]{$z$} -- (O) node[left]{$O$} -- (Ax) node[right]{$y$};
+
+  \begin{scope}[rotate around y=\thetaAng]
+    \coordinate (B) at (\phiAng:\viewLength);
+  \end{scope}
+
+  \coordinate (Bprojx) at ({cos(\phiAng)*cos(\thetaAng)*\viewLength},0,0);
+  \coordinate (Bprojz) at (0,0,{cos(\phiAng)*sin(-\thetaAng)*\viewLength});
+
+  \path[name path=horiz-guide] (Bprojz) -- +(\viewLength,0,0);
+  \path[name path=vert-guide] (Bprojx) -- +(0,0,\viewLength);
+  \path[name intersections={of=horiz-guide and vert-guide}];
+  \coordinate (B') at (intersection-1);
+
+  \draw[densely dotted] (B') -- (B);
+  \draw[densely dotted] (Bprojx) -- (B') -- (Bprojz);
+
+  \draw pic[draw,fill=white,->,angle radius=40,"$-\varphi$"] {angle=B'--O--B};
+  \draw pic[draw,fill=white,->,angle radius=45,"$\vartheta$"] {angle=Az--O--B'};
+
+  \draw[->] (O) -- (Az) node[below left]{$x$};
+  \draw[semithick,->] (O) -- (B') node[below right]{$F$};
+  \draw[thick,->] (O) -- node[above left]{$1$} (B) node[above right]{$V$};
+\end{tikzpicture}
+
+\end{document}

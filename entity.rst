@@ -161,6 +161,13 @@ times per frame.  The functions responsible of actually displacing entities are
 perform at most four aforementioned line tracing, each time potentially calling
 the velocity clipping function.
 
+.. figure:: images/collision-overbounce.svg
+   :name: collision overbounce
+
+   Depiction of a general case of collision, where the player collides with plane :math:`\mathit{OW}` at :math:`A`.
+
+Collision in the general case is depicted in :numref:`collision overbounce`. The point at which collision occurs is :math:`A`, and let the arrow :math:`\mathit{AB}` the velocity vector :math:`\mathbf{v}`. Then, the length of :math:`\mathit{AB'}` represents the dot product :math:`\mathbf{v} \cdot \mathbf{\hat{n}}`, and :math:`B'` is a projection of :math:`B` onto the line :math:`\mathit{AB'}`, which is parallel to the plane normal. In general, this dot product is scaled by :math:`b`, causing the final velocity vector to point out of the plane, shown by :math:`\mathit{AC}`. If :math:`b = 1` instead, then :math:`\mathit{AC'}` would be the final vector.
+
 In most cases, players have :math:`b = 1` because :math:`k_e = 1` and so is
 :math:`B`.  In general, :math:`b` for players is computed by :math:`b = 1 + B
 (1 - k_e)`.  The case of :math:`b \ne 1` is more common for other entities.
@@ -223,6 +230,8 @@ will improve, and so the speed will be better preserved.
 
    An example of a "speed preserving" wall in the Office Complex map of
    ``c1a2``, which is made up of multiple planes to approximate an arc.
+
+.. figure:: images/circular-wall.svg
 
 Let :math:`n` be the number of walls and let :math:`\beta` be the angle
 subtended by the arc joining the midpoints of every wall. For example, with

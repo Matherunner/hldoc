@@ -1,0 +1,73 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\slopedeg}{140}
+  \pgfmathsetmacro{\ongroundThickness}{15}
+  \pgfmathsetmacro{\slopelen}{300}
+  \pgfmathsetmacro{\guidelen}{150}
+  \pgfmathsetmacro{\bboxscale}{2}
+  \pgfmathsetmacro{\ABlen}{80}
+
+  \tikzset{
+    pics/bboxrect/.style args={#1}{
+      code={
+        \fill[opacity=0.2] (-16*\bboxscale,0) rectangle +(32*\bboxscale,#1*\bboxscale);
+        \draw (-16*\bboxscale,0) rectangle +(32*\bboxscale,#1*\bboxscale);
+        \fill[black] +(0,#1*0.5*\bboxscale) coordinate (bbox-center) circle (2);
+      },
+    },
+  }
+
+  \coordinate (O) at (0,0);
+  \coordinate (O') at ($ (O) + (0,\ongroundThickness) $);
+  \coordinate (S) at (\slopedeg:\slopelen);
+  \coordinate (S') at ($ (S) + (0,\ongroundThickness) $);
+  \coordinate (H) at (S |- O);
+
+  \fill[green20] (O') -- (S') -- (S) -- (O) -- cycle;
+  \draw[green50] (O') -- (S');
+  \fill[brown20] (O) -- (S) -- (H) -- cycle;
+  \draw[name path=O-S,thick,brown80] (O) -- (S);
+  \draw[<->] (S) -- node[left]{$2$} (S');
+
+  \draw pic [draw=green!20!black,<-,angle radius=40,"$\theta$",angle eccentricity=0.8] {angle=S--O--H};
+
+  \coordinate (B') at ($ (O)!0.4!(S) $);
+  \coordinate (C') at ($ (B') + (\ABlen,0) $);
+
+  % g-g' guideline
+  \draw[gray50,densely dotted] ($ (B') - (\guidelen,0) $) node[left]{$g$} -- ($ (B') + (\guidelen,0) $) node[right]{$g'$};
+  
+  \path[gray50] (B') pic {bboxrect=72};
+  \coordinate (B) at (bbox-center);
+  \draw (B) node[above right]{$B$};
+  \fill[black] (B') circle (2);
+  \node[below,xshift=-5] at (B') {$B'$};
+
+  \path[gray50] ($ (B') + (-\ABlen,100) + (0,18*\bboxscale) $) pic {bboxrect=36};
+  \coordinate (A) at (bbox-center);
+  \coordinate (A') at (A |- B');
+  \draw (A) node[above]{$A$};
+  \fill[black] (A') circle (2);
+  \draw (A') node[below]{$A'$};
+
+  \path[gray50] (C') pic {bboxrect=72};
+  \coordinate (C) at (bbox-center);
+  \draw (C) node[above]{$C$};
+  \fill[black] (C') circle (2);
+  \draw (C') node[below]{$C'$};
+
+  \draw (A) node[above=20*\bboxscale] {\emph{Ducked}};
+  \draw (B) node[above=38*\bboxscale] {\verb|-duck|};
+
+  \draw[->] (A) -- (B);
+  \draw[->] (B) -- (C);
+
+  \draw[densely dotted,gray50] (A) -- (A');
+  \draw[densely dotted,gray50] (B) -- (B');
+  \draw[densely dotted,gray50] (C) -- (C');
+\end{tikzpicture}
+
+\end{document}

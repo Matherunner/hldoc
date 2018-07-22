@@ -7,8 +7,7 @@ TODO incomplete
 TASing is fundamentally much more practical than theoretical. Mastery of any
 practical skill, be it playing the piano or tennis, can only come through
 practice, and so creating many TASes yourself is essential in understanding and
-appreciating the nuances of TASing and the Half-Life game physics. Due to the
-nature of this practical skill, this document alone will not teach you how to be
+appreciating the nuances of TASing and the Half-Life game physics. On this account, this document alone will not teach you how to be
 good at TASing. Instead, we will provide some tips and general notes.
 
 Console setup
