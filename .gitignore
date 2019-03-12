@@ -5,4 +5,4 @@ latex/
 *.swp
 *~
 venv/
-
+node_modules/
