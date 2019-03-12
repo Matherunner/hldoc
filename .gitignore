@@ -4,3 +4,5 @@ plots/
 latex/
 *.swp
 *~
+venv/
+
