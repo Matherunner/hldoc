@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "deploy": "./scripts/deploy"
+  },
+  "dependencies": {
+    "mathjax-node-page": "^3.0.1"
+  }
+}

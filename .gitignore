@@ -12,3 +12,5 @@ imgsrc/*.svg
 imgsrc/*.png
 imgsrc/*.gif
 
+venv/
+node_modules/
