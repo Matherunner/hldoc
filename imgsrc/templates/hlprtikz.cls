@@ -34,7 +34,7 @@
 
 \usetikzlibrary{
   angles,
-  arrows,
+  arrows.meta,
   calc,
   chains,
   intersections,
@@ -113,4 +113,6 @@
   \tikzset{
     every picture/.append style = {fs0},
   }
-\fi
+  \fi
+
+\pgfmathsetmacro{\DotRadius}{2}

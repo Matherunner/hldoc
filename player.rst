@@ -39,6 +39,10 @@ and the pitch by
 
 Note that these are different from :math:`\theta` and :math:`\phi`. We do not have a mathematical symbol for roll as it is rarely used. In mathematical discussions, the viewangles are assumed to be in *radians* unless stated otherwise. However, do keep in mind that they are stored in degrees in the game.
 
+.. figure:: images/viewangles.svg
+
+   Illustration of the geometric meaning of :math:`\vartheta` and :math:`\varphi`, with the camera's view represented by :math:`\mathit{OV}` and :math:`\mathit{OF}` is the projection of :math:`\mathit{OV}` on the horizontal plane. Note that since the sign convention of in-game :math:`\varphi` differs from that of standard trigonometry, a negative sign is needed.
+
 One way to change the yaw and pitch is by moving the mouse. This is not useful for tool-assisted speedrunning, however. A better method for precise control of the yaw and pitch angles is by issuing the commands ``+left``, ``+right``, ``+up``, or ``+down``. When these commands are active, the game increments or decrements the yaw or pitch by a certain controllable amount per frame. The amounts can be controlled by adjusting the variables ``cl_yawspeed`` and ``cl_pitchspeed``. For instance, when ``+right`` is active, the game multiplies the value of ``cl_yawspeed`` by the frame time, then subtracts the result from the yaw angle.
 
 .. TODO: should we talk about anglemod in the discussion about client-server in Game fundamentals?

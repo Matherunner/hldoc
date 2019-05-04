@@ -465,14 +465,3 @@ Then we proceed by substituting, yielding
 .. math:: r \approx \frac{\tau \lVert\mathbf{v}\rVert}{\sqrt{\lVert\mathbf{v}\rVert^2 - (L - k_e \tau MA)^2}} \left( \frac{2}{k_e \tau MA} \lVert\mathbf{v}\rVert^2 + 3L - 2 k_e \tau MA \right)
 
 We cannot simplify this equation further. In fact, solving for :math:`\lVert\mathbf{v}\rVert` is non-trivial as it requires finding a root to a relatively high order polynomial equation. As per the usual strategy when facing similar difficulties, we resort to iterative methods.
-
-Implementation notes
---------------------
-
-Anglemod compensation
-~~~~~~~~~~~~~~~~~~~~~
-
-Vectorial compensation
-~~~~~~~~~~~~~~~~~~~~~~
-
-Due to the anglemod,
