@@ -136,7 +136,9 @@ Preliminaries
 
 Referring to :numref:`stairparts` and borrowing architectural terminology, we will define a step to be a *riser* (vertical wall) of *rise height* :math:`h` followed by a *tread* (horizontal ground) of *tread depth* :math:`d`. Most stairs in Half-Life are homogeneous, in that the measurements of every step are the same throughout. This assumption will simplify analyses and cover the vast majority of circumstances a speedrunner would encounter in the field. On that account, we could describe stairs by the 3-tuple :math:`(d, h, n)` which encodes the tread depth, rise height, and number of steps respectively. 
 
-.. figure:: images/stairpairs.svg
+.. TODO: change this to svg
+
+.. figure:: images/stairparts.png
    :name: stairparts
 
    A schematic drawing of a stair.
