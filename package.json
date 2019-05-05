@@ -1,9 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "deploy": "./scripts/deploy"
+    "mjrender": "node ./scripts/mjrender"
   },
   "dependencies": {
+    "jsdom": "^15.0.0",
     "mathjax-node-page": "^3.0.1"
   }
 }
