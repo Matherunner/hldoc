@@ -491,10 +491,10 @@ lru-cache@^4.0.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-mathjax-node-page@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/mathjax-node-page/-/mathjax-node-page-3.0.1.tgz#6c1cad0dbab61fbf23054889369d5a89f833fcce"
-  integrity sha512-LlkChMBprwRqiNIhQ6eSuIG/FNt7HUzy0wkm2BD9/guGRLGvYxAmUC+cGbupmmqnuv0S1p0Un04BBoZAWdPqrQ==
+mathjax-node-page@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/mathjax-node-page/-/mathjax-node-page-3.2.0.tgz#251e78c08efecd5755234f96a1901bdb5bfc621d"
+  integrity sha512-06891FqPo9+IPoxFteF9vu8g09cHNUMvIrClTj2EmAOITJWtd2v1JC7V4FL40nZriMcMIkADkZw7eq+fpAA4Ww==
   dependencies:
     mathjax-node "^2.0.0"
     yargs "^11.0.0"

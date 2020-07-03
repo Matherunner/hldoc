@@ -14,10 +14,10 @@ postprocess() {
 export -f postprocess
 
 # Pre-render mathjax
-/bin/ls _build/html/*.html | parallel --will-cite postprocess
+/bin/ls build/html/*.html | parallel --will-cite postprocess
 
 # Delete unused static files from theme
-rm -vf _build/html/_static/jquery-*.js
-rm -vf _build/html/_static/underscore-*.js
+rm -vf build/html/_static/jquery-*.js
+rm -vf build/html/_static/underscore-*.js
 
 rsync -zavP --exclude '.buildinfo' --delete-excluded --delete _build/html/ $NFSNUSER@$NFSNHOST:/home/public/hl
