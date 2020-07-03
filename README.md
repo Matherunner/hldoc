@@ -9,11 +9,26 @@ This repo contains the source files for the Half-Life physics documentation host
 
 ## Building
 
-Install [Sphinx](http://www.sphinx-doc.org), then run
+Install python. Then first create a python `venv` folder:
 
-    make html
+    $ python -m venv venv
 
-The generated files will be in `_build`.
+Activate the venv:
+
+    $ . ./venv/bin/activate
+
+Then install the packages:
+
+    $ pip install -r requirements.txt
+
+To build the HTML files, run
+
+    $ make html
+
+To render the MathJax equations in the generated HTML files and deploy, first install yarn and parallel. Then run
+
+    $ yarn install
+    $ yarn deploy
 
 ## How to contribute
 
