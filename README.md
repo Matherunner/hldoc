@@ -1,6 +1,6 @@
 # Half-Life Physics Reference
 
-![Gordon and Scientist](https://www.jwchong.com/hl/_images/gordon-scientist.jpg)
+![Gordon and Scientist](https://raw.githubusercontent.com/Matherunner/hldoc/master/source/images/gordon-scientist.jpg)
 
 This repo contains the source files for the Half-Life physics documentation hosted at
 
