@@ -31,15 +31,8 @@ def clean_command(args):
 def build_command(args):
     subprocess.run(['sphinx-build', '-M', 'html', 'source', 'build']).check_returncode()
     postprocess_html('build/html')
-    # if args.production:
-    #     shutil.rmtree('dist', ignore_errors=True)
-
-    #     # FIXME: this currently has a problem: Parcel doesn't work well with jQuery and underscore
-    #     # Check the developer console and you'll see two errors
-    #     subprocess.run(['yarn', 'build'], shell=True).check_returncode()
 
 def deploy_command(args):
-    # FIXME: need to change the source to 'dist/' once the jQuery issue is fixed
     subprocess.run([
         'rsync', '-zavP', '--exclude', '.buildinfo',
         '--delete-excluded', '--delete', 'build/html/', args.dest

@@ -114,7 +114,7 @@ html_theme = 'alabaster'
 # documentation.
 html_theme_options = {
     'logo': 'hlprlogo.png',
-    'description': 'An attempt to document most aspects of Half-Life game physics and how to exploit them.',
+    'description': 'An attempt to document and exploit the in-game physics of Half-Life.',
     'font_size': '13pt',
     'font_family': '"minion pro", georgia, serif',
     'code_font_size': '85%',
