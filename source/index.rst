@@ -142,4 +142,5 @@ Contents
    automation
    casestudies
    practical
+   othergames
    glossary

@@ -11,16 +11,19 @@ Half-Life to validate and disprove existing beliefs or superstitions.
 General AI
 ----------
 
+.. attention:: This section is **work-in-progress**. The information here may be incomplete.
+
 In this section, we will describe the general AI framework shared by all
 monsters in Half-Life, specifically subclasses of ``CBaseMonster``.
 Understanding the AI system in Half-Life is crucial in comprehending behaviours
-of specific monster types.
+of specific monster types. Keep the Half-Life SDK code opened on the side to aid
+understanding.
 
-For a given monster, all AI behaviour starts with ``RunAI``. This function is
+For a given monster, all AI behaviour starts with ``RunAI`` defined in ``monsterstate.cpp``. This function is
 called by ``MonsterThink`` 10 times per second. This function may be overridden
 by subclasses. In vanilla Half-Life, only the human assassin, bullsquid, and
 controller monster classes do so. As a high level overview, this function checks
-for enemies and ensure the *schedules* are running.
+for enemies and ensures the *schedules* are running.
 
 A *schedule* composes a series of *tasks* to represent a complex behaviour. Each
 task represents an atomic, basic, predefined action, along with a floating point
@@ -404,3 +407,109 @@ Snarks are set to ``MOVETYPE_BOUNCE`` in each ``HuntThink``, which occurs once
 every 2 seconds. This implies that the bounce coefficient is :math:`b = 2 - 1/2
 = 3/2`. This bounce coefficient can affect how snarks bounce off any surface, as
 dictated by the general collision equation in :ref:`collision`.
+
+Houndeye
+--------
+
+Houndeyes are one of the less commonly encountered monsters in speedrunning. Nevertheless, they have a simple and yet unique attack system. Namely, houndeyes can form squads and the damage depends on squad size.
+
+Damage mechanism
+~~~~~~~~~~~~~~~~
+
+Houndeyes can form a squad with at most four members. Let :math:`n` be the number of squad members in a squad. Then, upon a sonic attack, a houndeye enumerates entities within a radius of 384 units, or ``HOUNDEYE_MAX_ATTACK_RADIUS`` as defined in the SDK. The houndeye will ignore other houndeyes and entities that cannot take damage.
+
+.. figure:: images/houndeyes.jpg
+
+   A squad of two houndeyes attacking the player.
+
+For each entity in the sphere, denote :math:`\ell` the distance between the centre (not the body centre used in explosion computations) that entity and the houndeye. If the entity is visible from the houndeye's point of view, apply damage
+
+.. math:: D = D_0 \left( 1.1 n - 0.1 \right) \left( 1 - \frac{\ell}{384} \right)
+
+where :math:`D_0` is the default houndeye damage indicated by the ``sk_houndeye_dmg_blast`` skill cvars, which is 10 on normal and 15 on both medium and hard modes. On the other hand, if the entity is not visible then what happens depends on the entity type. If the entity is a player, then the houndeye halves the damage :math:`D \gets D/2` dealt. If the entity is ``func_breakable`` or ``func_pushable``, then the original damage is dealt without halving. For all other entity types, the damage will be set to zero :math:`D \gets 0`.
+
+This is one of the more complex damage formula. The damage dealt depends on the squad size, and reaches a maximum of 4.3 times the original damage in the case of :math:`n = 4`, which can be devastating. The damage also depends on the radius of the target entity away from the houndeye, similar to how explosive damage works (see :ref:`explosions`).
+
+Hopping
+~~~~~~~
+
+Houndeyes are also one of the few monsters that can hop into the air. When the animation frame ``HOUND_AE_HOPBACK`` is played, the houndeye will set its velocity to
+
+.. math:: \mathbf{v} = -200 \mathbf{\hat{f}} + \langle 0,0, 0.3g \rangle
+
+where :math:`\mathbf{\hat{f}}` is the last ``gpGlobals->v_forward``, and :math:`g` is the value of ``sv_gravity``. This can and has been exploited to allow the player to jump to higher platforms, by having the houndeye jump first, and then jumping on top of it. One example of such use can be found in `this Blue Shift run <https://youtu.be/VPBckCOJ2Kk?t=353>`_ at 5:53 by quadrazid and rayvex, where he shot the houndeye to make it jump.
+
+.. TODO: is this the player's view vector or the houndeye's? Or is it not either? gpGlobals->v_forward can be changed by MakeVectors. OK there's a call in GetSchedule
+
+..
+   Assuming :math:`g = 800` and the player views vertically downward so that :math:`\mathbf{\hat{f}} = \langle 0,0,-1\rangle`, we can make the houndeye jump with an upward speed of 440 ups. This is a relatively high jumping speed, almost twice of that of the player (see :ref:`jumping`).
+
+
+Headcrab
+--------
+
+.. TODO: talk about the conditions for jumping
+
+Headcrabs are one of the most iconic monsters in Half-Life. They have a unique ability to jump towards the enemy's face and apply ``DMG_SLASH`` to it upon touch.
+
+.. figure:: images/headcrab-jump.svg
+   :name: headcrab jump
+
+   Illustration of how a headcrab plots its trajectory when attacking an enemy by leaping.
+
+When a headcrab is ready to attack by leaping, it will first shifts its position up by one unit. Then it targets the enemy's view (offset from the enemy's centre, as indicated by the point :math:`V` in :numref:`headcrab jump`) and tries to make its final vertical velocity at :math:`V` be zero. This amounts to computing the *initial* vertical speed, as obtained from solving classical mechanics,
+
+.. math:: v_z = \sqrt{2\max(g,1)\max(h,16)}
+
+where :math:`h` is the height difference between the centre of headcrab at :math:`C_H` and :math:`V`, and :math:`g` is the value of ``sv_gravity``. Notice that the headcrab will always make the height difference to be at least 16. The headcrab will then compute the time needed to travel to that height given this vertical velocity by
+
+.. math:: \Delta t = \frac{v_z}{g}
+
+This is followed by computing the initial horizontal velocity and replacing the vertical component by the initial vertical velocity computed above:
+
+.. math:: \mathbf{v} = \frac{\mathbf{r}_V - \mathbf{r}_{C_H}}{\Delta t} \operatorname{diag}(1,1,0) + \left\langle 0,0,v_z \right\rangle
+
+where :math:`\operatorname{diag}(1,1,0)` is a matrix projecting points to the horizontal plane, or simply one which extracts only the :math:`x` and :math:`y` components. The resulting trajectory is one that is illustrated by the parabola in :numref:`headcrab jump` from :math:`C_H` to :math:`V`. However, the headcrab does not stop here. If the speed :math:`\lVert\mathbf{v}\rVert > 650`, then the headcrab will scale it down to 650. This prevents the headcrab from jumping too far. This also implies that the headcrab can theoretically jump a maximum height of approximately 264 units when its initial vertical velocity is 650.
+
+As soon as the headcrab starts jumping, the headcrab begins to have a touch function set, which applies damage to any damageable entity that is not of the ``CLASS_ALIEN_PREY`` class. If this condition satisfies, the headcrab will apply damage when it's not on ground, and immediately after that, disable the touch function so as to prevent further damages.
+
+Bullsquid
+---------
+
+Bullsquids are one of the few monsters that can hop slightly into the air. When the ``BSQUID_AE_HOP`` animation frame is played, the bullsquid will set its vertical velocity to
+
+.. math:: v_z' = v_z + 0.3125g
+
+where :math:`g` is the value of ``sv_gravity``. If :math:`g = 800`, then the boost in vertical velocity is :math:`\Delta v_z = 250`, which is just a little under the player jumping speed (see :ref:`jumping`).
+
+Bullsquid melee attacks are also notable in the ability to launch the player into the air. For the ``BSQUID_AE_THROW`` attack, the bullsquid could set the player velocity to
+
+.. math:: \mathbf{v}' = \mathbf{v} + 300 \mathbf{\hat{f}} + 300 \mathbf{\hat{u}}
+
+where :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{u}}` are the *bullsquid's* forward and up view vectors respectively.
+
+Bullsquid's ranged attack is the highly recognisable spitting of green acid from a long distance. The green spit travels at a speed of *approximately* 900 ups as hardcoded in the SDK, in the direction towards the enemy. It is not exactly 900 ups because the spread of the spit is calculated without normalising the direction vector. Namely, if :math:`\mathbf{\hat{d}}` is the unit direction vector, then the spread is computed by setting
+
+.. math:: \mathbf{d}' = \mathbf{\hat{d}} + \left\langle U(-0.05,0.05), U(-0.05,0.05), U(-0.05,0) \right\rangle
+
+where :math:`U(a,b)` denotes a sample from the uniform distribution in :math:`[a, b]`, and the final spit velocity would be :math:`\mathbf{v} = 900\mathbf{d'}`.
+
+Alien grunt
+-----------
+
+Alien grunts are some of the toughest monsters in the game, and for a good reason. In the game storyline, they are armoured, and thus they are able to sustain more damage. But to be specific, they do not have an armour that work like the player's armour value. Instead, there is a hitgroup on the hitboxes that causes damages to it to be significantly reduced. When an enemy attacks the armoured hitboxes with damage :math:`D` and damage type ``DMG_BULLET``, or ``DMG_SLASH`` or ``DMG_CLUB``, the actual damage dealt will be
+
+.. math:: D' =
+          \begin{cases}
+          D - 20 & D > 20 \\
+          0.1 & D \le 20
+          \end{cases}
+
+That is, roughly, the damage dealt will be cut by a flat value of 20. In addition to the special armoured hitgroups, we must note that damaging the head of an alien grunt brings no benefits, unlike most other monsters. There is no three times scaling of damage from headshots.
+
+..
+   Zombie
+   ------
+
+   Zombies are one of the most iconic monsters in Half-Life as well. They do not have particularly interesting behaviour in the speedrunning context, though there is a notable aspect when receiving damage. Namely, a damage :math:`D` that is of pure ``DMG_BULLET`` type will only deal :math:`0.3D` to the zombie's health. This can be an important consideration when killing zombies as fast as possible is a concern. It is important to note that this only applies when the damage type is purely ``DMG_BULLET`` without other bits like ``DMG_NEVERGIB`` set.
+

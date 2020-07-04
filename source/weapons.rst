@@ -9,6 +9,10 @@ Gauss
 
 The gauss is one of the more interesting weapons in Half-Life. One of the earliest speedrunning tricks, the simple gauss boosting, and one of the most recently discovered tricks, quickgaussing, are both gauss-related. The gauss is arguably the most complex weapon in Half-Life, and it is worth devoting some paragraphs exploring its behaviour.
 
+.. figure:: images/gauss.jpg
+
+   The gauss weapon model.
+
 The gauss weapon has two modes, as any entry level Half-Life player would know. The primary mode of the gauss fires orange beams consuming 2 cells and providing 20 damage. The delay between shots in primary mode is 0.2s. The secondary mode is more interesting. In single-player mode, the weapon consumes a cell every 0.3s while charging, starting from an initial consumption of one cell. The minimum charge time is 0.5s. If the weapon charges for more than 10 seconds, the weapon will discharge and inflict 50 damage onto the player. The damage of the beam in secondary mode otherwise scales linearly with charging time :math:`T` such that
 
 .. math:: D = 50 \min(T, 4)
@@ -36,6 +40,10 @@ A detailed and complete understanding of the gauss behaviour can be achieved by 
 
 Beam iterations
 ~~~~~~~~~~~~~~~
+
+.. figure:: images/gauss-flowchart.svg
+
+   Flow chart of
 
 A gauss beam starts off with an initial damage :math:`D_1` and hit counter ``nMaxHits`` with an initial value of 10. The game then perform at most 10 iterations (tracked by ``nMaxHits`` which is decremented each iteration) to to calculate the dynamic behaviour of the gauss beam. In each iteration, the game may reduce the damage, inflict damage to some entity, or calculate beam reflection. If :math:`D_i \le 10` or ``nMaxHits`` reaches zero at some iteration :math:`i`, then the beam will stop iterating. This implies that the damage :math:`D_i` is akin to the "energy" of the beam.
 
@@ -218,12 +226,11 @@ Gauss rapid fire is useful in situations where gibbing damageable entities as qu
 Reflection bypass
 ~~~~~~~~~~~~~~~~~
 
-.. figure:: images/reflectionbypass-1.png
-   :scale: 50%
-
-   A gauss beam reflecting and bypassing a thin entity. The entity that lies within the purple dashed line remains undetected and untouched by the gauss beam.
-
 The reflection bypass refers to a method of causing the gauss beam to reflect and bypass a solid obstruction. Unlike the traditional way of punching through a wall using the secondary attack, this method relies on shooting very close to an edge so that the origin :math:`\mathbf{s}_i` of the reflected beam at some iteration :math:`i` is *outside the obstructing entity*. This works because the origin of the reflected beam :math:`\mathbf{s}_{j+1}` is 8 units away from :math:`\mathbf{e}_{j,1}` in the direction of the reflected vector :math:`\mathbf{\hat{p}}_{j+1}`. This 8 units skip in space allows bypassing any entity of any type of sufficient thinness. This trick works on both GR and non-GR entities, and for both primary and secondary shots.
+
+.. figure:: images/reflection-bypass.svg
+
+   A gauss beam reflecting and bypassing a thin entity. The entity that lies within the dotted line of 8 units in length is skipped completely by the reflected beam.
 
 This trick is useful for getting the beam to hit some entity on the other side of some thin obstruction with less than 8 units thickness. Although 8 units thin entities are relatively rare in Half-Life, it is not unusual to find them from time to time. The downside of this trick is that the beam loses some damage after reflection.
 
@@ -250,7 +257,11 @@ TODO
 Tripmine
 --------
 
+Tripmines can be placed 128 units away from the player's gun position. The origin of the tripmine will be placed 8 units away from the surface, with the beam parallel with the surface normal. Upon placing, the tripmine will be powered up after 1 if the bit 1 is set in ``pev->spawnflags``, or 2.5 seconds otherwise.
 
+.. TODO: explain what happens in PowerupThink()!
+
+Tripmines have a health of 1.
 
 .. _handgrenade:
 

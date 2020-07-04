@@ -1,0 +1,99 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}[start chain=main going below,node distance=30 and 180]
+  \node[fcbase,join] (start) {Start};
+  \node[fcbase,join] (init-dir) {$\symbf{d} \gets \symbf{f}$};
+  \node[fcbase,join] (init-source) {$\symbf{a} \gets \mathit{gun\ position}$};
+  \node[fcbase,join] (init-dest) {$\symbf{b} \gets \symbf{a} + 8192 \symbf{d}$};
+  \node[fcbase,join] (init-ignore) {$I \gets \mathit{player}$};
+  \node[fcbase,join] (init-has-punched) {$\mathit{punched} \gets 0$};
+  \node[fcbase,join] (init-damage) {$D \gets \mathit{initial\ damage}$};
+  \node[fcbase,join] (init-i) {$i \gets 10$};
+  \node[fcbase,join] (loop-condition) {$\left(D > 10 \land i > 0\right)$?};
+  \node[fcbase,join] (decrement-i) {$i \gets i - 1$};
+  \node[fcbase,join] (trace-1) {$\left(\symbf{e}_1, \mathit{ent}, \symbf{n}\right) \gets \operatorname{Tr}(\symbf{a}, \symbf{b}, I)$};
+  \node[fcbase,join] (all-solid-1) {All solid?};
+
+  \node[fcbase,join] (entity-is-null) {$(\mathit{ent} = \emptyset)$?};
+  \node[fcbase,join] (damageable) {Damageable?};
+  \node[fcbase,join] (reflectable) {Reflectable?};
+
+  \node[fcbase,join] (set-ignore-1) {$I \gets \emptyset$};
+  \node[fcbase,join] (compute-a) {$p \gets -\symbf{n} \cdot \symbf{d}$};
+  \node[fcbase,join] (a-lt-0_5) {$\left(p < 0.5\right)$?};
+
+  \node[fcbase,join] (has-punched) {$\left(\mathit{punched} = 1\right)$?};
+  \node[fcbase,join] (set-punched) {$\mathit{punched} \gets 1$};
+  \node[fcbase,join] (primary-fire) {Primary fire?};
+  \node[fcbase,join] (trace-2) {$\symbf{e}_2 \gets \operatorname{Tr}(\symbf{e}_1 + 8\symbf{d}, \symbf{b}, I)$};
+  \node[fcbase,join] (all-solid-2) {All solid?};
+  \node[fcbase,join] (trace-3) {$\symbf{e}_3 \gets \operatorname{Tr}(\symbf{e}_2, \symbf{e}_1, I)$};
+  \node[fcbase,join] (compute-a-dist) {$r \gets \lVert \symbf{e}_3 - \symbf{e}_1 \rVert$};
+  \node[fcbase,join] (a-lt-D) {$\left(r < D\right)$?};
+
+  \node[fcbase,join] (a-eq-0) {$\left(r = 0\right)$?};
+  \node[fcbase,join] (reduce-damage) {$D \gets D - r$};
+  \node[fcbase,join] (radius-damage) {$\operatorname{RadDmg}(\symbf{e}_3 + 8\symbf{d}, D)$};
+  \node[fcbase,join] (update-source-1) {$\symbf{a} \gets \symbf{e}_3 + \symbf{d}$};
+
+  \node[fcbase,on grid,left=of reflectable] (update-source-not-refl) {$\symbf{a} \gets \symbf{e}_1 + \symbf{d}$};
+  \node[fcbase,join] (update-ignore-not-refl) {$I \gets \mathit{ent}$};
+
+  \node[fcbase,on grid,left=of damageable] (apply-damage) {Dmg $\mathit{ent}$ by $D$};
+
+  \node[fcbase,on grid,right=of loop-condition] (break-1) {Stop};
+
+  \node[fcbase,on grid,left=of a-eq-0] (a-set-1) {$p \gets 1$};
+
+  \node[fcbase,on grid,left=of a-lt-0_5] (update-dir-refl) {$\symbf{d} \gets \symbf{d} + 2p\symbf{n}$};
+  \node[fcbase,join] (update-source-refl) {$\symbf{a} \gets \symbf{e}_1 + 8\symbf{d}$};
+  \node[fcbase,join] (update-dest-refl) {$\symbf{b} \gets \symbf{a} + 8192\symbf{d}$};
+  \node[fcbase,join] (reflect-damage) {$\operatorname{RadDmg}(\symbf{e}_1, pD)$};
+  \node[fcbase,join] (update-damage-refl) {$D \gets D \left(1 - p\right)$};
+
+  % Coordinates
+
+  \coordinate (loop-back-bend) at ($ (update-source-1) - (280,0) $);
+
+  % Drawing lines
+
+  \draw[->] (damageable.west) -- node[yesno,above]{yes} (apply-damage);
+  \path (damageable) to node[yesno,right]{no} (reflectable);
+  \draw[->] (apply-damage) -- (reflectable);
+
+  \draw[->] (reflectable.west) -- node[yesno,below]{no} (update-source-not-refl);
+  \path (reflectable) to node[yesno,right]{yes} (set-ignore-1);
+
+  \draw[->] (a-lt-0_5.west) -- node[yesno,above]{yes} (update-dir-refl);
+  \path (a-lt-0_5) to node[yesno,right]{no} (has-punched);
+  \draw[->] (update-damage-refl.west) -- (loop-back-bend |- update-damage-refl);
+
+  \draw[->] (update-ignore-not-refl.west) -- (update-ignore-not-refl -| loop-back-bend);
+
+  \draw[->] (all-solid-2.east) -| (break-1);
+  \path (all-solid-2) to node[yesno,above]{yes} (all-solid-2 -| break-1);
+  \path (all-solid-2) to node[yesno,right]{no} (trace-3);
+  \draw[->] (primary-fire) -- node[yesno,above]{yes} (primary-fire -| break-1);
+  \path (primary-fire) to node[yesno,right]{no} (trace-2);
+  \draw[->] (has-punched) -- node[yesno,above]{yes} (has-punched -| break-1);
+  \path (has-punched) to node[yesno,right]{no} (set-punched);
+  \draw[->] (entity-is-null) -- node[yesno,above]{yes} (entity-is-null -| break-1);
+  \path (entity-is-null) to node[yesno,right]{no} (damageable);
+  \draw[->] (all-solid-1) -- node[yesno,above]{yes} (all-solid-1 -| break-1);
+  \path (all-solid-1) to node[yesno,right]{no} (entity-is-null);
+  \draw[->] (loop-condition) -- node[yesno,above]{no} (break-1);
+  \path (loop-condition) to node[yesno,right]{yes} (decrement-i);
+
+  \draw[->] (a-lt-D) -- node[yesno,above]{no} (a-lt-D -| loop-back-bend);
+  \path (a-lt-D) to node[yesno,right]{yes} (a-eq-0);
+
+  \draw[->] (a-eq-0) -- node[yesno,above]{yes} (a-set-1);
+  \path (a-eq-0) to node[yesno,right]{no} (reduce-damage);
+  \draw[->] (a-set-1) -- (reduce-damage.west);
+
+  \draw[->] (update-source-1) -- (loop-back-bend) |- (loop-condition);
+\end{tikzpicture}
+
+\end{document}

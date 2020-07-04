@@ -11,20 +11,17 @@ General physics
 ---------------
 
 An explosion is a phenomenon in Half-Life that inflicts damage onto surrounding
-entities. An explosion needs not be visible, though it is normally accompanied
+entities. An explosion need not be visible, though it is normally accompanied
 with a fiery visual effect. We may describe an explosion in terms of three
 fundamental properties. Namely, as illustrated in :numref:`explosion terms`, an
 explosion has an *origin*, a *source damage*, and a *radius*.
 
-.. figure:: images/explosion-terms.png
+.. figure:: images/explosion-parts.svg
    :name: explosion terms
-   :scale: 50%
 
-   Illustration of the three main properties used to describe an explosion. Note
-   that in this figure it is assumed that nuking (see :ref:`nuking`) is not
-   done, so that the damage falls off linearly with distance from origin.
+   Illustration of the three main properties used to describe an explosion, namely the origin :math:`O` at the centre of the explosion, the source damage :math:`D` at the origin, and the radius :math:`R` of explosion. Here, it is assumed that nuking (see :ref:`nuking`) is *not* done, and so the damage falls off linearly with distance from origin.
 
-Suppose an explosion occurs. Let :math:`D` be its source damage and :math:`R` its radius. Suppose there is an entity adjacent to the explosion origin. From gaming experience, we know that the further away this entity is from the explosion origin, the lower the damage inflicted on this entity. In fact, the game only looks for entities within a sphere of radius :math:`R` from the explosion origin, ignoring all entities beyond. In the implementation, this is achieved by calling ``UTIL_FindEntityInSphere`` with the radius as one of the parameters.
+Suppose an explosion occurs. Let :math:`D` be its source damage and :math:`R` its radius, as shown in :numref:`explosion terms`. Suppose there is an entity adjacent to the explosion origin. From gaming experience, we know that the further away this entity is from the explosion origin, the lower the damage inflicted on this entity. In fact, the game only looks for entities within a sphere of radius :math:`R` from the explosion origin, ignoring all entities beyond. In the implementation, this is achieved by calling ``UTIL_FindEntityInSphere`` with the radius as one of the parameters.
 
 Assume the entity in question is within :math:`R` units from the explosion origin. First, the game traces a line from the explosion origin to the entity's *body target*. Recall from :ref:`entities` that the body target of an entity is usually, but not always, coincident with the entity's origin. Then, the game computes the distance between this entity's body target and the explosion origin as :math:`\ell`. The damage inflicted onto this entity is thus computed to be
 
@@ -77,6 +74,11 @@ Contact grenades
 ~~~~~~~~~~~~~~~~
 
 A contact grenade is a type of grenade which detonates upon contact with a solid entity. This includes the MP5 grenades and RPGs.
+
+.. figure:: images/explosion-contact-grenades.svg
+   :name: explosion contact grenades
+
+   Illustration of a contact grenade striking a surface and computing position of the the explosion origin :math:`O`. The line :math:`\mathit{AB}` is tangent to the trajectory at the final position.
 
 Let :math:`\mathbf{r}` be the origin of a contact grenade moving in space. Assuming the map is closed, the grenade will eventually hit some entity and then detonate. Denote unit vector :math:`\mathbf{\hat{n}}` the normal to the plane on the entity that got hit. Note that at the instant the grenade collides with the plane, its position will be on the plane. Thus at this instant, let :math:`\mathbf{v}` be the velocity of the grenade.
 

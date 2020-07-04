@@ -1,0 +1,37 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\groundWidth}{200}
+  \pgfmathsetmacro{\entThickness}{10}
+  \pgfmathsetmacro{\entHeight}{110}
+  \pgfmathsetmacro{\hitOffset}{20}
+  \pgfmathsetmacro{\hitAngle}{30}
+  \pgfmathsetmacro{\arrowLen}{80}
+  \pgfmathsetmacro{\skipLen}{40}
+  
+  \coordinate (O) at (0,0);
+  \coordinate (A) at (\groundWidth,0);
+  \coordinate (midOA) at ($ (O)!0.5!(A) $);
+  \coordinate (entA) at ($ (midOA) - (0.5*\entThickness,0) $);
+  \coordinate (entB) at ($ (midOA) + (0.5*\entThickness,\entHeight) $);
+  \coordinate (inc-end) at ($ (midOA) + (\hitOffset,0) $);
+  \coordinate (inc-start) at ($ (inc-end) + (\hitAngle:\arrowLen) $);
+  \coordinate (out-start) at ($ (inc-end) + (180-\hitAngle:\skipLen) $);
+  \coordinate (out-end) at ($ (out-start) + (180-\hitAngle:\arrowLen) $);
+
+  \draw (entA) rectangle (entB);
+  \node[above] at ($ (midOA) + (0,\entHeight) $) {Entity};
+  \draw[thick] (O) -- (A);
+
+  \draw[semithick,|->] (inc-start) -- node[near start,sloped,above=3,align=right]{Gauss \\[-5bp] beam} (inc-end);
+  \draw[densely dotted] (inc-end) -- (out-start);
+  \draw[semithick,|->] (out-start) -- (out-end);
+
+  \draw ($ (out-start)!10bp!90:(out-end) $) -- ($ (out-start)!50bp!90:(out-end) $);
+  \draw ($ (inc-end)!6bp!90:(out-end) $) -- ($ (inc-end)!50bp!90:(out-end) $);
+  \draw[<->] ($ (out-start)!40bp!90:(out-end) $) -- node[below left=-3]{$8$} ($ (inc-end)!40bp!90:(out-end) $);
+\end{tikzpicture}
+
+\end{document}

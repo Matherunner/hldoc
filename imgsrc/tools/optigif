@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec gifsicle --colors 256 --change-color '#ffffff' '#fafaf4' -O3 $@

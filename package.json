@@ -1,9 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "deploy": "./scripts/deploy"
+    "mjrender": "node ./scripts/mjrender",
+    "build": "parcel build --experimental-scope-hoisting --no-source-maps --public-url ./ ./_build/html/index.html"
   },
   "dependencies": {
-    "mathjax-node-page": "^3.2.0"
+    "jsdom": "^15.0.0",
+    "mathjax-node-page": "^3.2.0",
+    "parcel-bundler": "^1.12.3"
   }
 }

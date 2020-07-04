@@ -20,6 +20,8 @@ Movement automation
 In this chapter we will discuss a few algorithms or implementations of movement
 automation in a typical TAS tool.
 
+.. _vectorial compensation:
+
 Vectorial compensation
 ----------------------
 

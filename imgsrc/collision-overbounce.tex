@@ -1,0 +1,36 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\walldeg}{70}
+  \pgfmathsetmacro{\walllen}{300}
+  \pgfmathsetmacro{\wallthick}{150}
+  \pgfmathsetmacro{\overbounce}{0.4};
+
+  \coordinate (O) at (0,0);
+  \coordinate (W) at ($ (O) + (\walldeg:\walllen) $);
+  \coordinate (O') at ($ (O) + (\walldeg - 90:\wallthick) $);
+  \coordinate (W') at ($ (W) + (\walldeg - 90:\wallthick) $);
+
+  \coordinate (A) at ($ (O)!0.3!(W) $);
+  \coordinate (B) at ($ (A) + (\walldeg - 40:170) $);
+
+  \fill[brown20] (O) -- (W) -- (W') -- (O') -- cycle;
+  \draw[name path=O-W,brown80,thick] (O) node[below left,xshift=5]{$O$} -- (W) node[above,xshift=5]{$W$};
+
+  \coordinate (C') at ($ (O)!(B)!(W) $);
+  \coordinate (B-C') at ($ (C') - (B) $);
+  \coordinate (C) at ($ (C') + \overbounce*(B-C') $);
+  \coordinate (N) at ($ (A) - 0.3*(B-C') $);
+  \coordinate (B') at ($ (A)!(B)!(N) $);
+
+  \draw[densely dotted] (A) -- (B') node[below]{$B'$} -- (B) -- (C);
+  \draw[semithick,->] (A) -- (C) node[above]{$C$};
+  \draw[semithick,->] (A) node[left]{$A$} -- (B) node[above right]{$B$};
+  \draw[semithick,->] (N) node[below]{$\symbf{n}$} -- (A);
+
+  \draw (C') node[shift={(2,-3)},above right]{$C'$};
+\end{tikzpicture}
+
+\end{document}

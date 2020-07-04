@@ -1,0 +1,49 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\hcW}{50}
+  \pgfmathsetmacro{\eneH}{150}
+  \pgfmathsetmacro{\eneW}{66}
+  \pgfmathsetmacro{\eneOfs}{30}
+  \pgfmathsetmacro{\dimLen}{15}
+  
+  \coordinate (O) at (0,0);
+  \coordinate (A) at (310,0);
+  \coordinate (HC) at (50,5);
+  \coordinate (HCcentre) at ($ (HC) + 0.5*(\hcW,\hcW) $);
+  \coordinate (ENE) at (200,0);
+  \coordinate (ENEcentre) at ($ (ENE) + 0.5*(\eneW,\eneH) $);
+  \coordinate (ENEvofs) at ($ (ENEcentre) + (0,\eneOfs) $);
+
+  \coordinate (dimA) at ($ (HC) + (\hcW+5,0) $);
+  \coordinate (dimB) at ($ (dimA) + (40,0) $);
+
+  \node[right,yshift=5] at (dimB) {$1$};
+
+  \draw[thick] (O) -- (A);
+
+  \node[below] at (HCcentre |- O) {Headcrab};
+  \node[below] at (ENEcentre |- O) {Enemy};
+
+  \draw (HC) rectangle +(\hcW,\hcW);
+  \draw (ENE) rectangle +(\eneW,\eneH);
+
+  \draw (HCcentre) -- +(-0.5*\hcW-20,0) node[left]{$C_H$};
+  \draw (ENEcentre) -- +(0.5*\eneW+20,0) node[right]{$C_E$};
+  \draw (ENEvofs) -- +(0.5*\eneW+20,0) node[right]{$V$};
+
+  \draw[densely dotted] (HCcentre) -- (ENEvofs);
+  \draw[semithick,->] (HCcentre) parabola[bend at end] (ENEvofs);
+
+  \draw (dimA) -- (dimB);
+  \draw[<-] (dimB) ++(-10,0) -- ++(0,\dimLen);
+  \draw[<-] (dimB |- O) ++(-10,0) -- ++(0,-\dimLen);
+
+  \fill[black] (HCcentre) circle (\DotRadius);
+  \fill[black] (ENEcentre) circle (\DotRadius);
+  \fill[black] (ENEvofs) circle (\DotRadius);
+\end{tikzpicture}
+
+\end{document}

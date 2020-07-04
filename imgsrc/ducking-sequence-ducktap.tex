@@ -1,0 +1,60 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\xscale}{60}
+  \pgfmathsetmacro{\tshift}{-20}
+  \pgfmathsetmacro{\cmdshift}{-50}
+  \pgfmathsetmacro{\stateY}{110}
+  \pgfmathsetmacro{\stateshift}{8}
+
+  \tikzset{
+    pics/bboxrect/.style args={#1}{
+      code={
+        \draw (-16,0) rectangle +(32,#1);
+      },
+    },
+  }
+
+  \coordinate (before-ducking) at (-1.5*\xscale,0);
+  \coordinate (start-ducking) at (0,0);
+  \coordinate (mid-ducking-1) at (1*\xscale,0);
+  \coordinate (end-ducking) at (2*\xscale,0);
+
+  \coordinate (time-start) at (-120,0);
+  \coordinate (time-end) at (250,0);
+  \coordinate (state-O) at (0,\stateY);
+
+  \draw[thick,->] (time-start) -- (time-end);
+
+  \draw[->] (time-start |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (start-ducking |- state-O);
+  \draw[<->] (start-ducking |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{In-duck}} (end-ducking |- state-O);
+  \draw[<-] (end-ducking |- state-O) -- node[anchor=base,yshift=\stateshift]{\emph{Standing}} (time-end |- state-O);
+
+  \foreach \p in {start-ducking |- state-O, end-ducking |- state-O} {
+    \draw ($ (\p) - (0,10) $) -- ($ (\p) + (0,10) $);
+  }
+
+  \draw (end-ducking) ++(20,18) -- +(25,0);
+  \draw[<->] (end-ducking) ++(30,0) -- node[right=5]{$18$} +(0,18);
+
+  \path (before-ducking) pic {bboxrect=72};
+  \path (start-ducking) pic {bboxrect=72};
+  \path (mid-ducking-1) pic {bboxrect=72};
+  \path ([yshift=18]end-ducking) pic {bboxrect=72};
+
+  \foreach \p in {before-ducking, start-ducking, mid-ducking-1, end-ducking} {
+    \fill[black] (\p) circle (3);
+  };
+
+  \node[yshift=\tshift,anchor=base] at (start-ducking) {$t$};
+  \node[yshift=\tshift,anchor=base] at (mid-ducking-1) {$t + 0.1$};
+  \node[yshift=\tshift,anchor=base] at (end-ducking) {$t + 0.2$};
+
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (start-ducking-n) at (start-ducking) {\verb|+duck|};
+  \node[yshift=\cmdshift,anchor=base,darkBlue50] (end-ducking-n) at (end-ducking) {\verb|-duck|};
+  \draw[darkBlue50,densely dotted] (start-ducking-n) edge (end-ducking-n);
+\end{tikzpicture}
+
+\end{document}
