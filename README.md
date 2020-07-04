@@ -23,18 +23,11 @@ Then install the packages:
 
 To build the HTML files, run
 
-    $ make html
-
-To render the MathJax equations in the generated HTML files and deploy, first install yarn and parallel. Then run
-
-    $ yarn install
-    $ yarn deploy
+    $ python build.py build
 
 ## How to contribute
 
 You are encouraged to help out this documentation by researching and writing. You will be credited. This project will be kept online for as long as I'm alive. You can begin by checking out the list of topics below and research the ones you find interesting, or simply look at the empty sections of the documentation and contribute to research and writing for it.
-
-Quality in research is paramount.
 
 | Difficulty | Meaning |
 | --- | --- |
