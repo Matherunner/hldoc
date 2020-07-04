@@ -2,22 +2,9 @@
 
 set -e
 
-postprocess() {
-	file="$1"
-	tmpfile=$(mktemp) || exit 1
-	printf "Processing mathjax for $file...\n"
-	mjpage --output=CommonHTML < "$file" > "$tmpfile"
-	gsed -i '/<script.*MathJax\.js/d' "$tmpfile"
-	cp -f "$tmpfile" "$file"
-	rm -f "$tmpfile"
-}
-export -f postprocess
+if [[ -z $1 ]]; then
+	printf "usage: $0 bucket\n"
+	exit 1
+fi
 
-# Pre-render mathjax
-/bin/ls build/html/*.html | parallel --will-cite postprocess
-
-# Delete unused static files from theme
-rm -vf build/html/_static/jquery-*.js
-rm -vf build/html/_static/underscore-*.js
-
-rsync -zavP --exclude '.buildinfo' --delete-excluded --delete _build/html/ $NFSNUSER@$NFSNHOST:/home/public/hl
+exec aws s3 sync --delete --exclude .buildinfo build/html "$1"

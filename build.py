@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import os
+import glob
 import shutil
 import argparse
 import subprocess
 
 def postprocess_html(root):
+    print('Rendering MathJax')
     to_process = []
     for root, _dirs, files in os.walk(root):
         for file in files:
@@ -23,6 +25,13 @@ def postprocess_html(root):
         cssfile.seek(0, 0)
         cssfile.writelines(lines)
 
+    print('Delete unused files')
+    for file in glob.glob('build/html/_static/underscore-*.js'):
+        os.remove(file)
+    for file in glob.glob('build/html/_static/jquery-*.js'):
+        os.remove(file)
+    os.remove('build/html/objects.inv')
+
 def clean_command(args):
     shutil.rmtree('build', ignore_errors=True)
     shutil.rmtree('dist', ignore_errors=True)
@@ -31,12 +40,6 @@ def clean_command(args):
 def build_command(args):
     subprocess.run(['sphinx-build', '-M', 'html', 'source', 'build']).check_returncode()
     postprocess_html('build/html')
-
-def deploy_command(args):
-    subprocess.run([
-        'rsync', '-zavP', '--exclude', '.buildinfo',
-        '--delete-excluded', '--delete', 'build/html/', args.dest
-    ]).check_returncode()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -48,10 +51,6 @@ def main():
     build_parser = subparsers.add_parser('build', help='build help')
     build_parser.add_argument('-p, --production', dest='production', action='store_true', help='build for production')
     build_parser.set_defaults(func=build_command)
-
-    deploy_parser = subparsers.add_parser('deploy', help='deploy help')
-    deploy_parser.add_argument('dest', help='destination')
-    deploy_parser.set_defaults(func=deploy_command)
 
     args = parser.parse_args()
     args.func(args)
