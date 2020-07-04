@@ -18,7 +18,7 @@ function removeMathJaxScript(html) {
     return dom.serialize();
 }
 
-async function processFile(file) {
+function processFile(file) {
     console.log(`Processing ${file}`);
     const content = fs.readFileSync(file).toString();
     mjpage(content, { format: ['TeX'] }, { html: true }, (output) => {
@@ -28,12 +28,11 @@ async function processFile(file) {
     })
 }
 
-async function main() {
+function main() {
     const files = process.argv.slice(2);
-
-    // This is not truely multiprocessing, but it turns out running this script
-    // in parallel on each of the file provides little gain.
-    Promise.all(files.map(processFile));
+    for (const file of files) {
+        processFile(file)
+    }
 }
 
 main()
