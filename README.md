@@ -1,6 +1,6 @@
-# Half-Life Physics Documentation
+# Half-Life Physics Reference
 
-![Build Status](https://readthedocs.org/projects/tastools/badge/?version=latest)
+![Gordon and Scientist](https://www.jwchong.com/hl/_images/gordon-scientist.jpg)
 
 This repo contains the source files for the Half-Life physics documentation hosted at
 
