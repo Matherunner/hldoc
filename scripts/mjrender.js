@@ -20,7 +20,7 @@ function removeMathJaxScript(html) {
 
 async function processFile(file) {
     console.log(`Processing ${file}`);
-    const content = fs.readFileSync(file);
+    const content = fs.readFileSync(file).toString();
     mjpage(content, { format: ['TeX'] }, { html: true }, (output) => {
         const html = removeMathJaxScript(output);
         fs.writeFileSync(file, html);

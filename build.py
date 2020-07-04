@@ -11,10 +11,10 @@ def postprocess_html(root):
         for file in files:
             if file.endswith('.html'):
                 to_process.append(os.path.join(root, file))
-    subprocess.run(['yarn', 'mjrender', *to_process], shell=True).check_returncode()
+    subprocess.run(['yarn', 'mjrender', *to_process]).check_returncode()
 
     print('Fixing up alabaster.css')
-    with open('_build/html/_static/alabaster.css', 'r+') as cssfile:
+    with open('build/html/_static/alabaster.css', 'r+') as cssfile:
         lines = cssfile.readlines()
         for i, line in enumerate(lines):
             if line.startswith('@import url("basic.css");'):
@@ -24,25 +24,25 @@ def postprocess_html(root):
         cssfile.writelines(lines)
 
 def clean_command(args):
-    shutil.rmtree('_build', ignore_errors=True)
+    shutil.rmtree('build', ignore_errors=True)
     shutil.rmtree('dist', ignore_errors=True)
     shutil.rmtree('.cache', ignore_errors=True)
 
 def build_command(args):
-    subprocess.run(['sphinx-build', '-b', 'html', '.', '_build/html'], shell=True).check_returncode()
-    postprocess_html('_build/html')
-    if args.production:
-        shutil.rmtree('dist', ignore_errors=True)
+    subprocess.run(['sphinx-build', '-M', 'html', 'source', 'build']).check_returncode()
+    postprocess_html('build/html')
+    # if args.production:
+    #     shutil.rmtree('dist', ignore_errors=True)
 
-        # FIXME: this currently has a problem: Parcel doesn't work well with jQuery and underscore
-        # Check the developer console and you'll see two errors
-        subprocess.run(['yarn', 'build'], shell=True).check_returncode()
+    #     # FIXME: this currently has a problem: Parcel doesn't work well with jQuery and underscore
+    #     # Check the developer console and you'll see two errors
+    #     subprocess.run(['yarn', 'build'], shell=True).check_returncode()
 
 def deploy_command(args):
     # FIXME: need to change the source to 'dist/' once the jQuery issue is fixed
     subprocess.run([
         'rsync', '-zavP', '--exclude', '.buildinfo',
-        '--delete-excluded', '--delete', '_build/html/', args.dest
+        '--delete-excluded', '--delete', 'build/html/', args.dest
     ]).check_returncode()
 
 def main():
