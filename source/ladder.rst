@@ -430,3 +430,8 @@ noticeable difference.
 In general, if it is desired to attain as much height as possible by exiting a
 ladder, possibly with damage boosting immediately afterwards, it is always more
 optimal to exit the ladder at a lower frame rate.
+
+Non-normal :math:`\mathbf{n}`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It may be possible for the ladder normal :math:`\mathbf{n}` to not be normalised. This can happen if the player manages to "enter" the ladder entity. This may be achieved by ducking and unducking underneath the ladder entity.
