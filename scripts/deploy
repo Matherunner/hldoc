@@ -3,8 +3,8 @@
 set -e
 
 if [[ -z $1 ]]; then
-	printf "usage: $0 bucket\n"
+	printf "usage: $0 bucket/path\n"
 	exit 1
 fi
 
-exec aws s3 sync --delete --exclude .buildinfo build/html "$1"
+exec aws s3 sync --exclude .buildinfo build/html "$1"
