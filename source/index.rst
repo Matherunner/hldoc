@@ -114,7 +114,7 @@ Contact
 
 This documentation is currently a one-man project. `Contact me`_.
 
-.. _Contact me: me@jwchong.com
+.. _Contact me: jwcchong@gmail.com
 
 Contents
 --------
