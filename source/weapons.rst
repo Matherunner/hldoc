@@ -129,13 +129,17 @@ Multigauss
 
 Multigauss refers to the gauss beam hitting a non-gauss-reflectable entity, reflecting on some adjacent gauss-reflectable entity, and then hitting the same entity again with the reflected beam. In addition, a small radius damage is inflicted onto the entity as the beam reflects. Multigauss is useful for getting double the normal damage out of gauss beams for free.
 
+.. figure:: images/multigauss-crate.jpg
+
+   Aiming down at a crate and breaking it with one shot by shooting with the multigauss mechanism. The crate was hit twice, first by the incident beam and second by the reflected beam on the ground below the crate. This technique very close to double the damage inflicted. This crate would otherwise have required two primary gauss shots to break, consuming four cells instead of two.
+
+As explained in :ref:`entity piercing`, when a gauss beam hits a non-gauss-reflectable entity, it will inflict damage :math:`D` onto the entity. This is shown by the red portion of the beam in :numref:`multigauss figure`. In the next iteration, the beam will ignore the entity that got hit, passing right through the entity. Suppose the beam then hits a gauss-reflectable entity, such as the ground or a wall. If the angle of incidence is greater than 60 degrees (a necessary condition for the beam to reflect), the beam will reflect off the GR entity, as explained in :ref:`gauss mechanism`.
+
 .. figure:: images/multigauss-1.png
    :scale: 50%
    :name: multigauss figure
 
    Multigauss in action, depicted by a single gauss beam in three iterations (red, green, and blue) hitting a non-gauss-reflectable entity (i.e. damageable) twice. A radius damage is also produced at the point of reflection, though it is not depicted here.
-
-As explained in :ref:`entity piercing`, when a gauss beam hits a non-gauss-reflectable entity, it will inflict damage :math:`D` onto the entity. This is shown by the red portion of the beam in :numref:`multigauss figure`. In the next iteration, the beam will ignore the entity that got hit, passing right through the entity. Suppose the beam then hits a gauss-reflectable entity, such as the ground or wall. If the angle of incidence is greater than 60 degrees (a necessary condition for the beam to reflect), the beam will reflect off the GR entity, as explained in :ref:`gauss mechanism`.
 
 Whenever a gauss beam reflects, a radius damage will be applied from the point of reflection. This is a little known fact among Half-Life players. Suppose the angle of incident is :math:`\phi`. Then the radius damage is calculated to be :math:`D \cos\phi`. This radius damage will be inflicted onto the non-GR entity, though the final amount obviously depends on how far away the entity is from the point of reflection. In the most common case, the non-GR entity is simply in contact with the GR entity. For instance, a damageable crate (non-GR) is usually in contact with the ground (GR). As a result, the distance of the non-GR entity from the point of reflection will be zero, causing 100% of the radius damage to be inflicted onto it.
 
@@ -146,10 +150,10 @@ Iteration          Damage
 ================== ============
 First              :math:`D`
 Second             :math:`\le D \cos\phi`
-Third              :math:`D (1 - \cos\phi)`
+Third              :math:`D \left(1 - \cos\phi\right)`
 ================== ============
 
-The total damage inflicted onto the non-GR entity is simply the sum of all damages, which has a maximum of :math:`2D`, or twice the damage. Notice how the total damage is independent of the angle of incident :math:`\phi`. The only reason that causes the total damage to be less than :math:`2D` is the non-GR entity located at a distance away from the point of reflection. Never the less, even if we ignore the radius damage, the total damage inflicted onto the entity is still greater than the damage of a normal beam alone.
+The total damage inflicted onto the non-GR entity is simply the sum of all damages, which has a maximum of :math:`2D`, or twice the damage. Notice that the maximum possible damage is independent of the angle of incident :math:`\phi`. One way that could lower the total damage from the maximum of :math:`2D` is for the non-GR entity to be located at a distance away from the point of reflection. Nevertheless, even ignoring the radius damage, the total damage inflicted onto the entity is still greater than the damage of one normal beam alone.
 
 .. _entity punch:
 
@@ -164,6 +168,10 @@ As explained in :ref:`gauss mechanism`, a secondary gauss beam can punch through
    A secondary gauss beam can punch through a GR entity and create an explosion 8 units away from the exit point, with a damage magnitude proportional to :math:`\ell`.
 
 If the line tracings went well, the game will create an explosion 8 units away from the exit point. The thinner the walls or entities (barring the caveats above), the higher the explosive damage. Since the explosion origin is displaced from the exit surface, it is possible for the origin to be located inside some other entity, thus causes nuking (see :ref:`nuking`). In general, entity punching can be very powerful. With a full gauss charge, the player can instantly create explosions of a maximum of 200 source damage, outclassing most explosive weapons.
+
+.. figure:: images/gauss-entity-punch.jpg
+
+   An in-game execution of the gauss entity punch mechanism. While the beam struck the pillar and completely missed the human grunt targets, the explosion created on the other side of the pillar was able to reduce the grunt on the left into gibs and tear down a table on the right into splinters.
 
 Reflection boost
 ~~~~~~~~~~~~~~~~
@@ -204,6 +212,10 @@ Selfgauss is a very well known trick, but probably one of the least understood a
 .. caution:: It is a common misconception that selfgauss occurs because the beam somehow "reflects" backwards onto the player after hitting a wall. It is easy to see that this is a wrong explanation, because the beam cannot reflect when the angle of incidence is less than 60 degrees, and the gauss beam cannot reverse its damage inflicting direction.
 
 In the first iteration, the gauss beam will ignore the player, because ``pentIgnore`` is set the be the player entity, as explained in :ref:`gauss mechanism`. Selfgauss will only work in the next iteration if ``pentIgnore`` is set to null, and :math:`\mathbf{s}_i = \mathbf{s}_{i+1}`. Therefore, selfgauss cannot happen if the beam strikes a non-gauss reflectable entity, for it modifies :math:`\mathbf{s}_{i+1}` in the next iteration. Selfgauss cannot happen if the beam reflects, as reflections change :math:`\mathbf{s}_{i+1}` as well.
+
+.. figure:: images/boot_camp_selfgauss.jpg
+
+   A famous selfgauss spot in the ``boot_camp`` multiplayer map that has caused many players to die unintentionally.
 
 Suppose when the player fires the gauss in secondary mode, the beam first strikes some entity at a sufficiently small angle of incidence so that the beam does not reflect. Assuming this entity is gauss reflectable, the game will perform two traces to determine the distance between the "exit point" and the entry point. This distance is denoted as :math:`\ell`. Selfgauss will only work if :math:`\ell` is less than the numerical damage of the beam. If the opposite is true, then :math:`\mathbf{s}_{i+1}` will be modified, preventing selfgauss. This implies that higher :math:`\ell` is more desirable as it allows for selfgaussing with a greater damage, and thus producing greater boosts. The same caveat with regards to the meaning of :math:`\ell` should be applied, as explained in :ref:`entity punch`. Namely, while it commonly is found to be the thickness of the entity the beam is hitting, this is not always the case. It is not always easy to tell at first sight what :math:`\ell` might be for a given geometry and terrain.
 

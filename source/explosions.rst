@@ -5,6 +5,10 @@ Explosions
 
 This page details the physics of explosion and explosive weapons, along with some speedrunning tricks that arise of out these aspects of the game. Familiarity with the health and damage system is assumed (see :ref:`health and damage`).
 
+.. figure:: images/explosion-mortar.jpg
+
+   A powerful explosion created by a mortar strike in We've Got Hostile that gibbed a human grunt in one hit and inflicted some damage to the player from a distance.
+
 .. _explosion physics:
 
 General physics
@@ -97,6 +101,10 @@ Timed grenades
 
 Timed grenades are grenades that detonate after a specific amount of time. This
 includes hand grenades, which explode three seconds after the pin is pulled.
+
+.. figure:: images/timed-grenade.jpg
+
+   The handgrenade is the most common example of a timed grenade.
 
 Denote :math:`\mathbf{r}` the origin of a timed grenade. At detonation, the
 grenade may or may not be lying on a plane. Since the grenade could well be
