@@ -1,0 +1,62 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+% FIXME: emptyset and mathcal are too thin
+
+\begin{tikzpicture}[start chain=main going below,node distance=30 and 180]
+  \node[fcbase,join] (start) {Think Start};
+  \node[fcbase,join] (set-think) {$\mathit{NextThink} \gets t_G + 0.1$};
+  \node[fcbase,join] (has-prey) {$\mathit{Prey} \ne \emptyset$?};
+
+  \node[fcbase,on grid,right=of has-prey] (prey-dead) {Dead $\mathit{Prey}$?};
+  \node[fcbase,join] (lifting) {$\mathit{Lifting}$?};
+  \node[fcbase,join] (prey-dead-2) {Dead $\mathit{Prey}$?};
+  % Add draw=blue!80 to debug
+  \node[fcbase,join,text width=25em] (set-prey-new-orig) {
+    \vspace{-\baselineskip}
+    \begin{multline*}
+      \symbf{r}_{\mathit{Prey}}' \gets
+      \langle r_{B,x}, r_{B,y}, r_{\mathit{Prey},z + 8} \rangle \\
+      - \langle 6\cos(\vartheta_{\mathit{Prey}}), 6\sin(\vartheta_{\mathit{Prey}}), 0 \rangle
+    \end{multline*}
+  };
+  \node[fcbase,join] (decrement-tongue-len) {$L_T \gets L_T - 8$};
+  \node[fcbase,join] (position-reached) {$\left\lvert r_{B,z} - r_{\mathit{Prey},z} - \mathit{VOffset}_{\mathit{Prey},z} + 8 \right\rvert < 44$?};
+  \node[fcbase,join] (stop-lifting) {$\mathit{Lifting} \gets 0$};
+  \node[fcbase,join] (set-kill-time) {$\mathit{KillTime} \gets t_G + 10$};
+  \node[fcbase,join] (bite-prey-1) {$\operatorname{Bite}(\mathit{Prey})$};
+  \node[fcbase,join] (set-prey-origin) {$\symbf{r}_{\mathit{Prey}} \gets \symbf{r}_{\mathit{Prey}}'$};
+
+  \node[fcbase,on grid,left=of has-prey] (in-pvs) {Player in PVS?};
+  \node[fcbase,join] (find-prey) {$(P,\ell) \gets \operatorname{FindPrey}()$};
+  \node[fcbase,join] (found-prey) {$P \ne \emptyset \land \mathit{TongueExtended}$?};
+  \node[fcbase,join] (set-prey) {$\mathit{Prey} \gets P$};
+  \node[fcbase,join] (set-prey-movetype) {Set fly movetype for $\mathit{Prey}$};
+  \node[fcbase,join] (set-prey-vel) {$\symbf{v}_{\mathit{Prey}} \gets \symbf{0}$};
+  \node[fcbase,join] (set-prey-basevel) {$\symbf{b}_{\mathit{Prey}} \gets \symbf{0}$};
+  \node[fcbase,join] (set-prey-horiz) {$\symbf{r}_{\mathit{Prey}} \gets \langle r_{B,x},r_{B,y},r_{\mathit{Prey},z} \rangle$};
+  \node[fcbase,join] (set-tongue-length) {$L_T \gets r_{B,z} - \mathit{EyePosition}_{\mathit{Prey},z}$};
+
+  \node[fcbase,on grid,left=of bite-prey-1] (kill-time-check) {$t_G > \mathit{KillTime}$?};
+  \node[fcbase,join] (kill-prey) {$\operatorname{Damage}(\mathit{Prey}, \mathcal{H}_{\mathit{Prey}})$};
+  \node[fcbase,join] (sample-from-dist) {$x \gets U_D(0,49)$};
+  \node[fcbase,join] (compare-sample) {$x = 0$?};
+  \node[fcbase,join] (bite-prey-2) {$\operatorname{Bite}(\mathit{Prey})$};
+
+  % Drawing lines
+
+  \draw[->] (has-prey.east) -- node[yesno,above]{yes} (prey-dead);
+  \draw[->] (has-prey.west) -- node[yesno,above]{no} (in-pvs);
+  \path (prey-dead) to node[yesno,right]{no} (lifting);
+  \path (lifting) to node[yesno,right]{yes} (prey-dead-2);
+  \path (prey-dead-2) to node[yesno,right]{no} (set-prey-new-orig);
+  \path (position-reached) to node[yesno,right]{yes} (stop-lifting);
+
+  \path (found-prey) to node[yesno,right]{yes} (set-prey);
+
+  \path (kill-time-check) to node[yesno,right]{yes} (kill-prey);
+  \path (compare-sample) to node[yesno,right]{yes} (bite-prey-2);
+\end{tikzpicture}
+
+\end{document}
