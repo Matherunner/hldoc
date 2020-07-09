@@ -42,6 +42,7 @@ Beam iterations
 ~~~~~~~~~~~~~~~
 
 .. figure:: images/gauss-flowchart.svg
+   :name: gauss-flowchart
 
    Flow chart of
 
@@ -91,6 +92,8 @@ Suppose the player is stationary. At :math:`t = 0`, the player begins charging a
 
 If it is possible to pre-charge the gauss weapon before timing a particular run, then it is still beneficial to charge the weapon as much as possible and then release the charge at :math:`t = 0`. This gives a higher initial speed in :numref:`simple gauss boosts` instead of 0 as shown, which effectively shifts the graphs upwards and increasing the area under the graphs.
 
+.. _quickgauss:
+
 Quickgauss
 ~~~~~~~~~~
 
@@ -122,28 +125,27 @@ Entity piercing
 
 When a beam hits a non-gauss-reflectable entity, which implies it is damageable, the beam will first inflict damage onto the entity. Then, in the next iteration, the beam will *ignore* that entity while continue tracing forward. This results in the beam passing right through the entity untouched, and hitting some other entity instead. It is also important to note the beam does not lose energy when it passes through non-GR entities. Understanding entity piercing allows the runner to save time and ammo by reducing the number of shots required to damage multiple targets.
 
-.. _multigauss:
+.. _doublegauss:
 
-Multigauss
-~~~~~~~~~~
+Doublegauss
+~~~~~~~~~~~
 
-Multigauss refers to the gauss beam hitting a non-gauss-reflectable entity, reflecting on some adjacent gauss-reflectable entity, and then hitting the same entity again with the reflected beam. In addition, a small radius damage is inflicted onto the entity as the beam reflects. Multigauss is useful for getting double the normal damage out of gauss beams for free.
+Doublegauss refers to the technique in which a gauss beam hits a non-gauss-reflectable target entity, reflects off a gauss-reflectable entity beyond the first entity, and hits the target entity again with the reflected beam. As described in :ref:`gauss mechanism`, a beam reflection is always accompanied by a radius damage created at the point of reflection. Using this technique, this radius damage is normally also inflicted onto the target entity. Typically, the target entity receives three damage inflictions overall. Though inconspicuous and seemingly unremarkable when executed in a speedrun, doublegauss is the secret to getting nearly double (with some caveats explained below) the damage out of a single shot for free, whether in primary or secondary mode.
 
-.. figure:: images/multigauss-crate.jpg
+.. figure:: images/doublegauss-crate.jpg
 
-   Aiming down at a crate and breaking it with one shot by shooting with the multigauss mechanism. The crate was hit twice, first by the incident beam and second by the reflected beam on the ground below the crate. This technique very close to double the damage inflicted. This crate would otherwise have required two primary gauss shots to break, consuming four cells instead of two.
+   Aiming down at a crate and breaking it with one shot by shooting with the doublegauss mechanism. The crate was damaged three times, first by the incident beam, second by the radius damage on the ground below the crate, and third by the reflected beam. This technique very close to double the damage inflicted. This crate would otherwise have required two primary gauss shots to break, consuming four cells instead of two.
 
-As explained in :ref:`entity piercing`, when a gauss beam hits a non-gauss-reflectable entity, it will inflict damage :math:`D` onto the entity. This is shown by the red portion of the beam in :numref:`multigauss figure`. In the next iteration, the beam will ignore the entity that got hit, passing right through the entity. Suppose the beam then hits a gauss-reflectable entity, such as the ground or a wall. If the angle of incidence is greater than 60 degrees (a necessary condition for the beam to reflect), the beam will reflect off the GR entity, as explained in :ref:`gauss mechanism`.
+Let :math:`D` be the initial damage. In :ref:`entity piercing`, we explained that when a gauss beam hits a non-gauss-reflectable entity, it will inflict :math:`D` onto the entity. In :numref:`doublegauss figure`, this initial beam is represented by the :math:`\mathit{OA}`, and therefore the damage infliction point is :math:`A`. In the next beam iteration, the beam will ignore the target entity and pass right through it as line :math:`\mathit{AR}`. [#ARline]_ Suppose the beam subsequently hits a gauss-reflectable entity at :math:`R`, such as the ground or a wall. If the angle of incidence is greater than 60 degrees, which is a necessary condition for the beam to reflect, the beam will reflect off the GR entity, as explained in :ref:`gauss mechanism`.
 
-.. figure:: images/multigauss-1.png
-   :scale: 50%
-   :name: multigauss figure
+.. figure:: images/doublegauss-parts.svg
+   :name: doublegauss figure
 
-   Multigauss in action, depicted by a single gauss beam in three iterations (red, green, and blue) hitting a non-gauss-reflectable entity (i.e. damageable) twice. A radius damage is also produced at the point of reflection, though it is not depicted here.
+   An illustration of the doublegauss technique. :math:`O` is the starting point of the gauss beam. :math:`A` is the point of intersection of the incident beam with the non-gauss-reflectable target entity and where the first damage is inflicted. :math:`R` is the point on the gauss-reflectable entity where the beam reflects. :math:`B` is the start position of the reflected beam, which is exactly 8 units away from :math:`R`. :math:`C` is some point along the reflected beam and does not necessarily represent the end of the beam.
 
-Whenever a gauss beam reflects, a radius damage will be applied from the point of reflection. This is a little known fact among Half-Life players. Suppose the angle of incident is :math:`\phi`. Then the radius damage is calculated to be :math:`D \cos\phi`. This radius damage will be inflicted onto the non-GR entity, though the final amount obviously depends on how far away the entity is from the point of reflection. In the most common case, the non-GR entity is simply in contact with the GR entity. For instance, a damageable crate (non-GR) is usually in contact with the ground (GR). As a result, the distance of the non-GR entity from the point of reflection will be zero, causing 100% of the radius damage to be inflicted onto it.
+Recall that if the angle of incidence is :math:`\phi`, then the radius damage created from the reflection is :math:`D \cos\phi`. This radius damage will be inflicted onto the target entity with the explosion origin at :math:`R`. The actual damage inflicted depends on how far away the target entity is from :math:`R` as described in :ref:`explosion physics`. In most cases, the target entity is in contact with the GR entity. For instance, the target entity could be a damageable crate (:ref:`func_breakable`) which is almost always resting and in contact with the ground in Half-Life maps. In such cases, the distance of the target entity from :math:`R` will be zero, causing the full radius damage to be inflicted onto it.
 
-At the end of the second iteration, the gauss beam will no longer ignore the non-GR entity that got hit in the first iteration. Therefore, the reflected beam will hit the entity in question again in the third iteration provided the entity is sufficiently thick (otherwise you would be triggering a bypass instead, as explained in :ref:`reflection bypass`), though with a damage of :math:`D (1 - \cos\phi)`. Overall, the damages inflicted onto the entity in question is shown in the table below.
+At the end of the second iteration, the gauss beam will no longer ignore the target entity stuck in the first iteration. The reflected beam :math:`\mathit{BC}` will hit the target entity again at point :math:`B` (point blank) in the third iteration, though with a reduced damage of :math:`D \left(1 - \cos\phi\right)`. Observe that because :math:`B` is 8 units away from :math:`R`, it is possible for :math:`B` to be positioned beyond the target entity and missing it, resulting in a bypass (:ref:`reflection bypass`). Assuming :math:`B` is inside the target entity, then the damage inflictions onto the target are shown in the table below.
 
 ================== ============
 Iteration          Damage
@@ -153,7 +155,17 @@ Second             :math:`\le D \cos\phi`
 Third              :math:`D \left(1 - \cos\phi\right)`
 ================== ============
 
-The total damage inflicted onto the non-GR entity is simply the sum of all damages, which has a maximum of :math:`2D`, or twice the damage. Notice that the maximum possible damage is independent of the angle of incident :math:`\phi`. One way that could lower the total damage from the maximum of :math:`2D` is for the non-GR entity to be located at a distance away from the point of reflection. Nevertheless, even ignoring the radius damage, the total damage inflicted onto the entity is still greater than the damage of one normal beam alone.
+The total damage inflicted onto the target non-GR entity is simply the sum of all damages, which has a maximum of :math:`2D`. Observe that the maximum possible damage is independent of the angle of incidence :math:`\phi`.
+
+In the above analysis, we ignored what could happen next for the beam :math:`\mathit{BC}`. In reality, this beam could carry on to hit other entities, and even triggering subsequent doublegausses. Let :math:`D_1` be initial damage and :math:`\phi_1` be the angle of incidence of the first doublegauss. In the first doublegauss, the maximum potential damage inflicted is :math:`2D_1` and the remaining beam damage is :math:`D_2 = D_1 \left( 1 - \cos\phi_1 \right)`. In the second doublegauss, the maximum potential damage inflicited is therefore :math:`2D_2` and the remaining beam damage is :math:`D_3 = D_2 \left( 1 - \cos\phi_2 \right)`. In general, the maximum potential damage inflicted by the :math:`n`-th doublegauss is simply :math:`2D_n` and the remaining damage is
+
+.. math:: D_{n+1} = D_n \left( 1 - \cos\phi_n \right) = D_1 \prod_{i=1}^n \left( 1 - \cos\phi_i \right)
+
+Therefore, the total maximum potential damage inflicted by all of the :math:`n` doublegauss executions is
+
+.. math:: \sum_{i=1}^n 2D_i = 2D_1 \left( 1 + \sum_{i=2}^n \prod_{j=1}^{i-1} \left( 1 - \cos\phi_j \right) \right)
+
+Of academic note, as each of :math:`\phi_1,\phi_2,\ldots,\phi_n` tends towards :math:`\pi/2`, the total damage tends towards :math:`2D_1n`. Therefore, at least purely mathematically, we could have infinite total damage inflicted by a single shot. Examining :numref:`gauss-flowchart` more closely, however, reveals that the maximum number of beam iterations is :math:`n = 10`. A quickgauss (:ref:`quickgauss`) gives :math:`D_1 = 200`, which translates to the maximum total damage by a single shot of gauss as 4000, when combined with the doublegauss technique and the precise arrangement of entities in a map.
 
 .. _entity punch:
 
@@ -188,7 +200,7 @@ The ducking reflect boost sequence is as follows.
 
 The beam should be reflected off the ground, at a 60 degrees angle of incidence. This provides the player a 866 ups horizontal boost and a respectable vertical boost. The sequence demands high precision to produce the desired effects.
 
-The standing reflect boost uses explosive damage from beam reflection as well. The standing reflection boost essentially works by performing a self-inflicted multigauss (:ref:`multigauss`). However, the standing reflect boost sequence requires even higher precision to execute.
+The standing reflect boost uses explosive damage from beam reflection as well. However, the standing reflect boost sequence requires even higher precision to execute.
 
 #. Start charging for quickgauss
 #. Stand touching a wall
@@ -221,10 +233,10 @@ Suppose when the player fires the gauss in secondary mode, the beam first strike
 
 To perform selfgauss in practice, there are a few notes to keep in mind. Recall from :ref:`hitgroup` that attacks that trace to the player's head will deal three times the original damage. To save ammo, it is desirable to headshot the player while selfgaussing, giving a higher speed boost to ammo ratio. In addition, it is desirable to jump immediately before selfgaussing, as jumping provides an important initial vertical speed that can save health and ammo. However, note that a simple jump may not work. Recall from :ref:`duckjump` that when the player jumps, the player model plays the jumping animation, which changes the model geometry (and thus the hitboxes' positions) considerably. This can prevent headshotting even when the beam is fired from the same viewangles without jumping. The solution is to duck and jump, which prevents the jumping animation from playing.
 
-Doublegauss
-~~~~~~~~~~~
+Entity selfgauss
+~~~~~~~~~~~~~~~~
 
-The doublegauss is a way of doubling the damage of a secondary gauss attack using the same number of cells and charge time. Doublegauss works very similarly to selfgauss (:ref:`selfgauss`). The only difference is that, in the first beam iteration, the beam should hit the target entity which must be non-GR. As a result, the first damage will be inflicted and :math:`\mathbf{s}_{i+1}` will be calculated to be *inside the target entity*. The rest of the mechanism work exactly the same as that of selfgauss, except the trace origins are inside the target entity rather than the inside the player entity. Specifically, the beam will ignore the target entity in the second iteration and inflict a second unattenuated damage onto the entity in the third iteration. This implies that the conditions for triggering doublegauss are the same as selfgauss *as though the target entity were not there*.
+Entity selfgaussing is a way of doubling the damage of a secondary gauss attack using the same number of cells and charge time. Entity selfgaussing works very similarly to selfgauss (:ref:`selfgauss`). The only difference is that, in the first beam iteration, the beam should hit the target entity which must be non-GR. As a result, the first damage will be inflicted and :math:`\mathbf{s}_{i+1}` will be calculated to be *inside the target entity*. The rest of the mechanism work exactly the same as that of selfgauss, except the trace origins are inside the target entity rather than the inside the player entity. Specifically, the beam will ignore the target entity in the second iteration and inflict a second unattenuated damage onto the entity in the third iteration. This implies that the conditions for triggering entity selfgauss are the same as selfgauss *as though the target entity were not there*.
 
 Gauss rapid fire
 ~~~~~~~~~~~~~~~~
@@ -440,3 +452,7 @@ The squeak grenade is a weapon the player can carry. Upon release a squeak grena
 where :math:`\mathbf{v}` is the velocity of the player and :math:`\mathbf{\hat{f}}` is the unit forward view vector of the player.
 
 The behaviour of the squeak grenade after release is described in :ref:`squeak grenade monster`.
+
+.. rubric:: Footnotes
+
+.. [#ARline] Representing the second iteration beam as :math:`\mathit{AR}` is technically not correct, because the start of the beam is not exactly :math:`A`, but rather, :math:`A` offset by 1 unit in the direction of :math:`\mathit{AR}`.

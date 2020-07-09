@@ -1,0 +1,40 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\groundWidth}{300}
+  \pgfmathsetmacro{\boxWidth}{100}
+  \pgfmathsetmacro{\boxHeight}{80}
+  \pgfmathsetmacro{\boxGroundGap}{10}
+  \pgfmathsetmacro{\reflectionAngle}{30}
+  \pgfmathsetmacro{\beamOneLen}{150}
+  \pgfmathsetmacro{\beamTwoLen}{100}
+  \pgfmathsetmacro{\skipLen}{30}
+
+  \coordinate (GA) at (0,0);
+  \coordinate (GB) at (\groundWidth,0);
+  \coordinate (R) at ($(GA)!0.5!(GB)$);
+  \coordinate (O) at ($(R) + (\reflectionAngle:\beamOneLen)$);
+  \coordinate (O-2) at ($(R) + (180-\reflectionAngle:\skipLen)$);
+  \coordinate (E) at ($(O-2) + (180-\reflectionAngle:\beamTwoLen)$);
+  \coordinate (boxA) at ($ 0.5*(GA) + 0.5*(GB) + (-0.5*\boxWidth,\boxGroundGap) $);
+  %\coordinate (boxB) at ($ (boxA) + (\boxWidth,0) $);
+  %\coordinate (beam-start) at ($ (GB) - 0.2*(GB) + 0.2*(\boxWidth,0) + (0,\boxGroundGap + 0.7*\boxHeight) $);
+
+  % Ground
+  \draw[thick] (GA) -- node[very near start,below]{GR Entity} (GB);
+
+  % Box
+  \path[name path=box-border,draw] (boxA) -- ++(\boxWidth,0) -- ++(0,\boxHeight) -- node[above]{Non-GR Entity} ++(-\boxWidth,0) -- cycle;
+
+  % Beam
+  \path[name path=inc-beam,draw,semithick,<-|] (R) node[below]{$R$} -- (O) node[above right=-2]{$O$};
+  \draw[densely dotted] (R) -- (O-2) node[above=5]{$B$};
+  \draw[semithick,|->] (O-2) -- (E) node[above left=-5]{$C$};
+
+  \path[name intersections={of=box-border and inc-beam}];
+  \node[above left] at (intersection-2) {$A$};
+\end{tikzpicture}
+
+\end{document}
