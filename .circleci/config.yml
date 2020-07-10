@@ -9,6 +9,7 @@ jobs:
   build:
     docker:
       - image: cimg/python:3.7
+    resource_class: small
     steps:
       - checkout
       - python/load-cache
@@ -30,6 +31,7 @@ jobs:
   deploy:
     docker:
       - image: cimg/python:3.7
+    resource_class: small
     steps:
       - attach_workspace:
           at: build
