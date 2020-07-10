@@ -21,6 +21,10 @@ Then install the packages:
 
     $ pip install -r requirements.txt
 
+Install the node packages needed for the MathJax rendering script:
+
+    $ yarn install
+
 To build the HTML files, run
 
     $ python build.py build
