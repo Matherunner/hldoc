@@ -400,6 +400,11 @@ some time later.
 
 It is possible to have two MP5 grenades touch each other and explode together.
 
+.357 Magnum revolver
+--------------------
+
+The .357 Magnum revolver or Colt Python is a very powerful hitscan weapon that fires high damaging rounds. With the default game settings, a single shot of the revolver deals 40 damage of type ``DMG_BULLET``, which is greater than that of gauss in primary mode. The bullet range is 8192 units from the player's gun position. Each shot creates a sound with volume 1000. The behaviour of the revolver is simple. In single-player mode, which is game mode we are most interested in, it only fires in primary mode. It cannot be fired when the waterlevel is 3. When the waterlevel is less than 3 and the clip is not empty, it fires once every 0.75 seconds. A reload takes 2 seconds. Contrary to what some believed, the revolver has a square bullet spread of :math:`1^\circ` in the horizontal and vertical directions.
+
 Crowbar
 -------
 
