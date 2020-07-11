@@ -426,7 +426,12 @@ The crossbow is very powerful and important in speedrunning, thanks to its high 
 
    With ``r_drawentities 4`` we can see the model of the actual crossbow bolt entity that is created ex nihilo before the player when the crossbow is fired. In this screenshot, the bolt has already travelled for some distance.
 
-When the bolt touches a damageable entity, it applies a damage of type ``DMG_BULLET`` and removes itself from the world. If the entity it touches is not damageable and is the ``worldspawn`` entity, it will embed itself at where the entity is struck for 10s as a ``SOLID_NOT``. This is a quick-and-dirty way of testing if an entity is the ``worldspawn``: simply fire the crossbow at the entity and check if the bolt embeds itself on it. Similar to the 357 revolver (:ref:`revolver`), the crossbow fires at a rate of one bolt per 0.75 seconds. Still, it reloads at a glacial speed, taking 4.5 seconds to complete. Despite these downsides, the crossbow bolt does not have a spread and no known mechanism can cause its path to deviate.
+When the bolt touches a damageable entity, it applies a damage of type ``DMG_BULLET`` and removes itself from the world. If the entity it touches is not damageable and is the ``worldspawn`` entity, it will embed itself at where the entity is struck for 10s as a ``SOLID_NOT``.
+
+.. tip::
+   This is a quick-and-dirty way of testing if an entity is the ``worldspawn``: simply fire the crossbow at the entity and check if the bolt embeds itself on it. 
+
+Similar to the 357 revolver (:ref:`revolver`), the crossbow fires at a rate of one bolt per 0.75 seconds. Still, it reloads at a glacial speed, taking 4.5 seconds to complete. Despite these downsides, the crossbow bolt does not have a spread and no known mechanism can cause its path to deviate.
 
 Crowbar
 -------
