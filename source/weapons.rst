@@ -394,7 +394,7 @@ MP5
 
 The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a square type bullet spread of :math:`3^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
 
-The MP5 grenade explodes with a source damage of 100 in the default game settings. See :ref:`contact grenades` for a description of its explosive physics. An MP5 grenade has an entity gravity multiplier of :math:`g_e = 0.5`, causing it to experience a gravity of half the strength as experienced by the player. It is fired from the starting position of :math:`\mathit{GunPosition} + 16\mathbf{\hat{f}}`, at a rate of one grenade per second. Interestingly, the grenade is unique in how its initial velocity is independent of the current player velocity. This contradicts real life physics. In particular, the initial velocity of the grenade is always
+An MP5 grenade can be fired at a sound volume of 600. When touched, it explodes with a source damage of 100 in the default game settings. See :ref:`contact grenades` for a description of its explosive physics. An MP5 grenade has an entity gravity multiplier of :math:`g_e = 0.5`, causing it to experience a gravity of half the strength as experienced by the player. It is fired from the starting position of :math:`\mathit{GunPosition} + 16\mathbf{\hat{f}}`, at a rate of one grenade per second. Interestingly, the grenade is unique in how its initial velocity is independent of the current player velocity. This contradicts real life physics. In particular, the initial velocity of the grenade is always
 
 .. math:: 800 \mathbf{\hat{f}}
 
@@ -408,6 +408,23 @@ It is possible to have two MP5 grenades touch each other and explode together.
 --------------------
 
 The .357 Magnum revolver or Colt Python is a very powerful hitscan weapon that fires high damaging rounds. With the default game settings, a single shot of the revolver deals 40 damage of type ``DMG_BULLET``, which is greater than that of gauss in primary mode. The bullet range is 8192 units from the player's gun position. Each shot creates a sound with volume 1000. The behaviour of the revolver is simple. In single-player mode, which is game mode we are most interested in, it only fires in primary mode. It cannot be fired when the waterlevel is 3. When the waterlevel is less than 3 and the clip is not empty, it fires once every 0.75 seconds. A reload takes 2 seconds. Contrary to what some believed, the revolver has a square bullet spread of :math:`1^\circ` in the horizontal and vertical directions.
+
+Crossbow
+--------
+
+The crossbow is very powerful and important in speedrunning, thanks to its high damage. The crossbow has many downsides, however. It is not a hitscan weapon in single-player. When fired, a bolt entity is created with a low sound volume of 200, from a starting position of :math:`\mathit{GunPosition} - 2\mathbf{\hat{u}}`. The bolt is set to have a movetype of ``MOVETYPE_FLY``, which makes it ignore gravity. The initial velocity of the crossbow bolt depends on the waterlevel at the time it is fired:
+
+.. math:: \begin{cases}
+          1000 \mathbf{\hat{f}} & \mathit{waterlevel} = 3 \\
+          2000 \mathbf{\hat{f}} & \mathit{waterlevel} < 3
+          \end{cases}
+
+.. figure:: images/crossbow-bolt.jpg
+   :name: crossbow bolt
+
+   With ``r_drawentities 4`` we can see the model of the actual crossbow bolt entity that is created ex nihilo before the player when the crossbow is fired. In this screenshot, the bolt has already travelled for some distance.
+
+When the bolt touches a damageable entity, it applies a damage of type ``DMG_BULLET`` and removes itself from the world. If the entity it touches is not damageable and is the ``worldspawn`` entity, it will embed itself at where the entity is struck for 10s as a ``SOLID_NOT``. This is a quick-and-dirty way of testing if an entity is the ``worldspawn``: simply fire the crossbow at the entity and check if the bolt embeds itself on it. Similar to the 357 revolver (:ref:`revolver`), the crossbow fires at a rate of one bolt per 0.75 seconds. Still, it reloads at a glacial speed, taking 4.5 seconds to complete. Despite these downsides, the crossbow bolt does not have a spread and no known mechanism can cause its path to deviate.
 
 Crowbar
 -------
