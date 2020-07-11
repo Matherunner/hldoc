@@ -74,6 +74,8 @@ addition of this term is done in the function responsible for applying explosive
 damage, namely ``RadiusDamage``. Since all explosion code invoke this function,
 this term is always added to the origin for any explosion that happens.
 
+.. _contact grenades:
+
 Contact grenades
 ~~~~~~~~~~~~~~~~
 

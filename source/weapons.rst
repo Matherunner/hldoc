@@ -371,6 +371,8 @@ velocity* is invariant under the transformation :math:`\varphi \mapsto
 :math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ -
 60^\circ` is equal.
 
+.. _glock:
+
 Glock
 -----
 
@@ -379,8 +381,8 @@ The glock [#glockfile]_, also known as the 9mm handgun, is the first hitscan ran
 ===========  ===========  =============
 Mode         Cycle time   Bullet spread (square type)
 ===========  ===========  =============
-Primary      0.3s         :math:`2\tan 0.01 \approx 1.15^\circ` 
-Secondary    0.2s         :math:`2\tan 0.1 \approx 11.5^\circ`
+Primary      0.3s         :math:`2\arctan 0.01 \approx 1.15^\circ` 
+Secondary    0.2s         :math:`2\arctan 0.1 \approx 11.4^\circ`
 ===========  ===========  =============
 
 In primary mode, glock's precision is only slightly worse than the revolver. In practice, since the damage of each shot in either mode is the same, the speedrunner should almost always fire in the secondary mode when a sustained fire is called for. The lack of precision can be compensated easily by knowing where the next shot would land and adjusting the player yaw and pitch.
@@ -390,27 +392,13 @@ In primary mode, glock's precision is only slightly worse than the revolver. In 
 MP5
 ---
 
-The bullets are spread in similar ways to shotgun bullets, except there is only
-one bullet per ammo. See :ref:`shotgun` for a description of how bullet spreads
-are computed.
+The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a square type bullet spread of :math:`3^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
 
-The MP5 is a fairly versatile weapon due to its ability to shoot 10 contact
-grenades. A contact grenade has an entity gravity :math:`g_e = 0.5`. Therefore,
-an MP5 experiences only half of the gravity experienced by the player.
+The MP5 grenade explodes with a source damage of 100 in the default game settings. See :ref:`contact grenades` for a description of its explosive physics. An MP5 grenade has an entity gravity multiplier of :math:`g_e = 0.5`, causing it to experience a gravity of half the strength as experienced by the player. It is fired from the starting position of :math:`\mathit{GunPosition} + 16\mathbf{\hat{f}}`, at a rate of one grenade per second. Interestingly, the grenade is unique in how its initial velocity is independent of the current player velocity. This contradicts real life physics. In particular, the initial velocity of the grenade is always
 
-The MP5 grenade is unique in how its launch velocity is independent of current
-player velocity. This runs counter to real life physics, where an object
-initially stationary relative to a moving reference frame must have the same
-velocity as that of the reference frame, and therefore any additional velocity
-imparted onto the object must add to that. The MP5 grenade, on the contrary,
-always launches at velocity
+.. math:: 800 \mathbf{\hat{f}}
 
-.. math:: \mathbf{v}_g = 800 \mathbf{\hat{f}}
-
-where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. This
-peculiar behaviour can be advantageous in certain situations. For instance, we
-might want to "outrun" the grenade so that it explodes adjacent or behind us
-some time later.
+where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. This idiosyncratic behaviour can be advantageous in certain situations. For instance, the speedrunner could "outrun" the grenade with the intention of making it explode adjacent or behind the player at some point later.
 
 It is possible to have two MP5 grenades touch each other and explode together.
 
