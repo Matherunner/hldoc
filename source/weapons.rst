@@ -371,6 +371,20 @@ velocity* is invariant under the transformation :math:`\varphi \mapsto
 :math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ -
 60^\circ` is equal.
 
+Glock
+-----
+
+The glock [#glockfile]_, also known as the 9mm handgun, is the first hitscan ranged weapon acquired by the player in Half-Life. It does not see much use in speedruns once more powerful alternatives are acquired, owing to its relatively slow firing rate and low damage. Nevertheless, it can be used in a combination of weapons for quick weapon switching, offering 8 damage of type ``DMG_BULLET``. The volume of the gunfire is 600. Like most hitscan weapons in Half-Life, glock's range is 8192 units from the player's gun position. Reloading the glock takes 1.5s. Unlike the revolver (:ref:`revolver`), the glock can be fired under water. It can also be fired in both primary and secondary mode. The main differences between them are the firing rate and the bullet spread.
+
+===========  ===========  =============
+Mode         Cycle time   Bullet spread (square type)
+===========  ===========  =============
+Primary      0.3s         :math:`2\tan 0.01 \approx 1.15^\circ` 
+Secondary    0.2s         :math:`2\tan 0.1 \approx 11.5^\circ`
+===========  ===========  =============
+
+In primary mode, glock's precision is only slightly worse than the revolver. In practice, since the damage of each shot in either mode is the same, the speedrunner should almost always fire in the secondary mode when a sustained fire is called for. The lack of precision can be compensated easily by knowing where the next shot would land and adjusting the player yaw and pitch.
+
 .. _mp5:
 
 MP5
@@ -399,6 +413,8 @@ might want to "outrun" the grenade so that it explodes adjacent or behind us
 some time later.
 
 It is possible to have two MP5 grenades touch each other and explode together.
+
+.. _revolver:
 
 .357 Magnum revolver
 --------------------
@@ -461,3 +477,4 @@ The behaviour of the squeak grenade after release is described in :ref:`squeak g
 .. rubric:: Footnotes
 
 .. [#ARline] Representing the second iteration beam as :math:`\mathit{AR}` is technically not correct, because the start of the beam is not exactly :math:`A`, but rather, :math:`A` offset by 1 unit in the direction of :math:`\mathit{AR}`.
+.. [#glockfile] A note on glock's implementation in the Half-Life SDK: the ``dlls/glock.cpp`` is not the file to look for. The code actually resides in ``dlls/wpn_shared/hl_wpn_glock.cpp``. 
