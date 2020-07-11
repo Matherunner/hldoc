@@ -1,6 +1,8 @@
 Weapons
 =======
 
+Half-Life is a shining example of having an already stellar gameplay elevated by well designed weapons, not just from a casual gamer's point of view, but also that of a speedrunner. In this article, we will attempt to describe the physics of all the weapons in Half-Life that may be relevant to speedrunning. The physics of the various weapons are varied and interesting, with complexities ranging from those requiring only the simplest of descriptions to those demanding a level of research rivalling the player movement physics.
+
 .. TODO: satchels etc ignore the player, but after a save/load they no longer ignore the player
 .. TODO: but gauss probably doesn't ignore satchels, so possible to hit a grenade with gauss and reflect?
 
