@@ -159,7 +159,7 @@ Third              :math:`D \left(1 - \cos\phi\right)`
 
 The total damage inflicted onto the target non-GR entity is simply the sum of all damages, which has a maximum of :math:`2D`. Observe that the maximum possible damage is independent of the angle of incidence :math:`\phi`.
 
-In the above analysis, we ignored what could happen next for the beam :math:`\mathit{BC}`. In reality, this beam could carry on to hit other entities, and even triggering subsequent doublegausses. Let :math:`D_1` be initial damage and :math:`\phi_1` be the angle of incidence of the first doublegauss. In the first doublegauss, the maximum potential damage inflicted is :math:`2D_1` and the remaining beam damage is :math:`D_2 = D_1 \left( 1 - \cos\phi_1 \right)`. In the second doublegauss, the maximum potential damage inflicited is therefore :math:`2D_2` and the remaining beam damage is :math:`D_3 = D_2 \left( 1 - \cos\phi_2 \right)`. In general, the maximum potential damage inflicted by the :math:`n`-th doublegauss is simply :math:`2D_n` and the remaining damage is
+In the above analysis, we ignored what could happen next for the beam :math:`\mathit{BC}`. In reality, this beam could carry on to hit other entities, and even triggering subsequent doublegausses. Let :math:`D_1` be initial damage and :math:`\phi_1` be the angle of incidence of the first doublegauss. In the first doublegauss, the maximum potential damage inflicted is :math:`2D_1` and the remaining beam damage is :math:`D_2 = D_1 \left( 1 - \cos\phi_1 \right)`. In the second doublegauss, the maximum potential damage inflicted is therefore :math:`2D_2` and the remaining beam damage is :math:`D_3 = D_2 \left( 1 - \cos\phi_2 \right)`. In general, the maximum potential damage inflicted by the :math:`n`-th doublegauss is simply :math:`2D_n` and the remaining damage is
 
 .. math:: D_{n+1} = D_n \left( 1 - \cos\phi_n \right) = D_1 \prod_{i=1}^n \left( 1 - \cos\phi_i \right)
 
@@ -168,6 +168,8 @@ Therefore, the total maximum potential damage inflicted by all of the :math:`n` 
 .. math:: \sum_{i=1}^n 2D_i = 2D_1 \left( 1 + \sum_{i=2}^n \prod_{j=1}^{i-1} \left( 1 - \cos\phi_j \right) \right)
 
 Of academic note, as each of :math:`\phi_1,\phi_2,\ldots,\phi_n` tends towards :math:`\pi/2`, the total damage tends towards :math:`2D_1n`. Therefore, at least purely mathematically, we could have infinite total damage inflicted by a single shot. Examining :numref:`gauss-flowchart` more closely, however, reveals that the maximum number of beam iterations is :math:`n = 10`. A quickgauss (:ref:`quickgauss`) gives :math:`D_1 = 200`, which translates to the maximum total damage by a single shot of gauss as 4000, when combined with the doublegauss technique and the precise arrangement of entities in a map.
+
+.. FIXME: seems like entity piercing sometimes doesn't work on non monsters?
 
 .. _entity punch:
 
@@ -380,12 +382,12 @@ Glock
 
 The glock [#glockfile]_, also known as the 9mm handgun, is the first hitscan ranged weapon acquired by the player in Half-Life. It does not see much use in speedruns once more powerful alternatives are acquired, owing to its relatively slow firing rate and low damage. Nevertheless, it can be used in a combination of weapons for quick weapon switching, offering 8 damage of type ``DMG_BULLET``. The volume of the gunfire is 600. Like most hitscan weapons in Half-Life, glock's range is 8192 units from the player's gun position. Reloading the glock takes 1.5s. Unlike the revolver (:ref:`revolver`), the glock can be fired under water. It can also be fired in both primary and secondary mode. The main differences between them are the firing rate and the bullet spread.
 
-===========  ===========  =============
-Mode         Cycle time   Bullet spread (square type)
-===========  ===========  =============
-Primary      0.3s         :math:`2\arctan 0.01 \approx 1.15^\circ` 
-Secondary    0.2s         :math:`2\arctan 0.1 \approx 11.4^\circ`
-===========  ===========  =============
+=========  ==============  ===========================
+Mode       Cycle time      Bullet spread (square type)
+=========  ==============  ===========================
+Primary    0.3s            :math:`2\arctan 0.01 \approx 1.15^\circ`
+Secondary  0.2s            :math:`2\arctan 0.1 \approx 11.4^\circ`
+=========  ==============  ===========================
 
 In primary mode, glock's precision is only slightly worse than the revolver. In practice, since the damage of each shot in either mode is the same, the speedrunner should almost always fire in the secondary mode when a sustained fire is called for. The lack of precision can be compensated easily by knowing where the next shot would land and adjusting the player yaw and pitch.
 
@@ -403,6 +405,8 @@ An MP5 grenade can be fired at a sound volume of 600. When touched, it explodes 
 where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. This idiosyncratic behaviour can be advantageous in certain situations. For instance, the speedrunner could "outrun" the grenade with the intention of making it explode adjacent or behind the player at some point later.
 
 It is possible to have two MP5 grenades touch each other and explode together.
+
+.. TODO: expand on this!
 
 .. _revolver:
 
@@ -429,7 +433,7 @@ The crossbow is very powerful and important in speedrunning, thanks to its high 
 When the bolt touches a damageable entity, it applies a damage of type ``DMG_BULLET`` and removes itself from the world. If the entity it touches is not damageable and is the ``worldspawn`` entity, it will embed itself at where the entity is struck for 10s as a ``SOLID_NOT``.
 
 .. tip::
-   This is a quick-and-dirty way of testing if an entity is the ``worldspawn``: simply fire the crossbow at the entity and check if the bolt embeds itself on it. 
+   This is a quick-and-dirty way of testing if an entity is the ``worldspawn``: simply fire the crossbow at the entity and check if the bolt embeds itself on it.
 
 Similar to the 357 revolver (:ref:`revolver`), the crossbow fires at a rate of one bolt per 0.75 seconds. Still, it reloads at a glacial speed, taking 4.5 seconds to complete. Despite these downsides, the crossbow bolt does not have a spread and no known mechanism can cause its path to deviate.
 
@@ -443,11 +447,34 @@ The crowbar is
 Shotgun
 -------
 
-The shotgun is a very powerful weapon in Half-Life.
+The shotgun is a very powerful hitscan weapon in Half-Life, and has seen much use in the early and middle game, and as a quick weapon switching combination in the late game. It can be fired in primary or secondary mode. Regardless of the mode, the shotgun fires a certain number of pellets in each shot. Each pellet deals a damage of 5 in the default game settings. The shotgun has a bullet spread of approximately :math:`10^\circ` in both modes, and creates a volume of 1000. Unlike other hitscan weapons, the shotgun has a range of only 2048 units from the player's gun position. Here are the differences between the primary and the secondary modes:
 
-The primary attack of the shotgun fires 6 bullets and consumes 1 shell. The delay between shots is 0.75 seconds. The secondary attack fires 12 bullets and consumes 2 shells. The delay between shots is 1.5 seconds. Both the primary and the secondary attacks fire off multiple bullets, which is unique among Half-Life weapons. A special function called ``FireBulletsPlayer`` in ``combat.cpp`` is used to compute the damage tracings for shotguns and a few other weapons.
+=========  =======  ======  ==========  ============
+Mode       Pellets  Shells  Cycle time  Total damage
+=========  =======  ======  ==========  ============
+Primary    6        1       0.75s       30
+Secondary  12       2       1.5s        60
+=========  =======  ======  ==========  ============
 
-For each bullet, the game computes a pseudorandom direction vector which is then used for tracing attacks. The direction vector is randomised using the shared RNG (see :ref:`shared rng`), with the seed increased successively in a predictable way as the game iterates through all bullets. As there are only 256 possible ways to seed the shared RNG, so are there only 256 possible shotgun spread patterns.
+The shotgun has a more complex reloading behaviour. [#shotgun-reload]_ Unlike other weapons, there is a delay after firing before the shotgun can be reloaded, and this delay is the cycle time corresponding to the last firing mode. For example, if the player fires the shotgun in secondary mode at time :math:`t = 0` and tries to reload at :math:`t = 0.3 < 1.5`, the weapon will not respond.
+
+Suppose the player initiates a reload after more than the cycle time since the last shot, either by issuing the ``+reload`` command or by emptying the clip. The ``CShotGun::Reload`` function will get called by ``CBasePlayerWeapon::ItemPostFrame``, which kickstarts the reload process and starting a firing delay timer of one second. This causes the player to not be able to fire and cancel the reload until one second after the reload has begun. When this timer expires, the shotgun will initiate the actual loading of shells into the clip. This new state begins by starting another timer of half a second. Once this other timer expires, a shell will be added to the clip, and then the half-a-second timer restarts, and so on. This cycle is repeated at a rate of one shell every 0.5s, until either the clip is full or interrupted by firing the weapon.
+
+Fast shotgun reload
+~~~~~~~~~~~~~~~~~~~
+
+There is a way to decrease the shotgun reloading time by half a second. Observe that while the half-second timer is running and pending the loading of the next shell, the player can issue the ``+reload`` command again. Normally in other weapons, issuing ``+reload`` while reloading has no effect. Those weapons call ``CBasePlayerWeapon::DefaultReload`` to reload, which sets the ``CBasePlayerWeapon::m_fInReload`` to true to indicate that reloading is in progress. If the player then issues a ``+reload`` command, a check in ``CBasePlayerWeapon::ItemPostFrame`` will prevent calling ``Reload`` again:
+
+.. code-block:: c++
+   :caption: ``CBasePlayerWeapon::ItemPostFrame``
+
+   else if ( m_pPlayer->pev->button & IN_RELOAD && iMaxClip() != WEAPON_NOCLIP && !m_fInReload )
+   {
+       // reload when reload is pressed, or if no buttons are down and weapon is empty.
+       Reload();
+   }
+
+The shotgun, however, does not call the ``CBasePlayerWeapon::DefaultReload`` and so ``CBasePlayerWeapon::m_fInReload`` remains false at all time. Every time the player issues ``+reload``, ``CShotGun::Reload`` will be called. If ``CShotGun::Reload`` is called while the half-second timer is still active, the shotgun will load the next shell prematurely, before the timer expires. In other words, a shell is normally loaded at the trailing edge, and manually issuing ``+reload`` effectively moves each loading of shell to the leading edge. Therefore, it overall takes half a second shorter to fill the clip with the desired shell count. Once a shell has been loaded, issuing ``+reload`` again has no effect until the current timer expires.
 
 .. _satchel:
 
@@ -489,4 +516,7 @@ The behaviour of the squeak grenade after release is described in :ref:`squeak g
 .. rubric:: Footnotes
 
 .. [#ARline] Representing the second iteration beam as :math:`\mathit{AR}` is technically not correct, because the start of the beam is not exactly :math:`A`, but rather, :math:`A` offset by 1 unit in the direction of :math:`\mathit{AR}`.
-.. [#glockfile] A note on glock's implementation in the Half-Life SDK: the ``dlls/glock.cpp`` is not the file to look for. The code actually resides in ``dlls/wpn_shared/hl_wpn_glock.cpp``. 
+
+.. [#glockfile] A note on glock's implementation in the Half-Life SDK: the ``dlls/glock.cpp`` is not the file to look for. The code actually resides in ``dlls/wpn_shared/hl_wpn_glock.cpp``.
+
+.. [#shotgun-reload] This description of the shotgun reloading process is an abstraction over the implementation details in the SDK code, at a level appropriate for understanding the mechanisms relevant to exploitation and speedrunning. If you wish to understand the logic at a lower level, there is no substitute to reading the actual code in ``dlls/shotgun.cpp``.
