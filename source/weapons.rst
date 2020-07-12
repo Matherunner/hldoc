@@ -284,20 +284,63 @@ This trick is useful for getting the beam to hit some entity on the other side o
 Hornet gun
 ----------
 
-The hornets created in primary fire has initial velocity
+The hornet gun is very useful in speedrunning primarily for its ability to fire hornet entities that can block moving entities such as the ``func_train`` and ``func_door``. It can also be used in a weapon combination for quick weapon switching. The hornet gun has an replenishing ammo, and can be fired in both primary and secondary mode. In the primary mode, each shot creates a ``hornet`` entity with an initial origin of
 
-.. math:: \mathbf{v}_h = 300 \mathbf{\hat{f}}
+.. math:: \mathit{GunPosition} + 16\mathbf{\hat{f}} + 8\mathbf{\hat{s}} - 12\mathbf{\hat{u}}
+   :label: hornet initial origin
 
-where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. Hornets
-created in second fire has initial velocity
+and an initial velocity of
 
-.. math:: \mathbf{v}_h = 1200 \mathbf{\hat{f}}
+.. math:: 300\mathbf{\hat{f}}
 
-In both cases, the initial velocity is independent of the player velocity.
+Similar to the MP5 grenades (see :ref:`mp5`), the initial velocity is independent of the current player velocity. Firing in primary mode creates a sound volume of 200. After firing, the ammo recharge time is set to be 0.5s later, and the primary attack delay is set to be 0.25s. Unlike most other weapons, firing in primary mode does not set the delay for the secondary attack. It is possible to immediately fire in secondary mode after the primary, although this is hardly useful in speedrunning.
 
-TODO
+In the secondary mode, each shot also creates a ``hornet`` entity. The initial origin is first computed using the expression in :eq:`hornet initial origin`. However, the origin is further offset by adding to it a vector that depends on the *firing phase*. Denote :math:`0 \le \phi \le 7` the firing phase. [#firing-phase]_ Then the offset vector is given by
 
-TODO
+.. math::
+   \begin{cases}
+   8\mathbf{\hat{u}} & \phi = 0 \\
+   8\mathbf{\hat{s}} + 8\mathbf{\hat{u}} & \phi = 1 \\
+   8\mathbf{\hat{s}} & \phi = 2 \\
+   8\mathbf{\hat{s}} - 8\mathbf{\hat{u}} & \phi = 3 \\
+   -8\mathbf{\hat{u}} & \phi = 4 \\
+   -8\mathbf{\hat{s}} - 8\mathbf{\hat{u}} & \phi = 5 \\
+   -8\mathbf{\hat{s}} & \phi = 6 \\
+   -8\mathbf{\hat{s}} + 8\mathbf{\hat{u}} & \phi = 7
+   \end{cases}
+
+This offset vector is then added to the initial origin previously computed, and :math:`\phi` is then updated by :math:`\phi \gets (\phi + 1) \bmod 8`. Finally, the initial velocity is set to be
+
+.. math:: 1200\mathbf{\hat{f}}
+
+At the end of a secondary shot, the ammo recharge time is again set to be 0.5s later, and both the primary and the secondary firing delay is set to be 0.1s.
+
+The hornet entity is created with movetype ``MOVETYPE_FLY`` and ``SOLID_BBOX``. It has a health of 1 and is damageable. Interesting, when spawned it assigns itself one of two types:
+
+red hornet
+   has a reddish appearance and sets :math:`V = 600`
+yellow hornet
+   has a yellowish appearance and sets :math:`V = 800`
+
+It draws a number using the non-shared RNG (see :ref:`nonshared rng`). Effectively, 20% of the hornets spawned will be assigned red, with the remaining assigned yellow. In the first 0.1s of being spawned, the hornet has a different behaviour when touched. Depending on the firing mode, the behaviour of the hornet differs greatly.
+
+.. TODO: explain the first 0.1s!
+
+In secondary mode, the behaviour is simpler. After 0.1s of being spawned, the hornet will set to remove itself from the world after another 4s. In the meantime, the hornet will continue to move in a uniform straight line until it touches some entity. If the entity touched is damageable, then the hornet will apply a :math:`D_H` damage of type ``DMG_BULLET`` to the entity. Then, the hornet will become a ``SOLID_NOT`` and remove itself in 0.1s. Note that whether the hornet is red or yellow makes no difference in the secondary mode, except for the appearance.
+
+The hornet in the primary mode is more complicated. After 0.1s of being spawned, it properly initialises itself to the following behaviour. Whenever it collides with some entity, if the entity is the monster firing the hornet, then it turns into a ``SOLID_NOT``. Otherwise, it checks the relationship with the other entity. If the other entity is another hornet or not an enemy (e.g. a ``worldspawn`` wall), then the velocity and the origin will be modified in the following way:
+
+.. math::
+   \begin{aligned}
+   \mathbf{v}_H' &= V \mathbf{\hat{v}}_H \operatorname{diag}(-1,-1,1) \\
+   \mathbf{r}_H' &= \mathbf{r}_H + 4 \mathbf{\hat{v}}_H \operatorname{diag}(-1,-1,1)
+   \end{aligned}
+
+On the other hand, if the other entity is an enemy, then it will proceed to attack it the same way as a hornet in the secondary mode when touched.
+
+When the hornet is not touching any entity, it tries to track its enemy once every 0.1s.
+
+.. TODO: explain the complicated TrackTarget!
 
 Gluon gun
 ---------
@@ -558,6 +601,8 @@ The behaviour of the squeak grenade after release is described in :ref:`squeak g
 .. rubric:: Footnotes
 
 .. [#ARline] Representing the second iteration beam as :math:`\mathit{AR}` is technically not correct, because the start of the beam is not exactly :math:`A`, but rather, :math:`A` offset by 1 unit in the direction of :math:`\mathit{AR}`.
+
+.. [#firing-phase] We define :math:`\phi` differently from the SDK code, in a way that is more natural mathematically.
 
 .. [#glockfile] A note on glock's implementation in the Half-Life SDK: the ``dlls/glock.cpp`` is not the file to look for. The code actually resides in ``dlls/wpn_shared/hl_wpn_glock.cpp``.
 
