@@ -68,7 +68,7 @@ The background should usually be transparent unless a different background colou
 
 Texts should generally be set in Baskerville or its variants.
 
-Arrowheads should preferrably be "Arrow 9" in Illustrator.
+Arrowheads should preferably be "Arrow 9" in Illustrator.
 
 Lines should have a minimum stroke width of 1px.
 

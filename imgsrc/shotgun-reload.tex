@@ -1,0 +1,91 @@
+\documentclass{templates/hlprtikz}
+\usepackage{ifthen}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\GuidelineLen}{300}
+  \pgfmathsetmacro{\TickGap}{50}
+  \pgfmathsetmacro{\SignalTickClearance}{2}
+  \pgfmathsetmacro{\SignalHeight}{40}
+  \pgfmathsetmacro{\SignalAxisGap}{2}
+  \pgfmathsetmacro{\TickHeight}{6}
+
+  \coordinate (O) at (0,0);
+  \coordinate (T) at ($(O) + (\GuidelineLen,0)$);
+
+  % Axis and ticks
+  \draw[thick,->] (O) -- (T) node[right]{$t$};
+   \foreach \x/\xtext in {0/0,1/\frac{1}{2},2/1,3/{1\frac{1}{2}},4/2,5/{2\frac{1}{2}}} {
+    \draw (\x*\TickGap,-\TickHeight) node[below]{$\xtext$} -- +(0,\TickHeight);
+  }
+
+  % First second signal
+  \draw[yshift=\SignalAxisGap,darkBlue50,fill=blue20]
+    (0,0) -- ++(0,\SignalHeight) -- ++(2*\TickGap,0) -- ++(0,-\SignalHeight);
+
+  % Subsequent signals
+  \foreach \x in {2,3,4} {
+    \draw[yshift=\SignalAxisGap,darkRed50,fill=red20]
+      (\x*\TickGap+\SignalTickClearance,0) -- ++(0,\SignalHeight) --
+      ++(\TickGap-\SignalTickClearance,0) -- ++(0,-\SignalHeight);
+  }
+
+  \pgfmathsetmacro{\ShellGraphYShift}{\SignalHeight+30}
+  \pgfmathsetmacro{\ShellStartHeight}{10}
+  \pgfmathsetmacro{\ShellIncHeight}{20}
+  \pgfmathsetmacro{\VertAxisHeight}{90}
+
+  \begin{scope}[yshift=\ShellGraphYShift]
+    \coordinate (shellS) at (0,\VertAxisHeight);
+    \coordinate (shellO) at (0,0);
+    \coordinate (shellT) at ($(shellO) + (\GuidelineLen,0)$);
+
+    \draw[thick,<->] (shellS) -- (shellO) -- (shellT) node[right]{$t$};
+    \draw (0,\ShellStartHeight) -- ++(3*\TickGap,0) -- ++(0,\ShellIncHeight)
+      -- ++(\TickGap,0) -- ++(0,\ShellIncHeight) -- ++(\TickGap,0)
+      -- ++(0,\ShellIncHeight) -- ++(\TickGap,0);
+
+    \foreach \x in {1,2,3,4,5} {
+      \draw (\x*\TickGap,-\TickHeight) -- +(0,\TickHeight);
+    }
+    \foreach \y/\shellText in {0/5,1/6,2/7,3/8} {
+      \draw (-\TickHeight,\ShellStartHeight+\y*\ShellIncHeight) node[left]{$\shellText$} -- ++(\TickHeight,0);
+      \ifthenelse{\y=0}{}{
+        \draw[densely dotted,gray50] (2,\ShellStartHeight+\y*\ShellIncHeight) -- ++(2*\TickGap+\y*\TickGap-4,0);
+      }
+    }
+  \end{scope}
+
+  \begin{scope}[yshift=\ShellGraphYShift+\VertAxisHeight+20]
+    \coordinate (shellS) at (0,\VertAxisHeight);
+    \coordinate (shellO) at (0,0);
+    \coordinate (shellT) at ($(shellO) + (\GuidelineLen,0)$);
+    \pgfmathsetmacro{\ReloadArrowStart}{\VertAxisHeight+5}
+
+    \draw[thick,<->] (shellS) node[above]{Shells} -- (shellO) -- (shellT) node[right]{$t$};
+    \draw (0,\ShellStartHeight) -- ++(2*\TickGap+\SignalAxisGap,0) -- ++(0,\ShellIncHeight)
+      -- ++(\TickGap,0) -- ++(0,\ShellIncHeight) -- ++(\TickGap,0)
+      -- ++(0,\ShellIncHeight) -- ++(2*\TickGap-\SignalAxisGap,0);
+
+    \foreach \x in {1,2,3,4,5} {
+      \draw (\x*\TickGap,-\TickHeight) -- +(0,\TickHeight);
+    }
+    \foreach \y/\shellText in {0/5,1/6,2/7,3/8} {
+      \draw (-\TickHeight,\ShellStartHeight+\y*\ShellIncHeight) node[left]{$\shellText$} -- ++(\TickHeight,0);
+      \ifthenelse{\y=0}{}{
+        \draw[densely dotted,gray50] (2,\ShellStartHeight+\y*\ShellIncHeight) -- ++(\TickGap+\y*\TickGap-2,0);
+      }
+    }
+
+    \foreach \x in {2,3,4} {
+      \draw[semithick,->] (\x*\TickGap+\SignalTickClearance,\ReloadArrowStart)
+        -- ++(0,-\ReloadArrowStart+\ShellStartHeight+\x*\ShellIncHeight-\ShellIncHeight+2);
+    }
+    \node[above] at (2*\TickGap,\ReloadArrowStart) {$R$};
+    \node[above] at (3*\TickGap,\ReloadArrowStart) {$R$};
+    \node[above] at (4*\TickGap,\ReloadArrowStart) {$R$};
+  \end{scope}
+\end{tikzpicture}
+
+\end{document}

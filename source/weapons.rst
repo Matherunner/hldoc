@@ -463,7 +463,7 @@ Suppose the player initiates a reload after more than the cycle time since the l
 Fast shotgun reload
 ~~~~~~~~~~~~~~~~~~~
 
-There is a way to decrease the shotgun reloading time by half a second. Observe that while the half-second timer is running and pending the loading of the next shell, the player can issue the ``+reload`` command again. Normally in other weapons, issuing ``+reload`` while reloading has no effect. Those weapons call ``CBasePlayerWeapon::DefaultReload`` to reload, which sets the ``CBasePlayerWeapon::m_fInReload`` to true to indicate that reloading is in progress. If the player then issues a ``+reload`` command, a check in ``CBasePlayerWeapon::ItemPostFrame`` will prevent calling ``Reload`` again:
+The fast shotgun reload technique decreases the total shotgun reloading time by half a second. Observe that while the half-second timer is active and pending the loading of the next shell, the player can forcibly issue the ``+reload`` command again. Normally, issuing ``+reload`` while reloading other weapons has no effect. Those weapons call ``CBasePlayerWeapon::DefaultReload`` to reload, which sets the ``CBasePlayerWeapon::m_fInReload`` to true to indicate that reloading is in progress. If the player then issues a ``+reload`` command, a check in ``CBasePlayerWeapon::ItemPostFrame`` will prevent calling ``Reload`` again:
 
 .. code-block:: c++
    :caption: ``CBasePlayerWeapon::ItemPostFrame``
@@ -474,7 +474,14 @@ There is a way to decrease the shotgun reloading time by half a second. Observe 
        Reload();
    }
 
-The shotgun, however, does not call the ``CBasePlayerWeapon::DefaultReload`` and so ``CBasePlayerWeapon::m_fInReload`` remains false at all time. Every time the player issues ``+reload``, ``CShotGun::Reload`` will be called. If ``CShotGun::Reload`` is called while the half-second timer is still active, the shotgun will load the next shell prematurely, before the timer expires. In other words, a shell is normally loaded at the trailing edge, and manually issuing ``+reload`` effectively moves each loading of shell to the leading edge. Therefore, it overall takes half a second shorter to fill the clip with the desired shell count. Once a shell has been loaded, issuing ``+reload`` again has no effect until the current timer expires.
+The shotgun, however, does not call the ``CBasePlayerWeapon::DefaultReload`` and so ``CBasePlayerWeapon::m_fInReload`` remains false at all time. Every time the player issues ``+reload``, ``CShotGun::Reload`` will be called. As illustrated in :numref:`shotgun-reload-fig`, if ``CShotGun::Reload`` is called while the half-second timer is still active, the shotgun will load the next shell prematurely, before the timer expires. In other words, in normal reloading (represented by the second graph) shells are loaded at the trailing edges of the half-second timers, but manually issuing ``+reload`` moves each loading of shell to the leading edge.
+
+.. figure:: images/shotgun-reload.svg
+   :name: shotgun-reload-fig
+
+   An illustration of the fast shotgun reload technique, starting from a shell count of 5. The top two graphs represent the shell count in the clip over time, while the bottom represents the timers in the reload cycle. The blue one-second timer prevents interruption to the reload process by firing.
+
+By issuing the ``+reload`` command at the points :math:`R` in the top graph, the shell count can be incremented early. The result is that the clip is filled with 8 shells at :math:`t = 2`, compared to :math:`t = 2 \frac{1}{2}` in the normal reloading process (second graph). In general, it takes half a second shorter to fill the clip with the desired shell count. Note that once a shell has been loaded within a half-second window, issuing ``+reload`` again has no effect until the current timer expires.
 
 .. _satchel:
 
