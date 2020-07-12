@@ -140,6 +140,8 @@ Denote :math:`\mathbf{r}` the origin of the ``env_explosion``. Then
 Notice that the :math:`A` and :math:`B` for this entity type is similar to that
 of a timed grenade.
 
+.. _tripmine explosion:
+
 Tripmines
 ~~~~~~~~~
 

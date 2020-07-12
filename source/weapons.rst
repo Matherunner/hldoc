@@ -401,11 +401,26 @@ Overall, the damage rate is 140 per second and the ammo consumption rate is 10 p
 Tripmine
 --------
 
-Tripmines can be placed 128 units away from the player's gun position. The origin of the tripmine will be placed 8 units away from the surface, with the beam parallel with the surface normal. Upon placing, the tripmine will be powered up after 1 if the bit 1 is set in ``pev->spawnflags``, or 2.5 seconds otherwise.
+The tripmine is a high explosive that proved to be useful in speedrunning for damage boosting. As a weapon, it only admits the primary attack. The weapon first traces a line from the player's gun position to 128 units ahead in the direction of the player's unit forward vector :math:`\mathbf{\hat{f}}`. If the line hits an entity, and if the entity is not a conveyor (i.e. does not have the ``FL_CONVEYOR`` flag set), then the weapon will create a ``monster_tripmine`` entity on the target surface. Specifically, if :math:`\mathbf{e}` is the point hit by the trace line and :math:`\mathbf{\hat{n}}` is the plane normal, then the origin of the tripmine entity is set to be :math:`\mathbf{e} + 8\mathbf{\hat{n}}`. Regardless of whether the trace line hits an entity though, the next primary attack will only be allowed 0.3s later.
 
-.. TODO: explain what happens in PowerupThink()!
+The tripmine entity has very low health of 1, a unit forward vector :math:`\mathbf{\hat{f}} = \mathbf{\hat{n}}`, and a movetype of ``MOVETYPE_FLY``, which ignores gravity. Initially, it does not collide with any entity. On spawn, it waits for 0.2s, then initiates the power up process. At a high level, this process involves the tripmine entity trying to find the entity it is attached to (hereinafter known as the *host entity*, the tripmine being the "parasite") and making sure that entity does not change its origin position and the angles. In the beginning, it does not know the host entity. It tries to find it by tracing a line from :math:`\mathbf{r} + 8 \mathbf{\hat{f}}` to :math:`\mathbf{r} - 32 \mathbf{\hat{f}}`, where :math:`\mathbf{r}` is the tripmine origin and :math:`\mathbf{\hat{f}}` is the tripmine's unit forward vector. Then there are three cases that follows:
 
-Tripmines have a health of 1.
+hit its owner (usually the player) or started in solid
+   extends the process by another 0.1s
+
+hit an entity other than its owner
+   sets this entity as the host entity and remembers its origin and angles
+
+did not hit anything
+   remove the tripmine from the world after 0.1s
+
+Assuming the tripmine found the host entity. In subsequent iterations, it tries to make sure the host entity has not moved or rotated since. If the host entity does move or rotate, then the tripmine will simulate "dropping" itself by creating a ``weapon_tripmine`` entity with the origin of :math:`\mathbf{r} + 24 \mathbf{\hat{f}}` and set to remove itself after 0.1s. As long as the host entity stays put the whole time, the powering up process will eventually complete. The time it takes to complete the powering up process depends on the spawn flags of the tripmine. If the spawn flag has bit 1 set, then the powering up process is set to complete in one second (unless extended due to the first case above when finding the host entity). On the other hand, if bit 1 is not set, the process will complete in 2.5 seconds. Once the power up process completes, the tripmine entity will become solid (``SOLID_BBOX``) and the characteristic laser beam will be activated.
+
+To activate the beam, the tripmine first traces a line from its origin :math:`\mathbf{r}` to :math:`\mathbf{r} + 2048 \mathbf{\hat{f}}`. It then remembers the unobstructed trace fraction of this line. After 0.1s, the beam will be activated. While it is active, it checks for any entity crossing its path once every 0.1s. The low frequency allows a fast moving entity to move past the beam without detonating the tripmine, a fact exploited in many speedruns. It does the check by tracing a line from its origin at :math:`\mathbf{r}` to :math:`\mathbf{r} + 2048 \mathbf{\hat{f}}`, similar to trace involved in the beam activation. If the unobstructed trace fraction differs from that obtained from the beam activation by more than 0.001, then the tripmine will kill itself, which causes it to explode after a brief time (explained below). Even if the trace fraction remains the same, if the host entity is somehow null (there is no known mechanism to this), or if the host entity moved or rotated, the tripmine will also kill itself. And of course, since the tripmine entity is damageable, it can be killed by conventional means. 
+
+When the tripmine entity is killed, it initiates a delay before it actually explodes and inflicts a radius damage to the surrounding entities. This delay is randomised using the non-shared RNG (see :ref:`nonshared rng`) by picking a random number within :math:`[0.1, 0.3]`. When it is finally time to explode, the physics governing the rest follows the description in :ref:`tripmine explosion`. The source damage of the tripmine in the default game settings is 150, similar to the satchel charge (:ref:`satchel`).
+
+.. TODO: explain that we can explode an infinite number of tripmines: place a tripmine on a moving entity, explodes it, then collect the dropped tripmine to restore the ammo
 
 .. _handgrenade:
 
