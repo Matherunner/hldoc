@@ -6,6 +6,25 @@ Half-Life is a shining example of having an already stellar gameplay elevated by
 .. TODO: satchels etc ignore the player, but after a save/load they no longer ignore the player
 .. TODO: but gauss probably doesn't ignore satchels, so possible to hit a grenade with gauss and reflect?
 
+.. TODO: many of the discussions below takes about "a timer of 0.1s", or "a timer of 0.2s" etc. These are not really correct. It really is "a timer of 0.1s + 1 frame", or at least sometimes it is. E.g. at host_framerate 0.001, we see that something that is supposed to happen once every 0.1s (e.g. the damage in gluon gun), sometimes only happens once every 0.101s:
+
+.. 927.083435 hit!
+   927.183472 hit!
+   927.284424 hit!
+   927.384460 hit!
+   927.485474 hit!
+   927.586426 hit!
+   927.686462 hit!
+   927.787476 hit!
+   927.888428 hit!
+   927.988464 hit!
+   928.089478 hit!
+   928.190430 hit!
+
+.. Notice some of the gaps is 0.100, and others 0.101. E.g. This might be due to inherent FP errors when adding the frame time. This becomes worse that lower frame rates, the errors will be more pronounced!
+
+.. _gauss:
+
 Gauss
 -----
 
@@ -24,7 +43,7 @@ Observe that the damage caps at 200 after charging for 4 seconds. The secondary 
 .. math:: \mathbf{v}' = \mathbf{v} - 5D\mathbf{\hat{f}} \operatorname{diag}(1,1,0)
    :label: gauss velocity
 
-where :math:`\operatorname{diag}(1,1,0)` refers to the diagonal matrix with 1, 1, and 0 as the entries on the diagonal. Observe that the vertical velocity never changes. To maximise horizontal speed change, the player must fire from zero pitch, which gives the maximum speed change of 1000 ups, one of the greatest speed boosts available in Half-Life.
+where :math:`\operatorname{diag}(1,1,0)` refers to the diagonal matrix with 1, 1, and 0 as the entries on the diagonal. Observe that the vertical velocity never changes. To maximise horizontal speed change, the player must fire from zero pitch, which gives the maximum speed change of 1000 ups, one of the greatest speed boosts available in Half-Life. The gauss cannot be fired when the waterlevel is 3, and the gunfire volume is always 450 regardless of the mode.
 
 The behaviour of gauss beams is relatively complex compared to other Half-Life projectiles. Intuitively, players recognise that gauss beams have a tendency to reflect off surfaces. Gauss beams can also "punch" through walls and damage entities at the opposite side, through a mechanism that is not obvious at first sight. Gauss beams can even inflict damage onto oneself under the right circumstances. What is more, the damage from gauss beams can be seemingly amplified when fired through particular geometries.
 
@@ -279,6 +298,17 @@ In both cases, the initial velocity is independent of the player velocity.
 TODO
 
 TODO
+
+Gluon gun
+---------
+
+The gluon gun, also known as the egon gun, is a powerful weapon when measured by the damage rate, especially in casual gameplay. Its damage rate is so high that it can obliterate almost every damageable entity in mere moments. It also does not require a particularly good aim or set up to use effectively. In speedrunning, however, weapon switching, the gauss (:ref:`gauss`), and precise explosive placements almost always deliver better damage rate in short bursts.
+
+The gluon gun only fires in the primary mode. It cannot be fired when the waterlevel is 3. Like the gauss, when fired it produces a sound of volume 450. When ``+attack`` is issued, the gluon gun initialises a damage countdown of 0.1s. If ``+attack`` is still active after 0.1s, the first damage will be inflicted onto whatever damageable entity is in aim. A line is traced from the player's gun position to 2048 units in the direction of :math:`\mathbf{\hat{f}}` until an entity is hit. This implies the gluon gun only has a range of 2048 units. In addition, an ammo cell is consumed simultaneously with the damage. After the first damage infliction and cell consumption, a countdown to the next damage of 0.1s is restarted. In the default game settings, 14 damage of type ``DMG_ENERGYBEAM | DMG_ALWAYSGIB`` is inflicted in the first and subsequent damages. This cycle continues until the attack is interrupted. If :math:`\delta` is the Dirac delta function, then the damage inflicted at time :math:`t` may be written as
+
+.. math:: D(t) = 14 \sum_{i=1}^\infty \delta(t - 0.1i)
+
+Overall, the damage rate is 140 per second and the ammo consumption rate is 10 per second. When the attack stops, it takes 0.5s to restart it.
 
 .. _tripmine:
 
