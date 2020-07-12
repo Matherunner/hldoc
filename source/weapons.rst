@@ -518,24 +518,29 @@ By issuing the ``+reload`` command at the points :math:`R` in the top graph, the
 Satchel charge
 --------------
 
-Similar to the hand grenade (:ref:`handgrenade`), a satchel charge experiences
-entity gravity :math:`g_e = 0.5` and entity friction :math:`k_e = 0.8`, and has
-move type ``MOVETYPE_BOUNCE``. One difference from hand grenades is that the
-entity gravity gets reset to 1 in the ``SatchelSlide`` touch function upon
-touching. Also, satchel charges float in water when its waterlevel is 3.
+The satchel charge provides one of the highest explosive damages at the player's disposal. As a weapon, it has both primary and secondary mode. The behaviour in each mode depends on the weapon's state. If there is no thrown charges, issuing either ``+attack`` or ``+attack2`` will throw a charge. Then, issuing ``+attack`` again will detonate the charge, while issuing ``+attack2`` will throw another charge.
 
-A satchel charge, when thrown, is created at the player origin rather than at
-the player's view. The initial velocity is
+Throwing a satchel charge creates the entity at the player origin, rather than the gun position. The initial velocity of the satchel charge is set to be
 
-.. math:: \mathbf{v}_g = \mathbf{v} + 274\mathbf{\hat{f}}
+.. math:: \mathbf{v}_{\mathit{SC}} = \mathbf{v} + 274\mathbf{\hat{f}}
 
-where :math:`\mathbf{\hat{f}}` is the player's unit forward vector. The satchel
-charge has an owner property that remembers who created it. The satchel charge
-will pass through the owner, but will collide with any other entity. The owner
-property is saved across save loads. It is also saved across map changes,
-provided the satchel charge does not disappear across transition. If it does
-disappear, the charge will lose information about who the owner is, and so will
-not be detonate and will collide with the original owner.
+where :math:`\mathbf{v}` is the current player velocity and :math:`\mathbf{\hat{f}}` is the player's unit forward vector. After a satchel charge is thrown, it takes half a second before another one can be thrown. The only way to detonate the thrown charges is to issue the primary attack at least one second since the last one was thrown. When issued, the weapon searches for all the thrown satchel charges within 4096 units from the player's origin. All charges with the owner set to the player will be detonated. The weapon then starts a timer of one second before any more charges can be thrown again.
+
+A satchel charge has a source damage of 150 in the default game settings, which is higher than average. Refer to :ref:`detonating grenades` for the explosive physics of the satchel charge. With regards to its movement physics, it is similar to the hand grenade (:ref:`handgrenade`) in that it has an entity gravity of :math:`g_e = 0.5`, an entity friction of :math:`k_e = 0.8`, and is set to have a movetype of ``MOVETYPE_BOUNCE``. This allows the satchel charge to experience half the gravity as experienced by the player, in addition to bounciness when colliding with other entities. One difference from the hand grenade is that the entity gravity is reset to 1 in the ``CSatchelCharge::SatchelSlide`` touch function upon touching another entity other than its owner. This makes a thrown satchel charge twice as heavy as soon as touching some entity such as a wall.
+
+The satchel charge has a unique water physics. The satchel charge entity checks its waterlevel once every 0.1s in ``CSatchelCharge::SatchelThink``. If the waterlevel is 3, the entity's movetype is set to be ``MOVETYPE_FLY``, making it ignore gravity. In addition, the new velocity is set to be
+
+.. math:: \mathbf{v}_{\mathit{SC}}' = 0.8 \mathbf{v}_{\mathit{SC}} + 8 \mathbf{\hat{k}}
+
+where :math:`\mathbf{\hat{k}} = \langle 0,0,1\rangle`. In this movetype, the satchel charge will not see its velocity modified by any means except the above. Therefore, we can easily determine the steady state velocity to be :math:`40\mathbf{\hat{k}}`, which can be found by equating :math:`\mathbf{v}_{\mathit{SC}}' = \mathbf{v}_{\mathit{SC}}` and solving. If the waterlevel is 0, the movetype will be reset back to ``MOVETYPE_BOUNCE``. In any waterlevel other than 0 or 3, the velocity is modified as such:
+
+.. math:: \mathbf{v}_{\mathit{SC}}' = \mathbf{v}_{\mathit{SC}} - 8 \mathbf{\hat{k}}
+
+The satchel charge also applies an additional geometric friction when it is close to the ground. Specifically, every 0.1s, it traces a line from the charge origin :math:`\mathbf{r}_{\mathit{SC}}` to 10 units below at :math:`\mathbf{r}_{\mathit{SC}} - 10\mathbf{\hat{k}}`. If this line hits an entity other than monsters, the satchel charge will modify its velocity to
+
+.. math:: \mathbf{v}_{\mathit{SC}}' = 0.95 \mathbf{v}_{\mathit{SC}}
+
+The satchel charge has an owner property that remembers who created it. The satchel charge will pass through the owner, but collide with any other entity. The owner property is saved across save loads. It is also saved across map changes, provided the satchel charge does not disappear across transition. If it does disappear, the charge will lose the information about who the owner is, and so it cannot be detonated on primary attack and it will collide with the original owner.
 
 .. TODO: explain why
 

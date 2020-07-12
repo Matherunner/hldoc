@@ -160,6 +160,21 @@ vector). Then we have
 The unit forward vector is very well defined in the game, because it is parallel
 to the beam.
 
+.. _detonating grenades:
+
+Detonating grenades
+~~~~~~~~~~~~~~~~~~~
+
+A detonating grenade is an explosive that can only be detonated via some in-game triggers or interactions. The satchel charge described in :ref:`satchel` is the primary example of a detonating grenade. Let :math:`\mathbf{r}` be the origin of a detonating grenade. Then we have
+
+.. math::
+   \begin{aligned}
+   A &:= \mathbf{r} + 8\mathbf{\hat{k}} \\
+   B &:= \mathbf{r} - 40\mathbf{\hat{k}}
+   \end{aligned}
+
+Compared to a timed grenade or an ``env_explosion`` entity, the :math:`B` is located deeper beneath the entity.
+
 .. _nuking:
 
 Nuking
