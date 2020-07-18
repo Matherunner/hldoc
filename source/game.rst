@@ -15,14 +15,14 @@ Tracing is one of the most important computations done by the game. Tracing is d
 Randomness
 ----------
 
-The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. Randomness in Half-Life is sourced in two ways: by means of the *shared RNG* and the *non-shared RNG*. These are custom written pseudo-RNGs that are powered by vastly different algorithms. The shared RNG is so named because it is computed by the game server and shared with the game clients, while the non-shared RNG is computed independently by the game server and clients with no sharing or synchronisation between them.
+The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. Randomness in Half-Life is sourced in two ways: by means of the *shared RNG* and the *non-shared RNG*. These are custom written pseudo-RNGs that are powered by vastly different algorithms. The shared RNG is so named because it is computed by the game server and shared with the game clients, while the non-shared RNG is computed independently by the game server and clients without any kind of sharing or synchronisation between them.
 
 .. _shared rng:
 
 Shared RNG
 ~~~~~~~~~~
 
-The shared RNG code is open source and written in ``dlls/util.cpp`` in the Half-Life SDK. The shared RNG barely qualifies as an RNG given how it is used, and especially due to the fact that, given a fixed interval :math:`[l, h)`, the RNG only returns 253 possible values within the bounds, as we will explain below.
+The shared RNG code is open source and written in ``dlls/util.cpp`` in the Half-Life SDK. The shared RNG barely qualifies as an RNG given how it is used, and especially due to the fact that, given a fixed interval :math:`[l, h)`, the RNG only returns 253 possible values within the bounds, as we will explain below. The only uses of the shared RNG in Half-Life are related to weapon behaviours and bullet spreads (see :ref:`bullet spread`). 
 
 For some context, a typical pseudo-RNG must be seeded prior to use, for a pseudo-RNG needs to have its initial state defined. To put it differently, let :math:`S_0` be the initial state of a typical pseudo-RNG. To use this RNG, we must first call a seeding function :math:`S_0 \gets \operatorname{Seed}(s)` with some value :math:`s`, which is often just the current unix timestamp. Then, the next pseudorandom number is given by :math:`x_0` where :math:`(S_1, x_0) \gets f(S_0)`. In general, the :math:`i`-th pseudorandom number is given by :math:`(S_{i+1}, x_i) \gets f(S_i)`.
 
@@ -55,9 +55,9 @@ The most important aspect of the shared RNG is that it returns only 253 possible
 Non-shared RNG
 ~~~~~~~~~~~~~~
 
-The code for the non-shared RNG is not publicly available. Nevertheless, the Xash3D engine and the leaked Half-Life 2 source code provide the same non-shared RNG code in C++. The non-shared RNG is considerably more complex than the shared RNG. The non-shared RNG is used much more in the game for computations of bullet spreads (such as ``FireBullets``), explosion targets (``BodyTarget``), grenade tumbling velocities, delay between entity "thinks", NPC talking sequences, sounds, etc.
+The code for the non-shared RNG is not officially publicly available. Nevertheless, we do not need to resort to reverse engineering as the C++ code for the non-shared RNG is available in the Xash3D engine code, the ReHLDS project, and the leaked Half-Life 2 source code, all of which look almost identical. The non-shared RNG is considerably more complex than the shared RNG. The non-shared RNG is used much more in Half-Life than the shared RNG. Examples of the uses of the non-shared RNG include the randomisation of the player's explosion target position, grenade tumbling velocities, delays between entity "thinks", NPC talking sequences and general behaviours, the pitches of sounds, cosmetics and effects, and much more.
 
-.. note:: expansion needed
+Given the complexity of the non-shared RNG algorithm, we will not attempt to describe how it works here. We can say that it appears to be seeded based on the current unix timestamp. This meant that, in principle, we can change the system clock and restart Half-Life to alter the random behaviours and phenomena in the game. There are two functions exposed to the users to obtain the next random value: the integer version :math:`\mathfrak{R}_{\mathit{NS}}(S,l,h)` and the floating point version :math:`\mathfrak{R}_{\mathit{NS}}(S,l,h)`. Both of these rely on some global state :math:`S`.
 
 .. _frame rate:
 

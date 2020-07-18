@@ -9,6 +9,7 @@
         "baskerville",
         "circ",
         "colorlet",
+        "d",
         "dmg",
         "dmg alwaysgib",
         "dmg energybeam",
@@ -43,6 +44,7 @@
         "newif",
         "newlength",
         "noclip",
+        "nonshared",
         "numref",
         "omni",
         "omni graffle",
@@ -90,6 +92,8 @@
         "vert",
         "weapon",
         "weapon noclip",
+        "xash",
+        "xash d",
         "yesno",
         "yshift"
     ]
