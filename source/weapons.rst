@@ -23,6 +23,13 @@ Half-Life is a shining example of having an already stellar gameplay elevated by
 
 .. Notice some of the gaps is 0.100, and others 0.101. E.g. This might be due to inherent FP errors when adding the frame time. This becomes worse that lower frame rates, the errors will be more pronounced!
 
+.. _bullet spread:
+
+Bullet spread
+-------------
+
+
+
 .. _gauss:
 
 Gauss

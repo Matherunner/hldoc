@@ -15,20 +15,40 @@ Tracing is one of the most important computations done by the game. Tracing is d
 Randomness
 ----------
 
-The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. There are two sources of random generation, the *shared RNG* and the *non-shared RNG*. The shared RNG is named so because it is computed serverside, while the non-shared RNG is computed at both sides with no synchronisation between them. The shared RNG is usually more important because entities that require RNG in behaviour tend to use shared RNG. On the other hand, the non-shared RNG is typically used for sound and cosmetics.
+The Half-Life universe is full of uncertainties, much like our universe at the level of quantum mechanics. Randomness in Half-Life is sourced in two ways: by means of the *shared RNG* and the *non-shared RNG*. These are custom written pseudo-RNGs that are powered by vastly different algorithms. The shared RNG is so named because it is computed by the game server and shared with the game clients, while the non-shared RNG is computed independently by the game server and clients with no sharing or synchronisation between them.
 
 .. _shared rng:
 
 Shared RNG
 ~~~~~~~~~~
 
-The shared RNG code is open to public, given in ``dlls/util.cpp``. The computation relies on a *seed table*, which contains 256 entries of unsigned integers. The state of the RNG is global, which is stored as a 32-bit unsigned integer global variable named ``glSeed`` which is initialised to zero at program start up.
+The shared RNG code is open source and written in ``dlls/util.cpp`` in the Half-Life SDK. The shared RNG barely qualifies as an RNG given how it is used, and especially due to the fact that, given a fixed interval :math:`[l, h)`, the RNG only returns 253 possible values within the bounds, as we will explain below.
 
-To seed the RNG, the code would call ``U_Srand``, which is likely never called directly, as will be explained in a moment. The function seeds the RNG by using the lower 8 bits of a 32-bit unsigned integer parameter as an index to the seed table. The value returned by the seed table is then assigned to ``glSeed``. This implies that there are only 256 ways of seeding the RNG.
+For some context, a typical pseudo-RNG must be seeded prior to use, for a pseudo-RNG needs to have its initial state defined. To put it differently, let :math:`S_0` be the initial state of a typical pseudo-RNG. To use this RNG, we must first call a seeding function :math:`S_0 \gets \operatorname{Seed}(s)` with some value :math:`s`, which is often just the current unix timestamp. Then, the next pseudorandom number is given by :math:`x_0` where :math:`(S_1, x_0) \gets f(S_0)`. In general, the :math:`i`-th pseudorandom number is given by :math:`(S_{i+1}, x_i) \gets f(S_i)`.
 
-The entity code typically call one of two functions to generate random numbers: ``UTIL_SharedRandomLong`` for signed integers and ``UTIL_SharedRandomFloat`` for single precision floating point numbers. The implementations of the two functions can be found in the Half-Life SDK. It is interesting to note that, both of these functions seed the RNG at the very beginning using values dependent solely on their input parameters and nothing else (not even the system time). In fact, these two functions appear to be the only locations in the Half-Life SDK calling the seeding function. Given the observation that there are only 256 possible seeds, it follows that there are only 256 possible values returned by each of these functions. Calling the same function with the same seed repeatedly will result in the same value returned over and over again.
+.. TODO: which frame? probably not the usercmd frame, but need to explicitly state!
 
-Searching through the Half-Life SDK, the shared RNG is only used for idle weapon animations and randomisation of bullet spread in ``FireBulletsPlayer``. The ``FireBulletsPlayer`` function is called by many conventional weapons such as the MP5, 357, and shotgun (basis of box item duplication, see :ref:`item duplication`). It is not used by the glock, however. The implication is that there are only 256 ways bullets can spread when these weapons are fired. For example, it is feasible to enumerate all of 256 shotgun spread patterns given different seeds and select the ones most suited for a particular purpose.
+However, the Half-Life shared RNG is used differently. A "seed" in this context refers to an integer that appears to increment sequentially every frame. This integer is stored as the class variable ``CBasePlayer::random_seed``. This variable is set in ``CmdStart`` to the value of its ``random_seed`` parameter:
+
+.. code-block:: cpp
+   :caption: ``CmdStart``, ``dlls/client.cpp``
+   :emphasize-lines: 8
+
+   void CmdStart( const edict_t *player, const struct usercmd_s *cmd, unsigned int random_seed )
+   {
+     entvars_t *pev = (entvars_t *)&player->v;
+     CBasePlayer *pl = dynamic_cast< CBasePlayer *>( CBasePlayer::Instance( pev ) );
+
+     [...omitted...]
+
+     pl->random_seed = random_seed;
+   }
+
+``SV_RunCmd`` in the engine code supplies the value of the seed to ``CmdStart``. The ultimate source of the seed value appears to be dependent on the latest incoming sequence number of the client-server channel. This part of the code is not open source, and therefore not well researched. Nonetheless, empirical and field evidence shows that the seed value obtained in ``CmdStart`` appears to be sequential from frame to frame, or at least, increments in a very predictable way.
+
+The shared RNG may be denoted as :math:`\mathfrak{R}_S(\sigma, l, h)`, where :math:`\sigma` is an integer, while :math:`l` and :math:`h` are floating point numbers representing the lower and upper bounds of the output, forcing the function to give a value within :math:`[l, h)`. The current shared seed value is typically given for :math:`\sigma`, although there are exceptions, such as in the computation of bullet spreads as explained in :ref:`bullet spread`. In the SDK code, :math:`\mathfrak{R}_S` is simply ``UTIL_SharedRandomFloat``. [#shared-RNG-float]_
+
+The most important aspect of the shared RNG is that it returns only 253 possible values for a given interval :math:`[l, h)`. The reader is encouraged to read the SDK code for the implementation details. For a higher level overview here, when ``UTIL_SharedRandomFloat`` is called, it always initialises a global ``glSeed`` to one of the 256 possible values according to a 256-element lookup table. The previous value of ``glSeed`` prior to calling this function is completely discarded as a result. The index to the lookup table is computed by taking the lower 8-bits of the sum of the arguments of ``UTIL_SharedRandomFloat`` reinterpreted as 32-bit signed integers. What follows are computations involving ``glSeed`` and scaling of the output according to the bounds. Notice that because there are only 256 possible initial states, followed by deterministic and pure computations, there can only have a maximum of 256 possible output values. In reality, it is slightly worse than that: we counted the number of unique output values from :math:`\mathfrak{R}_S` (given fixed :math:`l` and :math:`h`), and there are only 253 of them. It is therefore quite a stretch to describe the outputs of the shared RNG as "random".
 
 .. _nonshared rng:
 
@@ -67,3 +87,7 @@ Walking through a frame
 -----------------------
 
 This section attempts to outline some of the major events relevant to speedrunning that happen in a frame. Extreme detail on how each part of the game engine works is beyond the scope of this documentation. In fact, some believe that code is documentation! Until Valve releases the source code of Half-Life, one can study the Xash3D engine source or the disassembly of Half-Life.
+
+.. rubric:: Footnote
+
+.. [#shared-RNG-float] We omit any mention of the integer version of the shared RNG, ``UTIL_SharedRandomLong``, because no code is calling this function in the SDK. It also behaves very similarly to the floating point version with only minor differences.
