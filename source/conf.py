@@ -159,6 +159,7 @@ html_last_updated_fmt = '%b %d, %Y'
 html_sidebars = {
     '**': [
         'about.html',
+        'extraabout.html',
         'navigation.html',
         'searchbox.html',
     ]
