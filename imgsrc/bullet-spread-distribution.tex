@@ -1,0 +1,31 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\AxisLen}{200}
+
+  \coordinate (O) at (0,0);
+  \coordinate (XA) at ($(O) - 0.5*(\AxisLen,0)$);
+  \coordinate (XB) at ($(XA) + (\AxisLen,0)$);
+  \coordinate (YA) at ($(O) - 0.5*(0,\AxisLen)$);
+  \coordinate (YB) at ($(YA) + (0,\AxisLen)$);
+
+  \draw[densely dotted] (O) circle (\AxisLen*0.5);
+  \draw (O) node[below left]{$O$} ++(0.5*\AxisLen, 0.5*\AxisLen) node[right]{$A$}
+    -- ++(0,-\AxisLen) node[right]{$B$}
+    -- ++(-\AxisLen,0) node[left]{$C$}
+    -- ++(0,\AxisLen) node[left]{$D$}
+    -- cycle;
+  \draw[thick]
+    (XA) node[left]{$\displaystyle\left(-\frac{\theta_S}{2}, 0\right)$}
+      -- (XB) node[right]{$\displaystyle\left(\frac{\theta_S}{2}, 0\right)$}
+    (YA) node[below]{$\displaystyle\left(0,-\frac{\theta_S}{2}\right)$}
+      -- (YB) node[above]{$\displaystyle\left(0,\frac{\theta_S}{2}\right)$};
+
+  \foreach \x/\y in {0.622/0.683,0.86/0.699,0.683/0.841,0.699/0.681,0.841/0.364,0.681/-0.0399} {
+    \draw[fill] (0.5*\AxisLen*\x,0.5*\AxisLen*\y) circle (2);
+  }
+\end{tikzpicture}
+
+\end{document}

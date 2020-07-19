@@ -77,7 +77,12 @@ In :eq:`bullet spread shared RNG`, if we ignored the deeply flawed randomness of
 
 However, due to the non-randomness of :math:`\mathfrak{R}_S`, and the fact that the values of the first argument provided to :math:`\mathfrak{R}_S` are deterministic and predictable, there are at most only 256 possible combinations of :math:`(m_x, m_y)`. This further implies that there are only at most 256 possible bullet spread patterns.
 
-We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{R}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
+.. figure:: images/bullet-spread-distribution.svg
+   :name: bullet spread distribution
+
+   An illustration of the bounds of the bullet spread, which is a square. A circle is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma = 87`.
+
+We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{R}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. This is illustrated in :numref:`bullet spread distribution`. Notice that two of the pellets lie outside the circle, proving that bullet spreads are not confined within it. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
 
 Meaning of :math:`\mathbf{\Omega}`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
