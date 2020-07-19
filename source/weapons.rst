@@ -28,7 +28,70 @@ Half-Life is a shining example of having an already stellar gameplay elevated by
 Bullet spread
 -------------
 
+The bullets of some weapons in Half-Life have a spread that cause them to deviate from the target slightly. The amount of deviation depends on the weapon. The deviation appears to be random and unpredictable to a casual player. However, bullets fired by the player rely only on the shared RNG, which we have concluded in :ref:`shared rng` that it is wholly predictable and non-random. In particular, if in a TAS the player loads from a savestate and fires a weapon with bullet spread in some fixed :math:`n`-th frame, then the spread of the bullets will not change if the savestate is loaded again and the same actions are repeated.
 
+The spread of the bullets when fired by the player is computed in ``CBaseEntity::FireBulletsPlayer``. One of the arguments to this function is the number of bullets :math:`n_B`. For example, the shotgun (see :ref:`shotgun`) in primary mode would pass 6 for this argument. In all other weapons that have bullet spreads, 1 is always passed in, because those weapons fire one bullet at a given time. This function also accepts several other obvious arguments. Of concern to us are the spread vector :math:`\mathbf{\Omega} \in \mathbb{R}^3`, the source of line trace :math:`\mathbf{a}`, the aiming direction :math:`\mathbf{d}`, the range :math:`\ell` of the weapon, the bullet type, and the shared RNG "seed" :math:`\sigma`.
+
+This function uses the multidamage mechanism described in :ref:`damage system`. At a higher level, the function begins by doing a *clear* on the currently accumulated damage and sets the accumulated damage type to ``DMG_BULLET | DMG_NEVERGIB``. It then enters a loop that spreads and  *adds* or accumulates the damage that *will be inflicted* due to each of the :math:`n_B` bullets. Once it exits the loop, it does an *apply* operation. The effect of these is that the damage will usually be accumulated and then actually inflicted, rather than inflicted for each bullet.
+
+The loop is the meat of the bullet spread physics. Let :math:`i` be the loop counter such that :math:`i = 1` in the first iteration, :math:`i = 2` in the second iteration, and so on. At the start of an iteration, it computes the deviation multipliers :math:`m_x` and :math:`m_y` in the horizontal and vertical directions respectively. Mathematically, these are computed as such:
+
+.. math::
+   \begin{aligned}
+   m_x &\gets \mathfrak{R}_S\left(\sigma + i, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{R}_S\left(\sigma + i + 1, -\frac{1}{2}, \frac{1}{2} \right) \\
+   m_y &\gets \mathfrak{R}_S\left(\sigma + i + 2, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{R}_S\left(\sigma + i + 3, -\frac{1}{2}, \frac{1}{2} \right)
+   \end{aligned}
+   :label: bullet spread shared RNG
+
+Then, if :math:`\mathbf{\hat{s}}` and :math:`\mathbf{\hat{u}}` are the player's unit right and up vectors (see :ref:`view vectors`), then it traces a line ignoring the player entity from the source :math:`\mathbf{a}` to the point given by
+
+.. math:: \mathbf{a} + \ell \left( \mathbf{d} + m_x \Omega_x \mathbf{\hat{s}} + m_y \Omega_y \mathbf{\hat{u}} \right)
+   :label: bullet spread end point
+
+If this line trace hits nothing, then nothing important is done. If this line hits an entity, then the ``TraceAttack`` of the hit entity will be called with an amount of damage depending on the bullet type argument passed to this function. The ``TraceAttack`` typically performs the *add* multidamage operation. The reader is encouraged to read the SDK code for more details.
+
+.. _actual bullet range:
+
+Actual bullet range
+~~~~~~~~~~~~~~~~~~~
+
+In :eq:`bullet spread end point`, we observe that distance from the source to the end point is not :math:`\ell`, the intended bullet range. We can see this because the direction vector is not normalised before being scaled up by :math:`\ell`. If we assume the player roll angle is 0 and :math:`\mathbf{d} = \mathbf{\hat{f}}`, both of which are true for the vast majority of the time, then it can be shown that the range of a bullet is actually
+
+.. math:: \ell \sqrt{1 + m_x^2 \Omega_x^2 + m_y^2 \Omega_y^2}
+
+rather than just :math:`\ell`. Though this error is very small and unnoticeable in practice. In the subsequent descriptions of the various weapons in this chapter, when we claim that a weapon has a bullet spread and a range of some value of :math:`\ell`, keep in mind that the actual range of the bullet is slightly longer depending on the spread. Weapons that do not have a bullet spread are not affected by the error described in this section.
+
+.. _bullet distribution:
+
+Distribution
+~~~~~~~~~~~~
+
+In :eq:`bullet spread shared RNG`, if we ignored the deeply flawed randomness of :math:`\mathfrak{R}_S`, then we can immediately see that :math:`-1 \le m_x < 1` and :math:`-1 \le m_y < 1`. In addition, both :math:`m_x` and :math:`m_y` are drawn from a triangular distribution (rather than a gaussian distribution claimed by the comments in the code), the PDF of which may be given by
+
+.. math::
+   f(z) =
+   \begin{cases}
+   z + 1 & -1 \le z < 0 \\
+   1 - z & 0 \le z \le 1
+   \end{cases}
+
+However, due to the non-randomness of :math:`\mathfrak{R}_S`, and the fact that the values of the first argument provided to :math:`\mathfrak{R}_S` are deterministic and predictable, there are at most only 256 possible combinations of :math:`(m_x, m_y)`. This further implies that there are only at most 256 possible bullet spread patterns.
+
+We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{R}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
+
+Meaning of :math:`\mathbf{\Omega}`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The vector :math:`\mathbf{\Omega}` is referred to as the spread vector above. The way this vector is named and defined in the SDK implies that each element in the vector is :math:`\sin(\theta_S/2)` where :math:`\theta_S` is the intended maximum side-to-side angle of deviation. The SDK defines a few constants for :math:`\mathbf{\Omega}` that are used by the various weapons. For example, the MP5 (see :ref:`mp5`) uses the following as its :math:`\mathbf{\Omega}`:
+
+.. code-block:: cpp
+   :caption: ``dlls/weapons.h``
+
+   #define VECTOR_CONE_6DEGREES	Vector( 0.05234, 0.05234, 0.05234 )
+
+Indeed, :math:`2 \arcsin(0.05234) \approx 6.000464^\circ`.
+
+However, if we look more closely at :eq:`bullet spread end point`, we see that the actual maximum angle of deviation is not exactly 6 degrees, for two reasons. Firstly, as explained in :ref:`bullet distribution`, the bullets spread in a square rather than a circle, so the angle of deviation from the centre is not constant. Even if we consider just the horizontal and the vertical angles of deviation, the actual angle differs from the intended angle because the method of obtaining the values defined in the SDK is incorrect given how those values are then used in :eq:`bullet spread end point`. In particular, using the MP5 as an example, the actual angle of deviation is :math:`2 \arctan 0.05234 \approx 5.992^\circ`. Admittedly, the difference is unnoticeable due to the small angle approximations (in radians) :math:`\sin x \approx \tan x \approx x`, as seen in their Maclaurin series expansions.
 
 .. _gauss:
 
@@ -433,7 +496,7 @@ In primary mode, glock's precision is only slightly worse than the revolver. In 
 MP5
 ---
 
-The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a square type bullet spread of :math:`3^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
+The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a square type bullet spread of :math:`6^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
 
 An MP5 grenade can be fired at a sound volume of 600. When touched, it explodes with a source damage of 100 in the default game settings. See :ref:`contact grenades` for a description of its explosive physics. An MP5 grenade has an entity gravity multiplier of :math:`g_e = 0.5`, causing it to experience a gravity of half the strength as experienced by the player. It is fired from the starting position of :math:`\mathit{GunPosition} + 16\mathbf{\hat{f}}`, at a rate of one grenade per second. Interestingly, the grenade is unique in how its initial velocity is independent of the current player velocity. This contradicts real life physics. In particular, the initial velocity of the grenade is always
 
