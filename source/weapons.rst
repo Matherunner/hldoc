@@ -412,84 +412,39 @@ Tripmines have a health of 1.
 Hand grenade
 ------------
 
-The handgrenade is one of the most useful weapons for damage boosting in
-Half-Life. It is versatile and can be used in many situations. However, making a
-handgrenade land and explode at the right location can be tricky due to its
-bouncy nature and the delayed detonation.
+The handgrenade is one of the most useful weapons for damage boosting in Half-Life. It is versatile and can be used in many situations. As a weapon, the handgrenade admits only the primary attack. When primary attack begins, the weapon sets a timer of half a second before a grenade can be thrown. If the ``+attack`` command is released before the timer expires, no grenade will be thrown until then. However, if the ``+attack`` is released after the timer expires, then a grenade will be thrown immediately. After throwing a grenade, the player cannot start throw another grenade until half a second later.
 
-The handgrenade experiences entity gravity :math:`g_e = 0.5` and entity friction
-:math:`k_e = 0.8`, and moves with type ``MOVETYPE_BOUNCE``. As a result, the
-handgrenade experiences only half of the gravity experienced by the player. In
-addition, recall from :ref:`collision` that, if the entity friction is not 1,
-then a ``MOVETYPE_BOUNCE`` entity has bounce coefficient :math:`b = 2 - k_e`,
-which, in the case of the handgrenade, is numerically :math:`b = 1.2`. This is
-why a handgrenade bounces off surfaces unlike other entities.
+When a grenade is thrown, the weapon will calculate the remaining time the grenade still has before detonation. If :math:`t_0` is the time when a primary attack begins, :math:`t` is the time of release, and :math:`H` is the Heaviside step function, then the remaining time upon release may be written as
 
-Interestingly, the initial speed and direction of the grenade when it is tossed
-depend on the player pitch in a subtle way. For example, when :math:`\varphi =
-\pi/2` (i.e. the player is facing straight down) the initial speed and direction
-are :math:`0` and :math:`\pi/2` respectively. However, when :math:`\varphi = 0`
-the initial speed and direction now become :math:`400` and :math:`-\pi/18 =
--10^\circ` respectively. Another notable aspect of handgrenades is that its
-initial velocity depends on the player velocity at the instant of throwing. This
-is unlike MP5 grenades.
+.. math:: t_r = \left( 3 + t_0 - t \right) H( \left( 3 + t_0 - t \right) - 0.1 )
 
-In general, we can describe the initial velocity and direction of handgrenades
-in the following way. **Assuming all angles are in degrees**. First of all, the
-player pitch will be clamped within :math:`(-180^\circ, 180^\circ]`. Let
-:math:`\varphi_g` be the handgrenade's initial pitch, then we have
+Then a grenade entity will be created at the player's gun position offset by :math:`16 \mathbf{\hat{f}}_G`, where :math:`\mathbf{\hat{f}}_G` is the throwing direction vector. Interestingly, the initial velocity of the grenade relative to the player when it is tossed depends on the player pitch in a subtle way. For example, when :math:`\varphi = \pi/2` (i.e. the player is facing straight down) the initial relative velocity of the thrown grenade is :math:`\mathbf{0}`. However, when :math:`\varphi = 0`, the initial relative speed of the grenade is :math:`400` and the pitch of the velocity is :math:`-\pi/18 = -10^\circ`.
 
-.. math:: \varphi_g = -10^\circ +
+In general, we can describe the initial velocity :math:`\mathbf{v}_G` of a thrown handgrenade in the following way. First, if the remaining time of the grenade :math:`t_r = 0`, then the grenade will have a velocity of :math:`\mathbf{v}_G = \mathbf{0}`. Therefore, we will assume :math:`t_r > 0`. The player pitch :math:`\varphi` modulo :math:`2\pi` and offset by :math:`-\pi` is used in the following calculations, so that :math:`-\pi < \varphi \le \pi`. This is because the ``CBasePlayer::pev::v_angle`` stores the angles in such a manner. Then we have
+
+.. math:: \varphi_G = -\frac{\pi}{18} +
           \begin{cases}
           8\varphi/9 & \varphi < 0 \\
           10\varphi/9 & \varphi \ge 0
           \end{cases}
 
-And if :math:`\mathbf{v}` is the current player velocity, :math:`\mathbf{v}_g`
-is the grenade's initial velocity, and :math:`\mathbf{\hat{f}}_g` is the unit
-forward vector computed using :math:`\varphi_g` and player's :math:`\vartheta`,
-then
+If :math:`\mathbf{v}` is the current player velocity and :math:`\mathbf{\hat{f}}_G` is the throwing direction vector with a pitch of :math:`\varphi_G` and a yaw of :math:`\vartheta`, then
 
-.. math:: \mathbf{v}_g = \mathbf{v} + \min(500, 360 - 4\varphi_g)
-          \mathbf{\hat{f}}_g
+.. math:: \mathbf{v}_G = \mathbf{v} + \min(500, 360 - 720\varphi_g/\pi) \mathbf{\hat{f}}_G
 
-To visualise this equation, we plotted :numref:`handgrenade vel 1` which depicts
-how the handgrenade's relative horizontal speed and vertical velocities vary
-with player pitch.
+To visualise this equation, we plotted :numref:`handgrenade vel 1` which depicts how the handgrenade's relative horizontal speed and vertical velocities vary with the player pitch :math:`\varphi`.
 
 .. figure:: images/handgrenade-vel-1.png
    :name: handgrenade vel 1
    :scale: 50%
 
-   Plot of the relationship between relative horizontal and vertical velocities
-   by varying the player pitch :math:`-180^\circ < \varphi \le 180^\circ`.
+   Plot of the relationship between relative horizontal and vertical velocities by varying the player pitch :math:`-180^\circ < \varphi \le 180^\circ`.
 
-From :numref:`handgrenade vel 1`, we can make a few observations to understand
-the handgrenade throwing angles better. Firstly, player pitch within :math:`-180
-< \varphi \le -28.125^\circ`, the curve is a circular arc. This is because the
-relative speed of the full 3D relative velocity vector is exactly :math:`500`,
-since in this range :math:`500 \le 360 - 4 \varphi_g`. Player pitch beyond the
-non-smooth point at :math:`\varphi = -28.125^\circ` corresponds to a less
-trivial curve, however, as the relative speed itself varies with the pitch. A
-second observation we can make is that, for the vast majority of player pitch,
-the relative vertical velocity is positive or pointing upward. There exist some
-pitch angles that result in downward vertical velocity, and these angles may be
-useful under certain circumstances. A third observation is that, there is a
-difference between throwing backwards by rotating :math:`\vartheta` by 180
-degrees and keeping :math:`\varphi` the same, versus keeping :math:`\vartheta`
-the same and setting :math:`\varphi \mapsto 360^\circ - \varphi`. For example,
-although the player's unit forward vector :math:`\mathbf{\hat{f}} = \langle -1,
-0, 0\rangle` is exactly the same when :math:`\vartheta = 0^\circ` and
-:math:`\varphi = -180^\circ`, and when :math:`\vartheta = 180^\circ` and
-:math:`\varphi = 0^\circ`, observe that the throw velocity is quite different.
-Indeed, by having :math:`\varphi = -180^\circ` we obtain the maximum possible
-horizontal throwing velocity not attainable with the "normal" player pitch range
-in :math:`[-90^\circ, 90^\circ]`. A fourth observation is that, assuming the
-player pitch lies within :math:`[0^\circ, 180^\circ]`, the relative *horizontal
-velocity* is invariant under the transformation :math:`\varphi \mapsto
-180^\circ - \varphi`. For example, the relative horizontal velocity at
-:math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ -
-60^\circ` is equal.
+.. FIXME: need to fix some of the following, because varphi_G is now in radians!
+
+From :numref:`handgrenade vel 1`, we can make a few observations to understand the handgrenade throwing angles better. Firstly, player pitch within :math:`-180 < \varphi \le -28.125^\circ`, the curve is a circular arc. This is because the relative speed of the full 3D relative velocity vector is exactly :math:`500`, since in this range :math:`500 \le 360 - 4 \varphi_g`. Player pitch beyond the non-smooth point at :math:`\varphi = -28.125^\circ` corresponds to a less trivial curve, however, as the relative speed itself varies with the pitch. A second observation we can make is that, for the vast majority of player pitch, the relative vertical velocity is positive or pointing upward. There exist some pitch angles that result in downward vertical velocity, and these angles may be useful under certain circumstances. A third observation is that, there is a difference between throwing backwards by rotating :math:`\vartheta` by 180 degrees and keeping :math:`\varphi` the same, versus keeping :math:`\vartheta` the same and setting :math:`\varphi \mapsto 360^\circ - \varphi`. For example, although the player's unit forward vector :math:`\mathbf{\hat{f}} = \langle -1, 0, 0\rangle` is exactly the same when :math:`\vartheta = 0^\circ` and :math:`\varphi = -180^\circ`, and when :math:`\vartheta = 180^\circ` and :math:`\varphi = 0^\circ`, observe that the throw velocity is quite different. Indeed, by having :math:`\varphi = -180^\circ` we obtain the maximum possible horizontal throwing velocity not attainable with the "normal" player pitch range in :math:`[-90^\circ, 90^\circ]`. A fourth observation is that, assuming the player pitch lies within :math:`[0^\circ, 180^\circ]`, the relative *horizontal velocity* is invariant under the transformation :math:`\varphi \mapsto 180^\circ - \varphi`. For example, the relative horizontal velocity at :math:`\varphi = 60^\circ` and :math:`\varphi = 120^\circ = 180^\circ - 60^\circ` is equal.
+
+The handgrenade entity experiences entity gravity :math:`g_e = 0.5` and entity friction :math:`k_e = 0.8`, and moves with type ``MOVETYPE_BOUNCE``. As a result, the handgrenade experiences only half of the gravity experienced by the player. In addition, recall from :ref:`collision` that, if the entity friction is not 1, then a ``MOVETYPE_BOUNCE`` entity has bounce coefficient :math:`b = 2 - k_e`, which, in the case of the handgrenade, is numerically :math:`b = 1.2`. This is why a handgrenade bounces off surfaces unlike other entities.
 
 .. _glock:
 
