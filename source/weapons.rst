@@ -80,7 +80,7 @@ However, due to the non-randomness of :math:`\mathfrak{R}_S`, and the fact that 
 .. figure:: images/bullet-spread-distribution.svg
    :name: bullet spread distribution
 
-   An illustration of the bounds of the bullet spread, which is a square. A circle is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma = 87`.
+   The square :math:`\mathit{ABCD}` forms the bounds of bullet spreads. A circle with centre :math:`O` is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma \equiv 87 \pmod{256}`.
 
 We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{R}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. This is illustrated in :numref:`bullet spread distribution`. Notice that two of the pellets lie outside the circle, proving that bullet spreads are not confined within it. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
 
@@ -499,7 +499,7 @@ Glock
 The glock [#glockfile]_, also known as the 9mm handgun, is the first hitscan ranged weapon acquired by the player in Half-Life. It does not see much use in speedruns once more powerful alternatives are acquired, owing to its relatively slow firing rate and low damage. Nevertheless, it can be used in a combination of weapons for quick weapon switching, offering 8 damage of type ``DMG_BULLET``. The volume of the gunfire is 600. Like most hitscan weapons in Half-Life, glock's range is 8192 units from the player's gun position. Reloading the glock takes 1.5s. Unlike the revolver (:ref:`revolver`), the glock can be fired under water. It can also be fired in both primary and secondary mode. The main differences between them are the firing rate and the bullet spread.
 
 =========  ==============  ===========================
-Mode       Cycle time      Bullet spread (square type)
+Mode       Cycle time      Bullet spread
 =========  ==============  ===========================
 Primary    0.3s            :math:`2\arctan 0.01 \approx 1.15^\circ`
 Secondary  0.2s            :math:`2\arctan 0.1 \approx 11.4^\circ`
@@ -512,7 +512,7 @@ In primary mode, glock's precision is only slightly worse than the revolver. In 
 MP5
 ---
 
-The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a square type bullet spread of :math:`6^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
+The MP5 submachine gun is a fairly versatile weapon thanks to its secondary mode of firing contact grenades. The primary mode is also always fairly strong in the early game. Although it shares the ammo capacity with the glock (:ref:`glock`), the damage of each bullet is 5 in the default game settings, lower than the glock's damage. Nonetheless, the MP5 primary mode fires a shot every 0.1s, yielding a respectable damage rate of 50 per second, which is higher than glock's 40 per second in the secondary mode. Unlike the glock's secondary mode, the MP5's primary mode fires at a higher precision, with a bullet spread of approximately :math:`6^\circ` in single-player. The MP5 can fire in neither the primary nor the secondary mode when the waterlevel is 3. Like the glock, the primary fire has a range of 8192 units from the player's gun position, reloading takes 1.5s, and the volume of gunfire is 600.
 
 An MP5 grenade can be fired at a sound volume of 600. When touched, it explodes with a source damage of 100 in the default game settings. See :ref:`contact grenades` for a description of its explosive physics. An MP5 grenade has an entity gravity multiplier of :math:`g_e = 0.5`, causing it to experience a gravity of half the strength as experienced by the player. It is fired from the starting position of :math:`\mathit{GunPosition} + 16\mathbf{\hat{f}}`, at a rate of one grenade per second. Interestingly, the grenade is unique in how its initial velocity is independent of the current player velocity. This contradicts real life physics. In particular, the initial velocity of the grenade is always
 
@@ -529,7 +529,7 @@ It is possible to have two MP5 grenades touch each other and explode together.
 .357 Magnum revolver
 --------------------
 
-The .357 Magnum revolver or Colt Python is a very powerful hitscan weapon that fires high damaging rounds. With the default game settings, a single shot of the revolver deals 40 damage of type ``DMG_BULLET``, which is greater than that of gauss in primary mode. The bullet range is 8192 units from the player's gun position. Each shot creates a sound with volume 1000. The behaviour of the revolver is simple. In single-player mode, which is game mode we are most interested in, it only fires in primary mode. It cannot be fired when the waterlevel is 3. When the waterlevel is less than 3 and the clip is not empty, it fires once every 0.75 seconds. A reload takes 2 seconds. Contrary to what some believed, the revolver has a square bullet spread of :math:`1^\circ` in the horizontal and vertical directions.
+The .357 Magnum revolver or Colt Python is a very powerful hitscan weapon that fires high damaging rounds. With the default game settings, a single shot of the revolver deals 40 damage of type ``DMG_BULLET``, which is greater than that of gauss in primary mode. The bullet range is 8192 units from the player's gun position. Each shot creates a sound with volume 1000. The behaviour of the revolver is simple. In single-player mode, which is game mode we are most interested in, it only fires in primary mode. It cannot be fired when the waterlevel is 3. When the waterlevel is less than 3 and the clip is not empty, it fires once every 0.75 seconds. A reload takes 2 seconds. Contrary to what some believed, the revolver has a bullet spread of approximately :math:`1^\circ` in the horizontal and vertical directions.
 
 Crossbow
 --------
