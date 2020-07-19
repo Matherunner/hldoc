@@ -82,7 +82,7 @@ We also observe that the spread of the bullets is square rather than circular. I
 Meaning of :math:`\mathbf{\Omega}`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The vector :math:`\mathbf{\Omega}` is referred to as the spread vector above. The way this vector is named and defined in the SDK implies that each element in the vector is :math:`\sin(\theta_S/2)` where :math:`\theta_S` is the intended maximum side-to-side angle of deviation. The SDK defines a few constants for :math:`\mathbf{\Omega}` that are used by the various weapons. For example, the MP5 (see :ref:`mp5`) uses the following as its :math:`\mathbf{\Omega}`:
+The vector :math:`\mathbf{\Omega}` is referred to as the spread vector above. The way this vector is named and defined in the SDK implies that each element in the vector is :math:`\sin(\theta_S/2)` where :math:`\theta_S` is the intended maximum side-to-side angle of deviation. In :numref:`bullet spread angle`, the angle :math:`\angle\mathit{BAC} = \theta_S/2` and therefore the length of :math:`\mathit{CC\,'} = \mathit{BD} = \sin(\theta_S/2)`. The SDK defines a few constants for :math:`\mathbf{\Omega}` that are used by the various weapons. For example, the MP5 (see :ref:`mp5`) uses the following as its :math:`\mathbf{\Omega}`:
 
 .. code-block:: cpp
    :caption: ``dlls/weapons.h``
@@ -91,7 +91,18 @@ The vector :math:`\mathbf{\Omega}` is referred to as the spread vector above. Th
 
 Indeed, :math:`2 \arcsin(0.05234) \approx 6.000464^\circ`.
 
-However, if we look more closely at :eq:`bullet spread end point`, we see that the actual maximum angle of deviation is not exactly 6 degrees, for two reasons. Firstly, as explained in :ref:`bullet distribution`, the bullets spread in a square rather than a circle, so the angle of deviation from the centre is not constant. Even if we consider just the horizontal and the vertical angles of deviation, the actual angle differs from the intended angle because the method of obtaining the values defined in the SDK is incorrect given how those values are then used in :eq:`bullet spread end point`. In particular, using the MP5 as an example, the actual angle of deviation is :math:`2 \arctan 0.05234 \approx 5.992^\circ`. Admittedly, the difference is unnoticeable due to the small angle approximations (in radians) :math:`\sin x \approx \tan x \approx x`, as seen in their Maclaurin series expansions.
+.. figure:: images/bullet-spread-angle.svg
+   :name: bullet spread angle
+
+   The different meaning of "bullet spread" used inconsistently in the SDK. :math:`A` is the bullet source of the line trace (denoted as :math:`\mathbf{a}`), :math:`\mathit{AC\,'B} = \mathit{AC}` has unit length represents the aiming direction, :math:`\mathit{ABD}` is a right-angle triangle, :math:`\mathit{CC\,'} = \mathit{BD}`, and :math:`\mathit{BC}` is an arc with a centre at :math:`A`.
+
+However, if we look more closely at :eq:`bullet spread end point`, we see that the actual maximum angle of deviation is not exactly 6 degrees, for two reasons. Firstly, as explained in :ref:`bullet distribution`, the bullets spread in a square rather than a circle, so the angle of deviation from the centre is not constant. Even if we consider just the horizontal and the vertical angles of deviation, the actual angle differs from the intended angle because the method of obtaining the values defined in the SDK is incorrect given how those values are then used in :eq:`bullet spread end point`. Specifically, :eq:`bullet spread end point` makes the maximum deviation to be the the line :math:`\mathit{AD}` with angle :math:`\angle\mathit{BAD} < \angle\mathit{BAC}`. Using the MP5 as an example, the actual angle of deviation is :math:`2 \arctan 0.05234 \approx 5.992^\circ` which is smaller than intended.
+
+In general, the actual angle of deviation :math:`\angle\mathit{BAD}` is always slightly smaller than the intended angle :math:`\angle\mathit{BAC}`. We can see this easily by expanding :math:`\arcsin x` and :math:`\arctan x` to two terms in their respective Maclaurin series:
+
+.. math:: \arcsin x \approx x + \frac{x^6}{6} > \arctan x \approx x - \frac{x^3}{3}
+
+Admittedly, the difference is very small thanks to the small angle approximations :math:`\sin x \approx \tan x \approx x` in radians.
 
 .. _gauss:
 

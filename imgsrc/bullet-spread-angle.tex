@@ -1,0 +1,21 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\BaseLen}{300}
+  \pgfmathsetmacro{\Angle}{30}
+
+  \coordinate (A) at (0,0);
+  \coordinate (B) at (\BaseLen,0);
+  \coordinate (C) at (\Angle:\BaseLen);
+  \coordinate (C') at (C |- A);
+  \coordinate (D) at (C -| B);
+
+  \draw (C) node[above]{$C$} -- (A) node[below]{$A$} -- (B) node[below]{$B$} -- (D) node[above]{$D$} -- (A);
+  \draw (C) -- (C') node[below]{$C'$};
+  \draw (B) arc (0:\Angle:\BaseLen);
+  \draw[densely dotted] (D) -- (C); 
+\end{tikzpicture}
+
+\end{document}
