@@ -22,7 +22,7 @@ The Half-Life universe is full of uncertainties, much like our universe at the l
 Shared RNG
 ~~~~~~~~~~
 
-The shared RNG code is open source and written in ``dlls/util.cpp`` in the Half-Life SDK. The shared RNG barely qualifies as an RNG given how it is used, and especially due to the fact that, given a fixed interval :math:`[l, h)`, the RNG only returns 253 possible values within the bounds, as we will explain below. The only uses of the shared RNG in Half-Life are related to weapon behaviours and bullet spreads (see :ref:`bullet spread`). 
+The shared RNG code is open source and written in ``dlls/util.cpp`` in the Half-Life SDK. The shared RNG barely qualifies as an RNG given how it is used, and especially due to the fact that, given a fixed interval :math:`[l, h)`, the RNG only returns 253 possible values within the bounds, as we will explain below. The only uses of the shared RNG in Half-Life are related to weapon behaviours and bullet spreads (see :ref:`bullet spread`).
 
 For some context, a typical pseudo-RNG must be seeded prior to use, for a pseudo-RNG needs to have its initial state defined. To put it differently, let :math:`S_0` be the initial state of a typical pseudo-RNG. To use this RNG, we must first call a seeding function :math:`S_0 \gets \operatorname{Seed}(s)` with some value :math:`s`, which is often just the current unix timestamp. Then, the next pseudorandom number is given by :math:`x_0` where :math:`(S_1, x_0) \gets f(S_0)`. In general, the :math:`i`-th pseudorandom number is given by :math:`(S_{i+1}, x_i) \gets f(S_i)`.
 
@@ -63,6 +63,17 @@ Given the complexity of the non-shared RNG algorithm, we will not attempt to des
 
 Frame rate
 ----------
+
+When we think of the concept of *frame rate*, or sometimes somewhat incorrectly referred to by its unit of measurement *frames per second* or *fps*, we think of the refresh rate of the screen when playing Half-Life. However, it is crucial to distinguish between three different types of frame rate:
+
+rendering frame rate
+  This is the real-time rate at which graphics are painted on the screen, denoted as :math:`f_r = \tau_r^{-1}`. This definition maps to what is normally thought of as the frame rate. The rendering frame rate is usually limited by ``fps_max`` in normal gameplay, though if ``host_framerate`` is set, then ``fps_max`` is ignored. Other factors can also limit the maximum frame rate, including, but not limited to, the "vertical sync" setting (in-game or otherwise) and ``fps_override``.
+
+game frame rate
+  This is the *virtual* rate at which the majority (with player movement being the important exception) of the game physics are run, denoted as :math:`f_g = \tau_g^{-1}`. The game frame rate is typically in sync with the rendering frame rate, though not always. For example, suppose a computer is not able to render the graphics beyond a rendering frame rate of 500 fps, but ``host_framerate`` is set to 0.001. This forces the physics to run at a virtual 1000 fps, though because the screen does not update that frequently, the game appears to run twice as slow in real time.
+
+player frame rate
+  The player frame rate is the *virtual* frame rate at which the majority of the player movement physics (see :ref:`player movement`) are run, denoted as :math:`f_p = \tau_p^{-1}`. The player frame rate roughly corresponds to the game frame rate. Depending on the engine version, whether the game is paused, and the value of the game frame rate itself, the player frame time :math:`\tau_p` may oscillate between different values, stay at zero, or be rounded towards zero to the nearest 0.001.
 
 .. figure:: images/frame_rate_unsync.png
    :name: frame rate unsync
