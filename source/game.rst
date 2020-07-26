@@ -82,6 +82,8 @@ player frame rate
 
    Frame rate dependent slow-down of player movement in older Half-Life engines.
 
+.. FIXME: this is misleading, this implies that on newer engines, the player frame rate is not rounded down. But it still is. It's just that the game also considers frame time remainders.
+
 Suppose the game frame rate is higher than 20 fps. On older game engines, roughly before build 6027, the player frame rate equals the game frame rate rounded towards zero to the nearest 0.001, as mentioned above. Namely, we have
 
 .. math:: \tau_p = \frac{\left\lfloor 1000 \tau_g \right\rfloor}{1000}

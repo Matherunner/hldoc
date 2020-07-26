@@ -224,9 +224,36 @@ Effects of frame rate
 
 The frame rate can affect the acceleration significantly. Looking at the first case of :eq:`maxaccel speed`, the acceleration per frame is
 
-.. math:: \frac{\sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} - \lVert\lambda(\mathbf{v})\rVert}{\tau}
+.. math:: \frac{\sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} - \lVert\lambda(\mathbf{v})\rVert}{\tau_g}
 
-One can immediately see that the lower the :math:`\tau` (that is, the higher the frame rate), the higher the acceleration. The second case is similar. For the third case, however, frame rate has no effect on the acceleration, because the frame rate simply disappears from the expression for acceleration.
+One can immediately see that the lower the :math:`\tau_g` (that is, the higher the game frame rate), the higher the acceleration. The second case is similar. For the third case, however, frame rate has no effect on the acceleration, because the frame rate simply disappears from the expression for acceleration.
+
+.. FIXME: similar to the frame rate section, this is misleading because it implies newer engines do not round tau_p.
+
+.. TODO: maybe should the effect of slowdown in player movement first, then discuss the proof only here
+.. TODO: also need to discuss and prove that tau_p = tau_g when f_p is a divisor of 1000? mention this in player movement maybe
+
+When :math:`\eta \ne 1`
++++++++++++++++++++++++
+
+Recall in :ref:`frame rate` that, on older game engines, the player frame rate :math:`\tau_p` is the game frame rate rounded towards zero to the nearest 0.001. This is not normally a problem, because speedruns are often run at frame rates such that :math:`\tau_p = \tau_g`, thus eliminating any slowdown. However, at the time of writing (July 2020), there exists an area of contention regarding the WON version of Blue Shift, where the default frame rate is 72 fps and some community rules forbid raising it further via console commands. Clearly, the slowdown factor at 72 fps is not 1. There is a question of whether it is optimal to
+
+1. use a lower :math:`\tau_g` such that :math:`\tau_p = \tau_g` (which would be :math:`\tau_g = 0.014` or :math:`f_g \approx 71.43` in the WON Blue Shift case), or
+2. use :math:`\tau_g = 1/72` and :math:`\tau_u = 0.013` in some of the frames and switch to :math:`\tau_p = \tau_g = 0.014` in other frames
+
+We claim that it is better to always lower :math:`\tau_g` such that :math:`\tau_p = \tau_g` and :math:`\eta = 1`. Precisely, we claim that the *average speed* over some time :math:`t` is maximised when :math:`\eta = 1` throughout time :math:`t`. To see why, recall that the average speed is simply the total distance travelled divided by the time taken. The average speed in the first frame is
+
+.. math:: V_1 = \frac{\tau_{u,1} \sqrt{\lVert\mathbf{v}_0\rVert^2 + K^2}}{\tau_{g,1}} = \eta_1 \sqrt{\lVert\mathbf{v}_0\rVert^2 + K^2}
+
+Immediately, we can see that to maximise the average speed, we must have :math:`\tau_{u,1} = \tau_{g,1}` so that :math:`\eta = 1` is as big as possible. Now suppose the player has already travelled for some distance at a *maximum* average speed :math:`V_n`, taking some game time :math:`t`. We need to strafe another frame. The new average speed is then given by
+
+.. math:: V_{n+1} = \frac{tV_n + \tau_{u,n+1} \lVert\mathbf{v}_{n+1}\rVert}{t + \tau_{g,n+1}}
+
+Recall that :math:`\tau_{u,n+1} = \left\lfloor \tau_{g,n+1} \right\rfloor / 1000`. Write :math:`\tau_{g,n+1} = \tau_{u,n+1} + \epsilon` for some :math:`0 \le \epsilon < 0.001`. Eliminating :math:`\tau_{g,n+1}`, the new average speed may be rewritten as
+
+.. math:: V_{n+1} = \frac{tV_n + \tau_{u,n+1} \lVert\mathbf{v}_{n+1}\rVert}{t + \tau_{u,n+1} + \epsilon}
+
+Observe that to maximise :math:`V_{n+1}`, we must have :math:`\epsilon = 0` which implies :math:`\tau_{g,n+1} = \tau_{u,n+1}`. By induction, we have proved our claim stated in the beginning of this section.
 
 Effects of friction
 ~~~~~~~~~~~~~~~~~~~
