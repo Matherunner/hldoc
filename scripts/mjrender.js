@@ -1,12 +1,13 @@
 const fs = require('fs');
 const { JSDOM } = require("jsdom");
 const { mjpage } = require('mathjax-node-page');
+const htmlMinify = require('html-minifier-terser').minify;
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 
 /**
  * Remove the <script> tag that loads MathJax.js from the CDN.
- * @param {string} html 
+ * @param {string} html
  */
 function removeMathJaxScript(html) {
     const dom = new JSDOM(html);
@@ -20,13 +21,23 @@ function removeMathJaxScript(html) {
     return dom.serialize();
 }
 
-function processFile(file) {
-    console.log(`Processing ${file}`);
-    const content = fs.readFileSync(file).toString();
-    mjpage(content, { format: ['TeX'] }, { html: true }, (output) => {
-        const html = removeMathJaxScript(output);
-        fs.writeFileSync(file, html);
-        console.log(`${file} done`);
+async function processFile(file) {
+    return new Promise(resolve => {
+        const content = fs.readFileSync(file).toString();
+        mjpage(content, { format: ['TeX'] }, { html: true }, (output) => {
+            let html = removeMathJaxScript(output);
+            html = htmlMinify(html, {
+                collapseWhitespace: true,
+                removeComments: true,
+                minifyCSS: true,
+                minifyJS: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+            });
+            fs.writeFileSync(file, html);
+            resolve();
+        })
     })
 }
 
@@ -50,13 +61,15 @@ function main() {
             files[i] = undefined;
         }
     } else {
-        process.on('message', msg => {
+        process.on('message', async msg => {
             if (msg.message === 'newFile') {
-                processFile(msg.newFile);
+                console.log(`Processing ${msg.newFile}`);
+                await processFile(msg.newFile, msg);
+                console.log(`${msg.newFile} done`);
                 process.send({ message: 'completed', fileIdx: msg.newFileIdx })
             }
         })
-    }    
+    }
 }
 
 main()
