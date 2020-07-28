@@ -27,7 +27,6 @@ async function processFile(file) {
         mjpage(content, { format: ['TeX'] }, { html: true }, (output) => {
             let html = removeMathJaxScript(output);
             html = htmlMinify(html, {
-                collapseWhitespace: true,
                 removeComments: true,
                 minifyCSS: true,
                 minifyJS: true,
