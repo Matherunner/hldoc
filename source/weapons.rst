@@ -38,8 +38,8 @@ The loop is the meat of the bullet spread physics. Let :math:`i` be the loop cou
 
 .. math::
    \begin{aligned}
-   m_x &\gets \mathfrak{R}_S\left(\sigma + i, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{R}_S\left(\sigma + i + 1, -\frac{1}{2}, \frac{1}{2} \right) \\
-   m_y &\gets \mathfrak{R}_S\left(\sigma + i + 2, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{R}_S\left(\sigma + i + 3, -\frac{1}{2}, \frac{1}{2} \right)
+   m_x &\gets \mathfrak{U}_S\left(\sigma + i, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{U}_S\left(\sigma + i + 1, -\frac{1}{2}, \frac{1}{2} \right) \\
+   m_y &\gets \mathfrak{U}_S\left(\sigma + i + 2, -\frac{1}{2}, \frac{1}{2} \right) + \mathfrak{U}_S\left(\sigma + i + 3, -\frac{1}{2}, \frac{1}{2} \right)
    \end{aligned}
    :label: bullet spread shared RNG
 
@@ -66,7 +66,7 @@ rather than just :math:`\ell`. Though this error is very small and unnoticeable 
 Distribution
 ~~~~~~~~~~~~
 
-In :eq:`bullet spread shared RNG`, if we ignored the deeply flawed randomness of :math:`\mathfrak{R}_S`, then we can immediately see that :math:`-1 \le m_x < 1` and :math:`-1 \le m_y < 1`. In addition, both :math:`m_x` and :math:`m_y` are drawn from a triangular distribution (rather than a gaussian distribution claimed by the comments in the code), the PDF of which may be given by
+In :eq:`bullet spread shared RNG`, if we ignored the deeply flawed randomness of :math:`\mathfrak{U}_S`, then we can immediately see that :math:`-1 \le m_x < 1` and :math:`-1 \le m_y < 1`. In addition, both :math:`m_x` and :math:`m_y` are drawn from a triangular distribution (rather than a gaussian distribution claimed by the comments in the code), the PDF of which may be given by
 
 .. math::
    f(z) =
@@ -75,14 +75,14 @@ In :eq:`bullet spread shared RNG`, if we ignored the deeply flawed randomness of
    1 - z & 0 \le z \le 1
    \end{cases}
 
-However, due to the non-randomness of :math:`\mathfrak{R}_S`, and the fact that the values of the first argument provided to :math:`\mathfrak{R}_S` are deterministic and predictable, there are at most only 256 possible combinations of :math:`(m_x, m_y)`. This further implies that there are only at most 256 possible bullet spread patterns.
+However, due to the non-randomness of :math:`\mathfrak{U}_S`, and the fact that the values of the first argument provided to :math:`\mathfrak{U}_S` are deterministic and predictable, there are at most only 256 possible combinations of :math:`(m_x, m_y)`. This further implies that there are only at most 256 possible bullet spread patterns.
 
 .. figure:: images/bullet-spread-distribution.svg
    :name: bullet spread distribution
 
    The square :math:`\mathit{ABCD}` forms the bounds of bullet spreads. A circle with centre :math:`O` is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma \equiv 87 \pmod{256}`.
 
-We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{R}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. This is illustrated in :numref:`bullet spread distribution`. Notice that two of the pellets lie outside the circle, proving that bullet spreads are not confined within it. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
+We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{U}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. This is illustrated in :numref:`bullet spread distribution`. Notice that two of the pellets lie outside the circle, proving that bullet spreads are not confined within it. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
 
 Meaning of :math:`\mathbf{\Omega}`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -420,7 +420,7 @@ Assuming the tripmine found the host entity. In subsequent iterations, it tries 
 
 To activate the beam, the tripmine first traces a line from its origin :math:`\mathbf{r}` to :math:`\mathbf{r} + 2048 \mathbf{\hat{f}}`. It then remembers the unobstructed trace fraction of this line. After 0.1s, the beam will be activated. While it is active, it checks for any entity crossing its path once every 0.1s. The low frequency allows a fast moving entity to move past the beam without detonating the tripmine, a fact exploited in many speedruns. It does the check by tracing a line from its origin at :math:`\mathbf{r}` to :math:`\mathbf{r} + 2048 \mathbf{\hat{f}}`, similar to trace involved in the beam activation. If the unobstructed trace fraction differs from that obtained from the beam activation by more than 0.001, then the tripmine will kill itself, which causes it to explode after a brief time (explained below). Even if the trace fraction remains the same, if the host entity has somehow become null, or if the host entity moved or rotated, the tripmine will also kill itself. And of course, since the tripmine entity is damageable, it can be killed by conventional means.
 
-When the tripmine entity is killed, it initiates a delay before it actually explodes and inflicts a radius damage to the surrounding entities. This delay is randomised using the non-shared RNG (see :ref:`nonshared rng`) by picking a random number with :math:`\mathfrak{R}_{\mathit{NS}}(S,0.1,0.3)` for some state :math:`S`. When it is finally time to explode, the physics governing the rest follows the description in :ref:`tripmine explosion`. The source damage of the tripmine in the default game settings is 150, similar to the satchel charge (:ref:`satchel`).
+When the tripmine entity is killed, it initiates a delay before it actually explodes and inflicts a radius damage to the surrounding entities. This delay is randomised using the non-shared RNG (see :ref:`nonshared rng`) by picking a random number with :math:`\mathfrak{U}_{\mathit{NS}}(S,0.1,0.3)` for some state :math:`S`. When it is finally time to explode, the physics governing the rest follows the description in :ref:`tripmine explosion`. The source damage of the tripmine in the default game settings is 150, similar to the satchel charge (:ref:`satchel`).
 
 .. TODO: explain that we can explode an infinite number of tripmines: place a tripmine on a moving entity, explodes it, then collect the dropped tripmine to restore the ammo
 
