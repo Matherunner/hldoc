@@ -403,7 +403,7 @@ Tripmine
 
 The tripmine is a high explosive that proved to be useful in speedrunning for damage boosting. As a weapon, it only admits the primary attack. The weapon first traces a line from the player's gun position to 128 units ahead in the direction of the player's unit forward vector :math:`\mathbf{\hat{f}}`. If the line hits an entity, and if the entity is not a conveyor (i.e. does not have the ``FL_CONVEYOR`` flag set), then the weapon will create a ``monster_tripmine`` entity on the target surface. Specifically, if :math:`\mathbf{e}` is the point hit by the trace line and :math:`\mathbf{\hat{n}}` is the plane normal, then the origin of the tripmine entity is set to be :math:`\mathbf{e} + 8\mathbf{\hat{n}}`. Regardless of whether the trace line hits an entity though, the next primary attack will only be allowed 0.3s later.
 
-.. TODO: explain why won't be hit by explosions: due to FindEntity in sphere, and as long as flFraction == 1 then will apply damage
+.. TODO: explain why will be hit by explosions: due to FindEntity in sphere, and as long as flFraction == 1 then will apply damage
 
 The tripmine entity has very low health of 1, a unit forward vector :math:`\mathbf{\hat{f}} = \mathbf{\hat{n}}`, and a movetype of ``MOVETYPE_FLY``, which ignores gravity. Initially, it does not collide with any entity due to being a ``SOLID_NOT``. This makes the tripmine impossible to be hit by any line trace and therefore any weapon, except for explosions. On spawn, it waits for 0.2s, then initiates the power up process. At a high level, this process involves the tripmine entity trying to find the entity it is attached to (hereinafter known as the *host entity*, the tripmine being the "parasite") and making sure that entity does not change its origin position and the angles. In the beginning, it does not know the host entity. It tries to find it by tracing a line from :math:`\mathbf{r} + 8 \mathbf{\hat{f}}` to :math:`\mathbf{r} - 32 \mathbf{\hat{f}}`, where :math:`\mathbf{r}` is the tripmine origin and :math:`\mathbf{\hat{f}}` is the tripmine's unit forward vector. Then there are three cases that follows:
 
@@ -423,6 +423,19 @@ To activate the beam, the tripmine first traces a line from its origin :math:`\m
 When the tripmine entity is killed, it initiates a delay before it actually explodes and inflicts a radius damage to the surrounding entities. This delay is randomised using the non-shared RNG (see :ref:`nonshared rng`) by picking a random number with :math:`\mathfrak{R}_{\mathit{NS}}(S,0.1,0.3)` for some state :math:`S`. When it is finally time to explode, the physics governing the rest follows the description in :ref:`tripmine explosion`. The source damage of the tripmine in the default game settings is 150, similar to the satchel charge (:ref:`satchel`).
 
 .. TODO: explain that we can explode an infinite number of tripmines: place a tripmine on a moving entity, explodes it, then collect the dropped tripmine to restore the ammo
+
+Skipping beams
+~~~~~~~~~~~~~~
+
+As mentioned above, it is possible to skip the tripmine beam if the body moving across it has a sufficiently high speed. This is thanks to the beam meaning to check for entities obstructing its path only once every 0.1s. One way to decrease the actual checking frequency is by changing the frame rate to a very low value. If this is undesirable, then 0.1s is still a sufficiently large window to allow skips. Denote :math:`s` the cross sectional length of the body cut by the beam. Then, we can see that a minimum speed of
+
+.. math:: \frac{s}{0.1} = 10s
+
+is needed to skip a beam. For example, the player's cross sectional width is approximately 20. Then a minimum speed of :math:`10 \cdot 20 = 200` is needed.
+
+In general, it may be tedious or impossible to predict the actual instances of time where the beam checks for entities. In particular, the :math:`n`-th checking is done at time :math:`t = 0.1n + r` for some unknown :math:`0 \le r < 0.1`. Nonetheless, we can compute the probability of an object of cross sectional length :math:`s` with cross sectional speed :math:`v` getting checked by the beam, assuming that :math:`r` is uniformly distributed. This is simply
+
+.. math:: \Pr(\text{hit by beam}) = \min\left(1, \frac{10s}{v}\right)
 
 .. _handgrenade:
 
