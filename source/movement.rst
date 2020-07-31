@@ -106,6 +106,8 @@ This type of friction is independent of the frame rate, unlike the geometric fri
 
 In the third case of :eq:`general friction`, where the speed is very low, the speed is simply set to zero. This case makes little practical difference.
 
+.. _edgefriction:
+
 Edgefriction
 ~~~~~~~~~~~~
 
@@ -124,11 +126,11 @@ Air and ground movements
 
 The physics governing the player's air and ground movements are of primary importance. With precise inputs, they can be exploited to allow mathematically unbounded speed gain (barring ``sv_maxvelocity``). The consequences of the air and ground physics will be described in detail in :ref:`strafing`.
 
-.. caution:: All vectors in this section are two dimensional on the :math:`xy` plane unless stated otherwise.
+.. note:: All vectors in this section are two dimensional on the :math:`xy` plane unless stated otherwise.
 
-The air or ground accelerations are computed before position update. Assuming :math:`\mathbf{v}'` is the velocity after air or ground acceleration, and :math:`\mathbf{r}` the player position. Ignoring collision (see :ref:`collision`), the position update entails
+The air or ground accelerations are computed before position update. Assuming :math:`\mathbf{v}'` is the velocity after air or ground acceleration, and :math:`\mathbf{r}` the player position. Ignoring collisions (see :ref:`collision`), the new position is given by
 
-.. math:: \mathbf{r}' = \mathbf{r} + \tau\mathbf{v}'
+.. math:: \mathbf{r}' = \mathbf{r} + \tau_p \mathbf{v}'
 
 Here, the new velocity :math:`\mathbf{v}'` is given by the *fundamental movement equation* (FME). Let :math:`\mathbf{v}` the initial player velocity in *two dimensions*, namely the velocity immediately before friction and acceleration are applied. Then the FME is simply
 
@@ -139,7 +141,7 @@ Here, :math:`\mathbf{\hat{a}}` is called the *unit acceleration vector*, such th
 .. math:: \mathbf{a} = F \mathbf{\hat{f}} + S \mathbf{\hat{s}} \implies
           \mathbf{\hat{a}} = \frac{F\mathbf{\hat{f}} + S\mathbf{\hat{s}}}{\sqrt{F^2 + S^2}}
 
-A few notes to be made here. First, the :math:`F` and :math:`S` are the forwardmove and sidemove respectively, described in :ref:`FSU`. Second, :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}` are the unit forward and side view vectors described in :ref:`view vectors`. But more importantly, they are obtained by assuming :math:`\varphi = 0`, regardless of the player's actual pitch. Consequently, they do not have a component in the :math:`z` axis.
+A few notes to be made here. First, the :math:`F` and :math:`S` are the forwardmove and sidemove respectively, described in :ref:`FSU`. Second, :math:`\mathbf{\hat{f}}` and :math:`\mathbf{\hat{s}}` are the unit forward and side view vectors described in :ref:`view vectors`. But more importantly, they are obtained by setting :math:`\varphi = 0` in the equations, regardless of the player's actual pitch. Consequently, they do not have a component in the :math:`z` axis.
 
 Define :math:`M` such that
 
