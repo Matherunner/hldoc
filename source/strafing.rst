@@ -113,6 +113,8 @@ Note that the precaution :math:`\mathbf{v} \ne \mathbf{0}` is needed so that the
 
 When written in the form of :eq:`newvelmat`, positive :math:`\theta` gives *clockwise* rotations, while negative :math:`\theta` gives *anticlockwise* rotations. If this convention is inconvenient for a particular application, one can easily reverse the directionality by reversing the signs of the :math:`\sin\theta` elements in the rotation matrix.
 
+.. _maxaccel:
+
 Maximum acceleration
 --------------------
 
@@ -153,20 +155,24 @@ On the other hand, the maximum of :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert`
    \begin{cases}
    1 & k_e\tau MA > 0 \\
    -1 & k_e\tau MA < 0 \\
-   \{ x \mid -1 \le x \le 1 \} & k_e\tau MA = 0
+   [-1, 1] & k_e\tau MA = 0
    \end{cases}
 
 If :math:`k_e\tau MA > 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. If :math:`k_e\tau MA < 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing.
 
 The relative sizes of :math:`\{ 0, \cos\zeta, \cos\bar{\zeta} \}` can vary in various ways, and there are in total :math:`3! = 6` permutations we must consider in order to study the behaviour of the new speed :math:`\lVert\mathbf{v}'\rVert` and therefore the maximum point.
 
+.. FIXME: these are not completely accurate, i didn't consider the cases where cos\bar\\zeta < -1 e.g. for some of them
+
+.. FIXME: need to go through these to think about the edge cases at -1, 1, cos\bar\zeta etc
+
 :math:`0 \le \cos\zeta \le \cos\bar{\zeta}`
    If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \ge 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing with a maximum point at :math:`\cos\theta = \cos\zeta`. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing. However, if :math:`\cos\zeta > 1`, then :math:`\mu = \gamma_1` for the entire range. We conclude that
-   
+
    .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = \min(1, \cos\zeta), \quad \mu = \gamma_1
 
 :math:`0 \le \cos\bar{\zeta} \le \cos\zeta`
-   If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing with a maximum point at :math:`\cos\theta = -1`. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is also strictly decreasing. Therefore, we always have
+   If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing with a maximum point at :math:`\cos\theta = -1`. In :math:`\cos\bar{\zeta} \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. Therefore, we always have
 
    .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = -1, \quad \mu = \gamma_1
 
@@ -178,7 +184,11 @@ The relative sizes of :math:`\{ 0, \cos\zeta, \cos\bar{\zeta} \}` can vary in va
 :math:`\cos\bar{\zeta} \le 0 \le \cos\zeta`
    If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \le 0`, and :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta} \le \cos\zeta`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert`, which is strictly decreasing because :math:`k_e\tau MA \le 0`. Therefore, the maximum point is at
 
-   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = -1, \quad \mu = \gamma_1
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      -1 & \cos\bar{\zeta} > -1 \\
+      [-1, 1] & \cos\bar{\zeta} \le -1
+      \end{cases} \qquad \mu = \gamma_1
 
 :math:`\cos\zeta \le \cos\bar{\zeta} \le 0`
    If and only if :math:`L - k_e\tau MA \le 0`, :math:`L \le 0`, and :math:`k_e\tau MA \ge 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta} \le 0`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}_{\mu=\gamma_2}\rVert` is also strictly increasing. But since :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}\rVert = 0` at :math:`\cos\theta = \cos\bar{\zeta}`, we conclude that
@@ -188,22 +198,21 @@ The relative sizes of :math:`\{ 0, \cos\zeta, \cos\bar{\zeta} \}` can vary in va
    As we will see later, this case actually yields :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}\rVert`, which is useless. But we will include this case for the sake of completeness.
 
 :math:`\cos\bar{\zeta} \le \cos\zeta \le 0`
-   If and only if :Math:`L - k_e\tau MA \le 0`, :math:`L \le 0`, :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. We conclude that
-
-   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = -1, \quad \mu = \gamma_1
+   If and only if :Math:`L - k_e\tau MA \le 0`, :math:`L \le 0`, :math:`k_e\tau MA \le 0`. The rest of the analysis and the result are exactly the same as that in the :math:`\cos\bar{\zeta} \le 0 \le \cos\zeta` case.
 
 Given the case-by-case study of these six permutations, we can summarise that the maximum point of :math:`\lVert\mathbf{v}'\rVert` occurs at
 
 .. math::
    \begin{aligned}
-   & \cos\theta = \cos\Theta = 
+   & \cos\theta = \cos\Theta \in
    \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert \\
    &=
    \begin{cases}
    \min(1, \cos\zeta) & k_e\tau MA \ge 0 \land L - k_e\tau MA \ge 0 \land L \ge 0 \\
    0 & k_e\tau MA \ge 0 \land L - k_e\tau MA \le 0 \land L \ge 0 \\
-   \in [\max(-1, \cos\bar{\zeta}), 1] & k_e\tau MA \ge 0 \land L - k_e\tau MA \le 0 \land L \le 0 \\
-   -1 & k_e\tau MA \le 0
+   [\max(-1, \cos\bar{\zeta}), 1] & k_e\tau MA \ge 0 \land L - k_e\tau MA \le 0 \land L \le 0 \\
+   [-1, 1] & k_e\tau MA \le 0 \land \cos\bar{\zeta} \le -1 \\
+   -1 & k_e\tau MA \le 0 \land \cos\bar{\zeta} > -1
    \end{cases}
    \end{aligned}
    :label: maxaccel theta
@@ -222,8 +231,8 @@ Using :eq:`maxaccel theta` we obtain the optimal :math:`\cos\theta` under variou
           \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + k_e \tau MA \left(2L - k_e \tau MA\right)} & \text{case 1} \land \cos\Theta = \cos\zeta \\
           \lVert\lambda(\mathbf{v})\rVert + k_e\tau MA & \text{case 1} \land \cos\Theta = 1 \\
           \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} & \text{case 2} \\
-          \lVert\lambda(\mathbf{v})\rVert & \text{case 3} \\
-          \lVert\lambda(\mathbf{v})\rVert - k_e \tau MA & \text{case 4}
+          \lVert\lambda(\mathbf{v})\rVert & \text{case 3 & 4} \\
+          \lVert\lambda(\mathbf{v})\rVert - k_e \tau MA & \text{case 5}
           \end{cases}
    :label: maxaccel speed
 
@@ -234,8 +243,8 @@ For airstrafing where there is no friction (namely :math:`\lambda(\mathbf{v}) = 
           \sqrt{\lVert\mathbf{v}_0\rVert^2 + nk_e \tau MA \left(2L - k_e \tau MA\right)} & \text{case 1} \land \cos\Theta = \cos\zeta \\
           \lVert\mathbf{v}_0\rVert + nk_e\tau MA & \text{case 1} \land \cos\Theta = 1 \\
           \sqrt{\lVert\mathbf{v}_0\rVert^2 + nL^2} & \text{case 2} \\
-          \lVert\mathbf{v}_0\rVert & \text{case 3} \\
-          \lVert\mathbf{v}_0\rVert - nk_e \tau MA & \text{case 4}
+          \lVert\mathbf{v}_0\rVert & \text{case 3 & 4} \\
+          \lVert\mathbf{v}_0\rVert - nk_e \tau MA & \text{case 5}
           \end{cases}
    :label: air maxaccel speed
 
@@ -259,7 +268,7 @@ The frame rate can affect the acceleration significantly. Looking at the second 
 
 .. math:: \frac{\sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} - \lVert\lambda(\mathbf{v})\rVert}{\tau_g}
 
-One can immediately see that the lower the :math:`\tau_g` (that is, the higher the game frame rate), the higher the acceleration. The first case of :eq:`maxaccel theta` and :math:`\cos\Theta = \cos\zeta` also provides greater accelerations at greater game frame rates. The third and fourth cases, however, do not admit greater accelerations at higher frame rates.
+One can immediately see that the lower the :math:`\tau_g` (that is, the higher the game frame rate), the higher the acceleration. The first case of :eq:`maxaccel theta` and :math:`\cos\Theta = \cos\zeta` also provides greater accelerations at greater game frame rates. The other cases, however, do not admit greater accelerations at higher frame rates.
 
 .. FIXME: similar to the frame rate section, this is misleading because it implies newer engines do not round tau_p.
 
@@ -320,7 +329,7 @@ By obtaining :eq:`air maxaccel speed`, we can immediately make a few important o
 
 for some :math:`K`. Now observe that, at :math:`t = 0`, the acceleration :math:`a_t \to \infty` as initial speed decreases :math:`v_0 \to 0`.
 
-When :math:`\lvert\cos\Theta\rvert = 1`, however, possibly in the first case and the fourth case of :eq:`maxaccel theta`, the growth of speed is linear. Even with the presence of ground friction, the growth of speed can be linear under an arithmetic friction. For example, in the default game settings, :math:`\cos\Theta = 1` on the ground when :math:`\lVert\mathbf{v}\rVert \le M \left(1 - k_e\tau A\right)`. In addition, the arithmetic friction is at play when :math:`\lVert\mathbf{v}\rVert < E`. Therefore, the speed at the :math:`n`-th frame is
+When :math:`\lvert\cos\Theta\rvert = 1`, however, possibly in the first case and the fifth case of :eq:`maxaccel theta`, the growth of speed is linear. Even with the presence of ground friction, the growth of speed can be linear under an arithmetic friction. For example, in the default game settings, :math:`\cos\Theta = 1` on the ground when :math:`\lVert\mathbf{v}\rVert \le M \left(1 - k_e\tau A\right)`. In addition, the arithmetic friction is at play when :math:`\lVert\mathbf{v}\rVert < E`. Therefore, the speed at the :math:`n`-th frame is
 
 .. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert + n\tau \left( k_eMA - Ek \right)
 
@@ -357,6 +366,185 @@ On the other hand, the player could also ducktap or jump to get into the air and
    \end{aligned}
 
 We have :math:`\lVert\mathbf{v}'_\text{air}\rVert > \lVert\mathbf{v}'_\text{ground}\rVert`. If the player actually ducktaps to leave the ground, it would have taken the player approximately 0.25s to land back onto the ground. However, before the player could have done so, the air acceleration would have already diminished owing to the sublinear growth mentioned in :ref:`maxaccel growth`. For example, even with :math:`\lVert\mathbf{v}\rVert = 40`, the next speed is :math:`\approx 42.2` for a speed difference of :math:`\approx 2.2`, which is lower than what would be obtained from groundstrafing.
+
+Maximum deceleration
+--------------------
+
+It is often the case that the player needs to rapidly decelerate in the air or on the ground without any aid using weapons, damage, or solid entities. When the player is on the ground, deceleration is easy to achieve by simply issuing the ``+use`` command, which would exponentially reduce the velocity by a factor of 0.3 per frame. When the player is in the air, however, the player must rely on the pure air movement physics to decelerate as much as possible.
+
+Arguments of the minima
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Using the tools and partial results we built earlier in :ref:`maxaccel`, we can perform a similar case-by-case analysis for the different permutations of :math:`\{0, \cos\zeta, \cos\bar{\zeta}\}`. We will not repeat some of the steps in the following analyses.
+
+:math:`0 \le \cos\zeta \le \cos\bar{\zeta}`
+   If :math:`\cos\zeta \ge 1`, then the minimum point is simply at :math:`\cos\theta = -1` since :math:`\mu = \gamma_1` for all :math:`-1 \le \cos\theta \le 1`.
+
+   Suppose :math:`\cos\zeta < 1` and :math:`\cos\bar{\zeta} > 1`. Then, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing in :math:`\cos\zeta \le \cos\theta \le 1`, so we must consider the points :math:`\cos\theta = \pm 1`. We show that the global minimum is still at :math:`\cos\theta = -1`. Calculate the local minima at :math:`\cos\theta = -1` and :math:`\cos\theta = 1`:
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=-1)\rVert &= \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert \\
+      \lVert\mathbf{v}'(\cos\theta=1)\rVert &= L
+      \end{aligned}
+
+   Suppose the minimum point is at :math:`\cos\theta = 1`. This implies
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=1)\rVert &\le \lVert\mathbf{v}'(\cos\theta=-1)\rVert \\
+      L &\le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+      \end{aligned}
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then this implies
+
+   .. math:: L + k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+
+   which is a contradiction, because our supposition that :math:`\cos\bar{\zeta} > 1` implies :math:`\lVert\lambda(\mathbf{v})\rVert < L`. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we obtain
+
+   .. math:: -\left( L - k_e\tau MA \right) \ge \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`0 \le \cos\zeta` implies :math:`L - k_e\tau MA \ge 0` and clearly :math:`\lVert\lambda(\mathbf{v})\rVert \ge 0`, which is a contradiction. This concludes the proof.
+
+   Suppose :math:`\cos\zeta \le \cos\bar{\zeta} \le 1`. Then in :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing with a minimum point at :math:`\cos\theta = -1`. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing with a minimum point at :math:`\cos\theta = \cos\bar{\zeta}` and a minimum value of :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert` corresponding to :math:`\mu = 0`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, the value stays at :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We show that the global minimum is yet again at :math:`\cos\theta = -1`. Calculate the local minima corresponding to :math:`\cos\theta = -1` and :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. We have
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=-1)\rVert &= \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert \\
+      \lVert\mathbf{v}'(\cos\theta \in [\cos\bar{\zeta},1])\rVert &= \lVert\lambda(\mathbf{v})\rVert
+      \end{aligned}
+
+   Suppose the global minimum is at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. This implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we obtain
+
+   .. math:: 0 \ge k_e\tau MA
+
+   which is a contradiction. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`, which implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \frac{1}{2} k_e\tau MA
+
+   But :math:`\cos\bar{\zeta} \le 1` implies :math:`L \le \lVert\lambda(\mathbf{v})\rVert`. Putting these inequalities together yields
+
+   .. math:: L - \frac{1}{2} k_e\tau MA \le 0
+
+   Since :math:`L \ge 0` and :math:`k_e\tau MA \ge 0`, this further implies that
+
+   .. math:: L - k_e\tau MA < L - \frac{1}{2} k_e\tau MA \le 0
+
+   But :math:`0 \le \cos\zeta` implies :math:`L - k_e\tau MA \ge 0`, which is a contradiction. This concludes the proof.
+
+   We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = -1
+
+:math:`0 \le \cos\bar{\zeta} \le \cos\zeta`
+   In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. If :math:`\cos\bar{\zeta} > 1`, the minimum point is at :math:`\cos\theta = 1` because :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = [\min(1,\cos\bar{\zeta}), 1]
+
+:math:`\cos\zeta \le 0 \le \cos\bar{\zeta}`
+   Suppose :math:`\cos\zeta < -1` and :math:`\cos\bar{\zeta} > 1`. Then :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` for all :math:`-1 \le \cos\theta \le 1`. Since :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}` is an even function in :math:`\cos\theta`, we have
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = \{-1, 1\}
+
+   Suppose :math:`\cos\zeta \ge -1` and :math:`\cos\bar{\zeta} > 1`. Then :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing in :math:`-1 \le \cos\theta \le \cos\zeta`, therefore there are also two local minima at :math:`\cos\theta = -1` and :math:`\cos\theta = 1`. We claim that the global minimum is at :math:`\cos\theta = -1`. Suppose the contrary, that is the global minimum is at :math:`\cos\theta = 1`. This implies
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'_{\mu=\gamma_2}(\cos\theta=1)\rVert &\le \lVert\mathbf{v}'_{\mu=\gamma_1}(\cos\theta=-1)\rVert \\
+      L &\le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+      \end{aligned}
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we have
+
+   .. math:: L + k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`\cos\bar{\zeta} \ge 1` implies :math:`\lVert\lambda(\mathbf{v})\rVert \le L`. Putting these inequalities together yields
+
+   .. math:: k_e\tau MA \le 0
+
+   This contradicts :math:`\cos\zeta \le \cos\bar{\zeta}`. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we have
+
+   .. math:: -\left( L - k_e\tau MA \right) \ge \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`-1 \le \cos\zeta \le 0` implies that :math:`\lvert L - k_e\tau MA\rvert = -\left( L - k_e\tau MA \right) \le \lVert\lambda(\mathbf{v})\rVert`, which is a contradiction. This concludes the proof.
+
+   Suppose :math:`\cos\zeta < -1` and :math:`\cos\bar{\zeta} \le 1`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we simply have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We claim that the global minimum is always at :math:`\cos\theta = -1`. Suppose the contrary, that the global minimum is at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. This implies that
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \lVert\mathbf{v}'_{\mu=\gamma_2}(\cos\theta=-1)\rVert = L
+
+   This contradicts the assumption that :math:`\cos\bar{\zeta} \le 1` from which we deduce that :math:`\lVert\lambda(\mathbf{v})\rVert \ge L`. End of proof.
+
+   Finally, suppose :math:`\cos\zeta \ge -1` and :math:`\cos\bar{\zeta} \le 1`. Then we again claim that the global minimum occurs at :math:`\cos\theta = -1`. Suppose the contrary, that the global minima occur at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. Then this implies that
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \lVert\mathbf{v}'_{\mu=\gamma_1}(\cos\theta=-1)\rVert = \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+   Assume that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we have
+
+   .. math:: \ge k_e\tau MA \le 0
+
+   which contradicts :math:`\cos\zeta \le \cos\bar{\zeta}`. Assume otherwise that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we obtain
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \frac{1}{2} k_e\tau MA
+
+   On the other hand, :math:`\cos\zeta \ge -1` implies
+
+   .. math::
+      \begin{aligned}
+      -\left( L - k_e\tau MA \right) &\le \lVert\lambda(\mathbf{v})\rVert \\
+      L &\ge \frac{1}{2} k_e\tau MA
+      \end{aligned}
+
+   But :math:`\cos\bar{\zeta} \le -1` also implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \ge L \ge \frac{1}{2} k_e\tau MA
+
+   which is a contradiction. End of proof.
+
+   We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      \{ -1, 1 \} & \cos\zeta < -1 \land \cos\bar{\zeta} > 1 \\
+      -1 & \cos\zeta \ge -1 \lor \cos\bar{\zeta} \le 1
+      \end{cases}
+
+:math:`\cos\bar{\zeta} \le 0 \le \cos\zeta`
+   In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = [\max(-1, \cos\bar{\zeta}), 1]
+
+:math:`\cos\zeta \le \cos\bar{\zeta} \le 0`
+   In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is also strictly increasing and ends with :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert` at :math:`\cos\theta = \cos\bar{\zeta}`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      -1 & \cos\bar{\zeta} > -1 \\
+      [-1, 1] & \cos\bar{\zeta} \le -1 \\
+      \end{cases}
+
+:math:`\cos\bar{\zeta} \le \cos\zeta \le 0`
+   The analysis and result is exactly the same as that in the :math:`\cos\bar{\zeta} \le 0 \le \cos\zeta` case.
+
+Combining the above case-by-case findings, we have the global minimum at
+
+.. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
+   \begin{cases}
+   -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \ge 0 \\
+   -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land (\cos\zeta \ge -1 \lor \cos\bar{\zeta} \le 1) \\
+   \{ -1, 1 \} & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land \cos\zeta < -1 \land \cos\bar{\zeta} > 1 \\
+   -1 & k_e\tau MA \ge 0 \land L \le 0 \land L - k_e\tau MA \le 0 \land \cos\bar{\zeta} > -1 \\
+   [-1, 1] & k_e\tau MA \ge 0 \land L \le 0 \land L - k_e\tau MA \le 0 \land \cos\bar{\zeta} \le -1 \\
+   [\min(\max(-1, \cos\bar{\zeta}), 1), 1] & k_e\tau MA \le 0
+   \end{cases}
+
+Maximum projected acceleration
+------------------------------
+
+Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
 
 Effects of bunnyhop cap
 -----------------------
