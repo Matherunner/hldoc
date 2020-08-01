@@ -531,8 +531,10 @@ Using the tools and partial results we built earlier in :ref:`maxaccel`, we can 
 
 Combining the above case-by-case findings, we have the global minimum at
 
-.. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
-   \begin{cases}
+.. math::
+   \begin{aligned}
+   & \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = \\
+   & \begin{cases}
    -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \ge 0 \\
    -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land (\cos\zeta \ge -1 \lor \cos\bar{\zeta} \le 1) \\
    \{ -1, 1 \} & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land \cos\zeta < -1 \land \cos\bar{\zeta} > 1 \\
@@ -540,6 +542,21 @@ Combining the above case-by-case findings, we have the global minimum at
    [-1, 1] & k_e\tau MA \ge 0 \land L \le 0 \land L - k_e\tau MA \le 0 \land \cos\bar{\zeta} \le -1 \\
    [\min(\max(-1, \cos\bar{\zeta}), 1), 1] & k_e\tau MA \le 0
    \end{cases}
+   \end{aligned}
+   :label: maxdecel theta
+
+Effects of frame rate
+~~~~~~~~~~~~~~~~~~~~~
+
+In every case in :eq:`maxdecel theta`, the frame rate has no effect on the deceleration if we ignore the effects of friction. For example, suppose :math:`\cos\theta = -1` in the first case. Then the speed in the next frame may be written as
+
+.. math:: \lVert\mathbf{v}'\rVert = \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+Assuming :math:`\tau = \tau_g`, the absence of friction, and :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`, then the deceleration in one frame is therefore
+
+.. math:: \frac{\lVert\mathbf{v}\rVert - k_e\tau MA  - \lVert\mathbf{v}\rVert}{\tau_g} = -k_eMA
+
+which is independent of the frame rate.
 
 Maximum projected acceleration
 ------------------------------

@@ -50,6 +50,7 @@
         "mathit",
         "matplotlib",
         "maxaccel",
+        "maxdecel",
         "maxspeed",
         "maxvelocity",
         "metapost",
