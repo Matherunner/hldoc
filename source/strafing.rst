@@ -135,8 +135,6 @@ Let :math:`\mathbf{v}` be the current player velocity, :math:`\mathbf{v}'` the v
 
 It turns out that maximising the per-frame acceleration "greedily" also maximises the global average acceleration over the span of some time :math:`t`. In other words, optimising only the individual frames result in the optimal "overall" acceleration as well. This is perhaps owing to good luck, because it is by no means a universal rule that local maxima yield a global maximum in other instances. We will prove this assertion in a later section.
 
-.. TODO: prove this assertion
-
 Now, we will assume :math:`\lVert\mathbf{v}\rVert` and :math:`\tau_g` are independent of any other variables. Therefore, we can ignore them, and the task of maximising acceleration boils down to maximising solely the new speed :math:`\lVert\mathbf{v}'\rVert`. Looking at :eq:`nextspeed gammas`, observe that the new speed is invariant to the transformation :math:`\theta \mapsto -\theta`, because both :math:`\cos\theta` and :math:`\sin^2\theta` are `even functions`_. Without loss of generality, we will consider only :math:`0 \le \theta \le \pi`.
 
 .. _`even functions`: https://en.wikipedia.org/wiki/Even_and_odd_functions
@@ -161,8 +159,6 @@ On the other hand, the maximum of :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert`
 If :math:`k_e\tau MA > 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. If :math:`k_e\tau MA < 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing.
 
 The relative sizes of :math:`\{ 0, \cos\zeta, \cos\bar{\zeta} \}` can vary in various ways, and there are in total :math:`3! = 6` permutations we must consider in order to study the behaviour of the new speed :math:`\lVert\mathbf{v}'\rVert` and therefore the maximum point.
-
-.. FIXME: these are not completely accurate, i didn't consider the cases where cos\bar\\zeta < -1 e.g. for some of them
 
 .. FIXME: need to go through these to think about the edge cases at -1, 1, cos\bar\zeta etc
 
@@ -217,9 +213,31 @@ Given the case-by-case study of these six permutations, we can summarise that th
    \end{aligned}
    :label: maxaccel theta
 
-.. FIXME: the following mu is not correct! it depends on the max(1, zeta) = 1 or zeta!
-
 To implement :eq:`maxaccel theta`, care must be taken when computing :math:`\cos\zeta` and :math:`\cos\bar{\zeta}`. This is because when :math:`\lVert\lambda(\mathbf{v})\rVert = 0`, we have :math:`\cos\zeta = \pm\infty` and :math:`\cos\bar{\zeta} = \pm\infty`.
+
+Optimality
+~~~~~~~~~~
+
+We show that the angles given in :eq:`maxaccel theta` actually gives the highest average acceleration over some time :math:`t`, more than just the maximum speed after one frame of strafing. After one frame of strafing, the average acceleration is given by
+
+.. math:: \frac{\lVert\mathbf{v}_1\rVert - \lVert\mathbf{v}_0\rVert}{\tau_g}
+
+Since the only variable is :math:`\lVert\mathbf{v}_1\rVert`, clearly the angles in :eq:`maxaccel theta` maximises the acceleration. Now suppose the player has strafed for
+some time :math:`t` at a *maximum* average acceleration possible :math:`\bar{a}` so that the final speed is some :math:`\lVert\mathbf{v}_n\rVert = \bar{a} t`, and it is required to strafe another frame. The new average acceleration after another frame is then
+
+.. math:: \frac{\lVert\mathbf{v}_{n+1}\rVert - \lVert\mathbf{v}_0\rVert}{t + \tau_g}
+
+where :math:`\lVert\mathbf{v}_{n+1}\rVert` is given by the FME with :math:`\lVert\mathbf{v}_n\rVert` as the starting speed. Since the only variable is again :math:`\lVert\mathbf{v}_{n+1}\rVert`, clearly :eq:`maxaccel theta` gives the maximum :math:`\lVert\mathbf{v}_{n+1}\rVert`. We conclude by induction that :eq:`maxaccel theta` gives the maximum average acceleration over some time :math:`t`.
+
+On top of that, we also show that :eq:`maxaccel theta` gives the highest average *speed* over some time :math:`t`. In other words, it admits the shortest time possible to travel any distance :math:`d`. Given an initial speed of :math:`\lVert\mathbf{v}_0\rVert`, the average speed after one frame of strafing is
+
+.. math:: \frac{\lVert\mathbf{v}_1\rVert \tau}{\tau_g}
+
+Clearly :eq:`maxaccel theta` gives the maximum average speed because :math:`\lVert\mathbf{v}_1\rVert` is the only variable. Now, suppose the player has strafed for some time :math:`t` at the maximum possible average speed :math:`\bar{v}` with some final speed :math:`\lVert\mathbf{v}_n\rVert`. After another frame of strafing, the new average speed is
+
+.. math:: \frac{\bar{v} t + \lVert\mathbf{v}_{n+1}\rVert \tau}{t + \tau_g}
+
+where :math:`\lVert\mathbf{v}_{n+1}\rVert` is given by the FME with :math:`\lVert\mathbf{v}_n\rVert` as the starting speed and is the only variable. Again, the angles given by :eq:`maxaccel theta` maximises :math:`\lVert\mathbf{v}_{n+1}\rVert`.
 
 Speed equations
 ~~~~~~~~~~~~~~~
@@ -558,10 +576,14 @@ Assuming :math:`\tau = \tau_g`, the absence of friction, and :math:`\lVert\lambd
 
 which is independent of the frame rate.
 
-Maximum projected acceleration
-------------------------------
+.. TODO:
 
-Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
+..
+
+   Maximum projected acceleration
+   ------------------------------
+
+   Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
 
 Effects of bunnyhop cap
 -----------------------
