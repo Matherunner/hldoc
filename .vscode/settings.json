@@ -2,6 +2,7 @@
     "cSpell.enabled": true,
     "cSpell.ignoreWords": [
         "a rline",
+        "accel",
         "alwaysgib",
         "amsmath",
         "arccos",
@@ -49,6 +50,8 @@
         "mathfrak",
         "mathit",
         "matplotlib",
+        "max",
+        "max accel",
         "maxaccel",
         "maxdecel",
         "maxspeed",

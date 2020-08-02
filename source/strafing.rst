@@ -336,6 +336,35 @@ Interestingly, when there is edge friction, the game sets :math:`k = 8` with the
 
 We also see that when the entity friction :math:`k_e` is less than 1, the effect on the maximum groundstrafe speed is very small. For instance, if :math:`k_e = 0.5`, then :math:`k = 2`. This yields the maximum groundstrafe speed of :math:`\approx 505.6`, barely larger than the normal groundstrafe speed.
 
+Traditionally, jumping is done repeatedly to lift off from the ground to avoid the effects of ground friction. However, the presence of the bunnyhop cap (see :ref:`bunnyhop cap`) compels speedrunners to opt for ducktapping (see :ref:`ducktapping`) instead. Ducktapping has a downside of requiring one frame of ground contact, which introduces one frame of friction. The effect of this one frame of friction can be completely eliminated by setting the frame rate to an extremely high value in that frame alone, which forces :math:`\tau_p = 0` while the player is on the ground. If this is not possible, or forbidden, then the one frame of friction is unavoidable.
+
+It turns out that the single frame of ground friction can be devastating, especially in lower frame rates. In fact, under most circumstances and combinations of movement variables, there exists a fixed point or steady state speed which acts as a limit to the speed a player can maintain indefinitely using only ducktapping and strafing alone. Let :math:`\lVert\mathbf{v}\rVert_S` be this steady state speed. Let :math:`\operatorname{MaxAccel}(\text{type}, v_0, n)` be a function that gives the speed after :math:`n` frames of maximum-acceleration strafing from an initial speed of :math:`v_0`. Denote :math:`T_D` the ducktap "period", or the time the player spends in the air after a ducktap. Define functions
+
+.. math::
+   \begin{aligned}
+   V_A(v_0) &:= \operatorname{MaxAccel}(\text{air}, v_0, T_D \tau^{-1}) \\
+   V_G(v_0) &:= \operatorname{MaxAccel}(\text{ground}, \lambda(V_A(v_0)), 1)
+   \end{aligned}
+
+Then :math:`V_G` gives the speed when the player lands on the ground after a ducktap and airstrafing. In general, to find the steady state speed :math:`\lVert\mathbf{v}\rVert_S`, we solve the equation
+
+.. math:: V_G(\lVert\mathbf{v}\rVert_S) = \lVert\mathbf{v}\rVert_S
+   :label: ducktap steady state
+
+To give some concrete examples, consider ducktapping and strafing in a typical 1000 fps TAS with default Half-Life settings. Assuming :math:`\lVert\mathbf{v}\rVert_S > E` so that the geometric friction is in effect. Then :eq:`ducktap steady state` can be rewritten using :eq:`maxaccel speed` and :eq:`general friction` as
+
+.. math:: \sqrt{\left( \lVert\mathbf{v}\rVert_S^2 + T_D C_A \right) \left(1 - k \tau\right)^2 + C_G} = \lVert\mathbf{v}\rVert_S
+
+where
+
+.. math:: C_A = k_e MA_A \left( 60 - k_e\tau MA_A \right), \quad C_G = k_e\tau M^2 A_G \left( 2 - k_e\tau A_G\right)
+
+Assuming :math:`T_D = 0.2`, we obtain :math:`\lVert\mathbf{v}\rVert_S \approx 2184`. This implies that the player is able to maintain at least the default ``sv_maxvelocity`` at 1000 fps by ducktapping and strafing. Consider, however, ducktapping and strafing at 100 fps, which is a restriction some in the community are in favour of imposing. Here, :eq:`ducktap steady state` may instead be rewritten as
+
+.. math:: \sqrt{\left( \lVert\mathbf{v}\rVert_S^2 + T_D \tau^{-1} 900 \right) \left(1 - k \tau\right)^2 + C_G} = \lVert\mathbf{v}\rVert_S
+
+With :math:`\tau = 0.01` and solving, we instead obtain :math:`\lVert\mathbf{v}\rVert_S \approx 678`, which is substantially lower than that at 1000 fps.
+
 .. _maxaccel growth:
 
 Growth of speed
@@ -384,6 +413,24 @@ On the other hand, the player could also ducktap or jump to get into the air and
    \end{aligned}
 
 We have :math:`\lVert\mathbf{v}'_\text{air}\rVert > \lVert\mathbf{v}'_\text{ground}\rVert`. If the player actually ducktaps to leave the ground, it would have taken the player approximately 0.25s to land back onto the ground. However, before the player could have done so, the air acceleration would have already diminished owing to the sublinear growth mentioned in :ref:`maxaccel growth`. For example, even with :math:`\lVert\mathbf{v}\rVert = 40`, the next speed is :math:`\approx 42.2` for a speed difference of :math:`\approx 2.2`, which is lower than what would be obtained from groundstrafing.
+
+Effects of bunnyhop cap
+~~~~~~~~~~~~~~~~~~~~~~~
+
+It is impossible to avoid the bunnyhop cap (see :ref:`bunnyhop cap`) when jumping in later official releases of the game. To lift off the ground and avoid the effects of ground friction, one alternative would be to ducktap instead (see :ref:`ducktapping`). However, each ducktap requires the player to slide on the ground for one frame. Without using very high frame rates to force the frame to be :math:`\tau_p = 0`, the player will lose speed due to friction, especially at lower frame rates. In addition, the player cannot ducktap if there is insufficient clearance above the player. In such cases, jumping ist he only way to maintain speed, though there are different possible ways to approach this.
+
+
+One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
+The second way would be to accelerate while in the air, then backpedal after
+landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
+off again.  Yet another way would be to accelerate in the air *and* on the
+ground, though the speed will still decrease while on the ground as long as the
+speed is greater than the maximum groundstrafe speed.  To the determine the
+most optimal method we must compare the distance travelled for a given number
+of frames.  We will assume that the maximum groundstrafe speed is lower than
+:math:`1.7M_m`.
+
+It turns out that the answer is not as straightforward as we may have thought and would require more investigations.
 
 Maximum deceleration
 --------------------
@@ -584,28 +631,6 @@ which is independent of the frame rate.
    ------------------------------
 
    Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
-
-Effects of bunnyhop cap
------------------------
-
-It is impossible to avoid this mechanism when jumping.  In speedruns a
-workaround would be to ducktap instead, but each ducktap requires the player to
-slide on the ground for one frame, thereby losing a bit of speed due to
-friction.  In addition, a player cannot ducktap if there is insufficient space
-above him.  In this case jumping is the only way to maintain speed, though
-there are different possible styles to achieve this.
-
-One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
-The second way would be to accelerate while in the air, then backpedal after
-landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
-off again.  Yet another way would be to accelerate in the air *and* on the
-ground, though the speed will still decrease while on the ground as long as the
-speed is greater than the maximum groundstrafe speed.  To the determine the
-most optimal method we must compare the distance travelled for a given number
-of frames.  We will assume that the maximum groundstrafe speed is lower than
-:math:`1.7M_m`.
-
-It turns out that the answer is not as straightforward as we may have thought and would require more investigations.
 
 Speed preserving strafing
 -------------------------

@@ -67,20 +67,38 @@ Ducktapping
 
 Suppose a player is onground and the duckstate is *in-duck* or *ducked*. When the player then unducks, ``PM_UnDuck`` will be called. This function will try to move the player origin up by 18 units, and will succeed in doing so provided sufficient space above the player. Suppose the player is in the *ducked* state. Then this upward displacement makes sense, as one can check that the difference in vertical player position (measured at the centre point of the hull in use) using the ducked and standing hulls when resting on the same ground level is exactly 18 units. If the function did not forcibly displace the player in such a way, the player would be stuck to the ground with 18 units buried below it. Interestingly, the behaviour of ``PM_UnDuck`` does not distinguish between *in-duck* and *ducked* states, and it does not "notice" that the standing hull is used in the *in-duck* state. This results in the player incorrectly being displaced 18 units upwards when unducked in the *in-duck* state, while using the standing hull throughout. This lies the basis for ducktapping, where the player holds the duck key to get into the *in-duck* state from the *standing* state, and then releasing the duck key while the player is still in the *in-duck* state, preferably as soon as possible. The player will be teleported to 18 units in the air, and air movement physics will take over.
 
-Ducktapping is an alternative to jumping in minimising or eliminating the effect of ground friction (see :ref:`player friction`) on the player's horizontal speed. Ducktapping is especially critical in the presence of the bunnyhop cap. Nonetheless, even without the bunnyhop cap, ducktapping can be useful in altering the player vertical position some time later to a more desirable location. For example, a tight vent may be hard to get in by a series of pure jumps because the player may not be in the right vertical position at the mouth of the vent. By doing ducktaps in place of jumping at appropriate points, however, the player vertical position may be manipulated to level with the vent, making entrance much easier. The downside of ducktapping, at least in its standard form, is that there is always one frame where the player is onground, and therefore subjected to ground friction. This may be eliminated in newer Half-Life engines by setting the frame rate to a very high value on landing, thereby causing the usercmd frame time (see :ref:`frame rate`) to be zero, or :math:`\tau = 0`, in at least the frame the player is onground. This has an effect of completely eliminating friction, while still allowing ducking and jumping physics to work as normal. If the frame in which the player is onground is made to have :math:`\tau = 0`, and the player also gets displaced into the air in this frame, then ground friction can be bypassed completely.
+Ducktapping is an alternative to jumping in minimising or eliminating the effect of ground friction (see :ref:`player friction`) on the player's horizontal speed. Ducktapping is especially critical in the presence of the bunnyhop cap (see :ref:`bunnyhop cap`). Nonetheless, even without the bunnyhop cap, ducktapping can be useful in altering the player vertical position some time later to a more desirable location. For example, a tight vent may be hard to get in by a series of pure jumps because the player may not be in the right vertical position at the mouth of the vent. By doing ducktaps in place of jumping at appropriate points, however, the player vertical position may be manipulated to level with the vent, making entrance much easier. The downside of ducktapping, at least in its standard form, is that there is always one frame where the player is onground, and therefore subjected to ground friction. This may be eliminated in newer Half-Life engines by setting the frame rate to a very high value on landing, thereby causing the player frame rate (see :ref:`frame rate`) to be zero, or :math:`\tau_p = 0`, in at least the frame the player is onground. This has an effect of completely eliminating friction, while still allowing ducking and jumping physics to work as normal. If the frame in which the player is onground is made to have :math:`\tau_p = 0`, and the player also gets displaced into the air in this frame, then ground friction can be bypassed completely.
+
+When ducktapping, the vertical velocity remains unchanged and is usually zero, since the player needs to be on the ground in the prior frame which would set the vertical velocity to zero. Therefore, the time it takes for the player to fall back onto the ground by entering the 2 units onground layer can be found by solving
+
+.. math:: 2 = 18 - \frac{1}{2} gt^2
+
+or
+
+.. math:: t = \sqrt{\frac{32}{g}}
+
+Assuming the entity gravity is 1 and the value of ``sv_gravity`` is 800, then we have :math:`t = 0.2`.
 
 .. _jumping:
 
 Jumping
 -------
 
-When the jump bit is set, the player will jump. To be precise, the act of jumping refers to setting the vertical velocity to
+When the jump bit is set by issuing the ``+jump`` command and the player is onground, the player will jump. To be precise, the act of jumping refers to setting the vertical velocity to
 
-.. math:: v_z = \sqrt{2 \cdot 800 \cdot 45} = 120 \sqrt{5} \approx 268.3
+.. math:: \sqrt{2 \cdot 800 \cdot 45} = 120 \sqrt{5} \approx 268.3
 
-The unsimplified expression for the vertical velocity is how it is calculated in the code. It implies the intention of jumping to the height of 45 units with :math:`g = 800`, though all of the numbers are hardcoded constants independent of any game variables.
+The unsimplified expression :math:`2 \cdot 800 \cdot 45` above reflects how it is actually written and calculated in the SDK code. It implies the intention of jumping to the height of 45 units with :math:`g = 800`, though all of the numbers are hardcoded constants independent of any game variables.
 
-The condition of jumping is being onground.
+The time it takes for the player to fall back onto the ground by entering the 2 units onground layer can be found by solving
+
+.. math:: 2 = 120 \sqrt{5} t - \frac{1}{2} gt^2
+
+or
+
+.. math:: t = \frac{2}{g} \left( 60\sqrt{5} + \sqrt{18000 - g} \right)
+
+Assuming the entity gravity is 1 and the value of ``sv_gravity`` is 800, then we have :math:`t \approx 0.663`.
 
 .. _bunnyhop cap:
 
@@ -134,7 +152,7 @@ However, there still are restrictions on how fast one could travel horizontally 
 Preliminaries
 ~~~~~~~~~~~~~
 
-Referring to :numref:`stairparts` and borrowing architectural terminology, we will define a step to be a *riser* (vertical wall) of *rise height* :math:`h` followed by a *tread* (horizontal ground) of *tread depth* :math:`d`. Most stairs in Half-Life are homogeneous, in that the measurements of every step are the same throughout. This assumption will simplify analyses and cover the vast majority of circumstances a speedrunner would encounter in the field. On that account, we could describe stairs by the 3-tuple :math:`(d, h, n)` which encodes the tread depth, rise height, and number of steps respectively. 
+Referring to :numref:`stairparts` and borrowing architectural terminology, we will define a step to be a *riser* (vertical wall) of *rise height* :math:`h` followed by a *tread* (horizontal ground) of *tread depth* :math:`d`. Most stairs in Half-Life are homogeneous, in that the measurements of every step are the same throughout. This assumption will simplify analyses and cover the vast majority of circumstances a speedrunner would encounter in the field. On that account, we could describe stairs by the 3-tuple :math:`(d, h, n)` which encodes the tread depth, rise height, and number of steps respectively.
 
 .. TODO: change this to svg
 
@@ -226,7 +244,7 @@ Suppose the :math:`\phi` cycles between two points. Then :math:`\Delta\phi_\ell 
 
 
 
-   
+
 
 
 .. ================================================================================
