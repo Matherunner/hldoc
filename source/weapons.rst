@@ -80,7 +80,7 @@ However, due to the non-randomness of :math:`\mathfrak{U}_S`, and the fact that 
 .. figure:: images/bullet-spread-distribution.svg
    :name: bullet spread distribution
 
-   The square :math:`\mathit{ABCD}` forms the bounds of bullet spreads. A circle with centre :math:`O` is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma \equiv 87 \pmod{256}`.
+   The square :math:`\mathit{ABCD}` forms the bounds of bullet spreads, where :math:`\theta_S` is the side-to-side angle of deviation. A circle with centre :math:`O` is drawn here for reference. The six dots drawn here represent the shotgun's primary attack bullet spread with a shared seed of :math:`\sigma \equiv 87 \pmod{256}`.
 
 We also observe that the spread of the bullets is square rather than circular. In other words, if :math:`\mathfrak{U}_S` is truly random and enough bullets have been fired at a wall, then the bullet markings on the wall would form a square rather than a circle. This is illustrated in :numref:`bullet spread distribution`. Notice that two of the pellets lie outside the circle, proving that bullet spreads are not confined within it. The deviation of bullets in each of the horizontal and vertical directions is independent. We can see this easily because :math:`m_x^2 + m_y^2 \le 1` is false.
 
