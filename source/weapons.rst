@@ -167,6 +167,8 @@ When a game is loaded, the field is restored properly. However, in the overridde
 
 Since ``CLIENT_WEAPONS`` is defined, ``UTIL_WeaponTimeBase`` simply returns 0. This effectively resets ``CBasePlayer::m_flNextAttack``, bypassing the check in ``CBasePlayer::ItemPostFrame`` described above.
 
+Note that picking up a weapon also incurs the same delay, though the mechanism by which this happens is slightly different: ``CBasePlayer::SwitchWeapon`` is called instead, which in turn also calls the ``Deploy`` virtual method of the new weapon. The subsequent logic follows the descriptions above.
+
 .. _gauss:
 
 Gauss
@@ -409,9 +411,11 @@ Entity selfgaussing is a way of doubling the damage of a secondary gauss attack 
 Gauss rapid fire
 ~~~~~~~~~~~~~~~~
 
-When firing the gauss in the primary mode, there is a small delay between shots, similar to how other weapons behave. However, unlike other weapons in Half-Life, if a save/load is performed immediately after a primary fire, this firing delay will be eliminated entirely. Consequently, it is possible to fire the gauss at a dramatic rate, dishing out an extreme damage rate. For instance, each primary fire deals 20 damage. At 1000 fps, it is possible to fire the weapon at a rate of 1000 times per second, for a total of 50 shots (recall that each primary fire consumes 2 out of 100 cells). This results in an impressive 1000 damage in just 0.05 seconds. The downside, of course, is the dramatic ammo consumption.
+When firing the gauss in the primary mode, there is a delay 0.2s between shots, similar to how other weapons behave. However, unlike other weapons in Half-Life, if a saveload is performed immediately after a primary fire, this firing delay will be eliminated entirely. Consequently, it is possible to fire the gauss at a dramatic rate, dishing out an extreme damage rate. For instance, each primary fire deals 20 damage. At 1000 fps, it is possible to fire the weapon at a rate of 1000 times per second, for a total of 50 shots (recall that each primary fire consumes 2 out of 100 cells). This results in an impressive 1000 damage in just 0.05 seconds. The downside, of course, is the dramatic ammo consumption. This technique is sometimes confusingly referred to as "fastfire" in the community, which must be avoided to prevent confusion with quick weapon switching (see :ref:`quick weapon switching`).
 
-Gauss rapid fire is useful in situations where gibbing damageable entities as quick as possible is of utmost consideration, thanks to the primary fire's ability to gib corpses. For example, clearing monsters in a narrow pathway which obstruct the runner's path. The runner should always headshot monsters if possible to obtain a three times damage boost. The weapon should be continuously fired even as the corpse is slowly falling after the monster is dead.
+The delay between primary fire in gauss is implemented by setting ``CBasePlayer::m_flNextAttack``, which is unlike other weapons where ``CBasePlayerWeapon:::m_flNextPrimaryAttack`` is set instead. As described in :ref:`quick weapon switching`, the value of ``CBasePlayer::m_flNextAttack`` is always reset after a restore, which eliminates the switching delay of all weapons and the cycle delay in gauss.
+
+Gauss rapid fire is useful in situations where gibbing damageable entities as quick as possible is of utmost consideration, thanks to the primary fire's ability to gib corpses. For example, clearing monsters in a narrow pathway which obstruct the runner's path. The runner should always headshot monsters if possible to obtain a threefold damage increase. The weapon should be continuously fired even as the corpse is slowly falling after the monster is dead.
 
 .. _reflection bypass:
 
