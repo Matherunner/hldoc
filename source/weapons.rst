@@ -109,6 +109,64 @@ In general, the actual angle of deviation :math:`\angle\mathit{BAD}` is always s
 
 Admittedly, the difference is very small thanks to the small angle approximations :math:`\sin x \approx \tan x \approx x` in radians.
 
+.. _quick weapon switching:
+
+Quick weapon switching
+----------------------
+
+When the player switching to any weapon in Half-Life, the weapon imposes a delay before any attack or reload is permitted. This delay may be called the *switching delay*, and is independent of the attack cycle time or delay between shots, except for the unique case of Gauss described in :ref:`gauss rapid fire`. When the player switches to a weapon, ``CBasePlayer::SelectItem`` or ``CBasePlayerWeapon::SelectLastItem`` will be called. Both of these functions call the ``Deploy`` virtual method of the selected item. In all weapons of Half-Life, the ``CBasePlayerWeapon::DefaultDeploy`` is eventually called, whether or not the ``Deploy`` function is overridden by the weapon derived class. In ``CBasePlayerWeapon::DefaultDeploy``, the switching delay is set to be half a second:
+
+.. code-block:: c++
+   :caption: ``CBasePlayerWeapon::DefaultDeploy``
+
+   m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
+
+This delay is enforced in ``CBasePlayer::ItemPostFrame``:
+
+.. code-block:: c++
+   :emphasize-lines: 2
+   :caption: ``CBasePlayer::ItemPostFrame``
+
+   #if defined( CLIENT_WEAPONS )
+     if ( m_flNextAttack > 0 )
+   #else
+     if ( gpGlobals->time < m_flNextAttack )
+   #endif
+     {
+       return;
+     }
+
+     ImpulseCommands();
+
+     if (!m_pActiveItem)
+     return;
+
+     m_pActiveItem->ItemPostFrame( );
+
+The ``CLIENT_WEAPONS`` is always defined in the compiler flags. Therefore, as long as the countdown is not up, ``m_pActiveItem->ItemPostFrame`` will not be called, which in turn prevents the reload and attack methods of the weapon being called.
+
+The technique of *quick weapon switching* eliminates the switching delay completely,. This technique is also known as "fastfire" in the community, which frequently causes confusion with gauss rapid fire (:ref:`gauss rapid fire`) and thus must be avoided. To eliminate the switching delay, we simply perform a saveload immediately upon switching to a weapon. Examining ``CBaseMonster::m_SaveData`` in ``monsters.cpp``, we do see ``CBaseMonster::m_flNextAttack`` being saved, which is inherited by the ``CBasePlayer`` derived class:
+
+.. code-block:: c++
+   :caption: ``CBaseMonster::m_SaveData``
+
+   DEFINE_FIELD( CBaseMonster, m_flNextAttack, FIELD_TIME ),
+
+When a game is loaded, the field is restored properly. However, in the overridden ``CBasePlayer::Restore``, we see the following at the end of the method:
+
+.. code-block:: c++
+   :caption: ``CBasePlayer::Restore``
+   :emphasize-lines: 5
+
+   #if defined( CLIENT_WEAPONS )
+     // HACK:  This variable is saved/restored in CBaseMonster as a time variable, but we're using it
+     //        as just a counter.  Ideally, this needs its own variable that's saved as a plain float.
+     //        Barring that, we clear it out here instead of using the incorrect restored time value.
+     m_flNextAttack = UTIL_WeaponTimeBase();
+   #endif
+
+Since ``CLIENT_WEAPONS`` is defined, ``UTIL_WeaponTimeBase`` simply returns 0. This effectively resets ``CBasePlayer::m_flNextAttack``, bypassing the check in ``CBasePlayer::ItemPostFrame`` described above.
+
 .. _gauss:
 
 Gauss
@@ -180,7 +238,6 @@ The game traces a line from :math:`\mathbf{e}_{i,1} + 8\mathbf{\hat{p}}_i` to :m
 .. math:: \ell = \lVert\mathbf{e}_{i,3} - \mathbf{e}_{i,1}\rVert
 
 If :math:`\ell \ge D_i`, the game moves on to the next iteration. Otherwise, if :math:`\ell = 0` set :math:`\ell \gets 1`. The game now calculates :math:`D_{i+1} \gets D_i - \ell`. With this new damage, the game then creates an explosion with the origin at :math:`\mathbf{e}_{i,3} + 8\mathbf{\hat{p}}_i` and source damage :math:`D_{i+1}`. Finally, the game sets :math:`\mathbf{s}_{i+1} \gets \mathbf{e}_{i,3} + \mathbf{\hat{p}}_i`.
-
 
 Simple gauss boost
 ~~~~~~~~~~~~~~~~~~
@@ -346,6 +403,8 @@ Entity selfgauss
 ~~~~~~~~~~~~~~~~
 
 Entity selfgaussing is a way of doubling the damage of a secondary gauss attack using the same number of cells and charge time. Entity selfgaussing works very similarly to selfgauss (:ref:`selfgauss`). The only difference is that, in the first beam iteration, the beam should hit the target entity which must be non-GR. As a result, the first damage will be inflicted and :math:`\mathbf{s}_{i+1}` will be calculated to be *inside the target entity*. The rest of the mechanism work exactly the same as that of selfgauss, except the trace origins are inside the target entity rather than the inside the player entity. Specifically, the beam will ignore the target entity in the second iteration and inflict a second unattenuated damage onto the entity in the third iteration. This implies that the conditions for triggering entity selfgauss are the same as selfgauss *as though the target entity were not there*.
+
+.. _gauss rapid fire:
 
 Gauss rapid fire
 ~~~~~~~~~~~~~~~~
