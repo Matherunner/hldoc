@@ -3,22 +3,20 @@
 Strafing
 ========
 
-*Strafing* in the context of Half-Life physics refers to the act of pressing the correct movement keys and moving the mouse in a precise way, typically with the aim of gradually increasing the horizontal speed or cornering without losing too much speed. Strafing is commonly accompanied by a series of jumps intended to keep the player off the ground, as ground movements are subject to friction. This combination of techniques is simply *bunnyhopping*. Since the strafing part of bunnyhopping is much more interesting than the jumping part, we will focus only on the former in this chapter.
+*Strafing* in the context of Half-Life speedrunning refers to the technique of pressing the correct movement keys (usually the WASD keys) and moving the mouse left and right in a precise way to increase the player speed beyond what the developers intended or make sharp turns without sacrificing too much speed. Strafing as a technique can be achieved similarly in the air and on the ground. If there is a need to distinguish between them, we refer to the former as "airstrafing" and the latter as "groundstrafing". Strafing is commonly accompanied by a series of jumps intended to keep the player off the ground, as there is friction when moving on the ground. For the purpose of our discussions, the sole act of jumping repeatedly like a rabbit, regardless of whether strafing is done concurrently, is *bunnyhopping*, although the reader will find some in the community who include airstrafing when the term "bunnyhopping" is used. In this chapter, we will only discuss strafing and not bunnyhopping.
 
-Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. This applies to TASes as well: we want to optimise strafing as much as possible so that we can pretty much forget about it when TASing, allowing us to concentrate on the "general picture" and specific tricks.
+While this chapter is not the first mathematical treatment of this topic, it is the goal of the author to write the definitive analysis and optimisation of strafing in a significantly greater level of precision and thoroughness than seen in other sources. This chapter shall serve as the starting point and baseline for further discussions and analysis of strafing-related techniques and physics. Other attempts at mathematical treatments of strafing like `this by injx`_, `this by flafla2`_, `this by Kared13`_, `this by ZdrytchX`_, `this by jrsala`_, and `this by Matt's Ramblings`_, are ad-hoc and suffer from flaws that make them less suited for further analyses (e.g. surfing analysis, speed-preserving strafing, curvature analysis, minimal-time paths), gaining a deeper understanding of strafing, or indeed for practical implementations.
 
-While this is not the first mathematical treatment of this topic, this documentation strives to be more precise and less ad hoc. Other attempts at mathematical treatments like `this by injx`_, `this by flafla2`_, `this by Kared13`_, `this by ZdrytchX`_, and `this by jrsala`_, have flaws that make them less suited for further analyses (e.g. surfing analysis, speed-preserving strafing, curvature analysis, minimal-time paths) or indeed for implementation.
-
-.. _`this by injx`: http://www.funender.com/quake/articles/
+.. _`this by injx`: https://web.archive.org/web/20190428135531/http://www.funender.com/quake/articles/strafing_theory.html
 .. _`this by flafla2`: http://flafla2.github.io/2015/02/14/bunnyhop.html
 .. _`this by Kared13`: https://steamcommunity.com/sharedfiles/filedetails/?id=184184420
 .. _`this by ZdrytchX`: https://sites.google.com/site/zdrytchx/how-to/strafe-jumping-physics-the-real-mathematics
 .. _`this by jrsala`: https://gamedev.stackexchange.com/a/45656
+.. _`this by Matt's Ramblings`: https://youtu.be/rTsXO6Zicls
 
-.. caution:: Before venturing further in this chapter, be sure to familiarise
-             yourself with the fundamentals of player movement described in
-             :ref:`player movement`. Without the prerequisite knowledge, this
-             chapter can be hard to follow.
+Strafing is so fundamental to speedrunning, that a speedrunner ought to "get it out of the way" while focusing on other techniques. Strafing should be viewed as a building block that is used as a basis for other speedrunning techniques and tricks. If we do not cannot perform strafing near optimally, the entire speedrun falls apart. This applies to TASes as well: we want to optimise strafing as much as possible so that we can "forget about it" when constructing a TAS and permitting us to concentrate on the planning, the "general picture", and executing specific tricks.
+
+.. tip:: Be sure to familiarise yourself with the fundamentals of player movement described in :ref:`player movement`. Without the prerequisite knowledge, this chapter can be hard to follow.
 
 Basic intuition
 ---------------
@@ -39,21 +37,21 @@ This may be interpreted geometrically as putting the acceleration arrow after th
    point to the correct direction (though having the correct length or
    magnitude).
 
-In Half-Life physics, the magnitude or length of the acceleration vector :math:`\mathbf{a}` may be depend on the current speed and the angle between the velocity and itself, which in turn is controlled by the viewangles, as explained in :ref:`player air ground`. The task of finding the right angles is the topic of this chapter.
+In Half-Life physics, the magnitude or length of the acceleration vector :math:`\mathbf{a}` depends on the current speed and the angle between the velocity and itself, which in turn is controlled by the viewangles, as explained in :ref:`player air ground`. The task of finding the optimal angles to achieve a certain goal is the topic of this chapter.
 
 .. _strafe building blocks:
 
 Building blocks
 ---------------
 
-Before exploiting the fundamental movement equation (FME) for our own gains, there are a few mathematical building blocks we should be aware of to make analyses easier. Firstly, write :math:`\lVert\mathbf{v}'\rVert = \sqrt{\mathbf{v}' \cdot \mathbf{v}'}`, where :math:`\mathbf{v}'` is already given in :ref:`player air ground`. Expanding each :math:`\mathbf{v}'` yields
+Regardless of the objective of strafing, its physics is governed by the fundamental movement equation (FME). We will construct several few mathematical building blocks to aid further analyses. Firstly, write :math:`\lVert\mathbf{v}'\rVert = \sqrt{\mathbf{v}' \cdot \mathbf{v}'}`, where :math:`\mathbf{v}'` is already given in :ref:`player air ground`. Expanding each :math:`\mathbf{v}'` yields
 
 .. math:: \lVert\mathbf{v}'\rVert
    = \sqrt{(\lambda(\mathbf{v}) + \mu\mathbf{\hat{a}}) \cdot (\lambda(\mathbf{v}) + \mu\mathbf{\hat{a}})}
    = \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + \mu^2 + 2 \lVert\lambda(\mathbf{v})\rVert \mu \cos\theta}
    :label: nextspeed
 
-This can be done because the dot product satisfies the distributive law. Equation :eq:`nextspeed` is sometimes called the *scalar FME*, often used in practical applications as the most general way to compute new speeds given :math:`\theta`.
+This can be done because the dot product satisfies the distributive law. Very quickly, we obtained :eq:`nextspeed` which is sometimes called the *scalar FME*, often used in practical applications as the most general way to compute new *speeds* (as opposed to velocity vectors) given :math:`\theta`.
 
 .. tip:: This is a very common and useful trick that can be used to quickly
          yield an expression for the magnitude of vectorial outputs without
@@ -64,13 +62,34 @@ From equation :eq:`nextspeed`, we can further write down the equations by assumi
 
 .. math::
    \begin{aligned}
-   \lVert\mathbf{v}'\rVert_{\mu = \gamma_1} &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 +
+   \lVert\mathbf{v}'_{\mu = \gamma_1}\rVert &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 +
    k_e \tau MA \left( k_e \tau MA + 2 \lVert\lambda(\mathbf{v})\rVert \cos\theta \right)} \\
-   \lVert\mathbf{v}'\rVert_{\mu = \gamma_2} &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 \sin^2 \theta + L^2}
+   \lVert\mathbf{v}'_{\mu = \gamma_2}\rVert &= \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 \sin^2 \theta + L^2}
    \end{aligned}
    :label: nextspeed gammas
 
-These equations will be important in the exploitative analyses of the FME shortly.
+Note that when :math:`\gamma_1 = \gamma_2`, we have :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert`. Define :math:`\zeta` such that
+
+.. math:: \cos\zeta = \frac{L - k_e\tau MA}{\lVert\lambda(\mathbf{v})\rVert}
+
+Assuming :math:`\gamma_2 \ge 0`, then if :math:`\cos\theta \le \cos\zeta`, we have :math:`\mu = \gamma_1`. If :math:`\cos\theta \ge \cos\zeta`, then :math:`\mu = \gamma_2`. Define also :math:`\bar{\zeta}` such that :math:`\gamma_2 < 0` and therefore :math:`\mu = 0`, as
+
+.. math:: \cos\bar{\zeta} = \frac{L}{\lVert\lambda(\mathbf{v})\rVert}
+
+.. note:: Note that we permit :math:`\lvert\cos\zeta\rvert > 1` and :math:`\lvert\cos\bar{\zeta}\rvert > 1`, but restricts :math:`\lvert\cos\theta\rvert \le 1`. We never need to invert the cosines to obtain :math:`\zeta` and :math:`\bar{\zeta}` in theoretical and practical computations when their absolute values are greater than 1. However, had we really done it, :math:`\zeta` and :math:`\bar{\zeta}` would have imaginary parts.
+
+Putting these together, we can write the :math:`\mu` more explicitly as a piecewise-defined function
+
+.. math::
+   \mu =
+   \begin{cases}
+   0 & \cos\theta \ge \cos\bar{\zeta} \\
+   \gamma_2 & \cos\theta < \cos\bar{\zeta} \land \cos\theta \ge \cos\zeta \\
+   \gamma_1 & \cos\theta < \cos\bar{\zeta} \land \cos\theta \le \cos\zeta
+   \end{cases}
+   :label: piecewise mu
+
+The new speed :math:`\lVert\mathbf{v}'\rVert` can also be correspondingly written as a piecewise-defined function by substituting :math:`\mu` with :eq:`piecewise mu`. These equations will be important in the exploitative analyses of the FME shortly.
 
 However, computing speeds is sometimes not sufficient. We sometimes want to also compute velocity *vectors* endowed with both directionality and magnitude, but without worrying about player viewangles and :math:`\mathbf{\hat{a}}`. We can achieve this by parametrising :math:`\mathbf{\hat{a}}` in terms of a rotation of :math:`\mathbf{\hat{v}}` by an angle of :math:`\theta`. This may be expressed as
 
@@ -90,114 +109,160 @@ With this idea in mind, we can rewrite the FME as
    \quad\quad (\mathbf{v} \ne \mathbf{0})
    :label: newvelmat
 
-Note that the precaution :math:`\mathbf{v} \ne \mathbf{0}` is needed so that the unit vector :math:`\mathbf{\hat{v}} = \mathbf{v} / \lVert\mathbf{v}\rVert` is well defined. This is one downside of this form of parametrisation, where the special case of zero velocity must be handled separately by replacing :math:`\mathbf{\hat{v}} = \mathbf{\hat{f}}` (and assuming :math:`\varphi = 0` as usual) in :eq:`newvelmat`, thereby involving the viewangles in the computations.
+Note that the precaution :math:`\mathbf{v} \ne \mathbf{0}` is needed so that the unit vector :math:`\mathbf{\hat{v}} = \mathbf{v} / \lVert\mathbf{v}\rVert` is well defined. In other words, the directionality of :math:`\mathbf{v}` is lost when it is zero. This is therefore one downside of parametrising in terms of :math:`\theta`, where the special case of zero velocity must be handled separately by replacing :math:`\mathbf{\hat{v}} = \mathbf{\hat{f}}` (and assuming :math:`\varphi = 0` as usual) in :eq:`newvelmat`, thereby involving the viewangles in the computations.
 
 When written in the form of :eq:`newvelmat`, positive :math:`\theta` gives *clockwise* rotations, while negative :math:`\theta` gives *anticlockwise* rotations. If this convention is inconvenient for a particular application, one can easily reverse the directionality by reversing the signs of the :math:`\sin\theta` elements in the rotation matrix.
+
+.. _maxaccel:
 
 Maximum acceleration
 --------------------
 
-Airstrafing to continuously gain speed is one of the oldest speedrunning tricks. It is of no surprise that one of the earliest inquiries into Half-Life physics has to do with the question of how to strafe with the maximum acceleration, when research began circa 2012 by the author of this documentation. In this section, we will provide precise mathematical descriptions of how maximum-acceleration strafing works in a way that can readily be implemented in TAS tools.
+Airstrafing to continuously gain speed beyond what the developers intended is one of the oldest speedrunning tricks. It is of no surprise that one of the earliest inquiries into Half-Life physics is related to the question of how to airstrafe with the maximum acceleration, when research began circa 2012 by the author of this documentation. In this section, we will provide precise mathematical descriptions of how maximum-acceleration strafing works in a way that will provide a baseline for further analyses and also can readily be implemented in TAS tools.
+
+We must define our metric for "maximum acceleration" in a mathematically precise way. Specifically, we want to maximise the *average scalar acceleration* over some period of time :math:`t`. The average scalar acceleration may in turn be defined as
+
+.. math:: \overline{\lVert\mathbf{a}\rVert} = \frac{\Delta\lVert\mathbf{v}\rVert}{t} = \frac{\lVert\mathbf{v}_t\rVert - \lVert\mathbf{v}_0\rVert}{t}
+
+where :math:`\lVert\mathbf{v}_t\rVert` is the speed at time :math:`t` and :math:`\lVert\mathbf{v}_0\rVert` is the initial speed. We believe this is a valid metric because it reflects the intention of the speedrunner better in the field: namely, to increase the speed as much as possible over some time, which automatically also increases the distance travelled within the same period of time, since the distance travelled is simply the sum of all the speeds in every frame within the period of time in question.
 
 Arguments of the maxima
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Let :math:`\mathbf{v}` be the current player velocity, :math:`\mathbf{v}'` the velocity after strafing, and :math:`\tau` the frame time. Maximising the acceleration means to maximise the per-frame acceleration
+Let :math:`\mathbf{v}` be the current player velocity, :math:`\mathbf{v}'` the velocity after strafing, and :math:`\tau_g` the game frame time (see :ref:`frame rate`). To maximise the average scalar acceleration, it is sufficient to maximise the per-frame scalar acceleration
 
-.. math:: \frac{\lVert\mathbf{v}'\rVert - \lVert\mathbf{v}\rVert}{\tau}
+.. math:: \frac{\lVert\mathbf{v}'\rVert - \lVert\mathbf{v}\rVert}{\tau_g}
 
-It turns out that maximising the per-frame acceleration gives rise to the global optimum. In other words, optimising only the individual frames result in the optimal "overall" acceleration as well. This is perhaps owing to good luck, because it is by no means a universal rule that local maxima yield a global maximum in other instances.
+It turns out that maximising the per-frame acceleration "greedily" also maximises the global average acceleration over the span of some time :math:`t`. In other words, optimising only the individual frames result in the optimal "overall" acceleration as well. This is perhaps owing to good luck, because it is by no means a universal rule that local maxima yield a global maximum in other instances. We will prove this assertion in a later section.
 
-Now, we will assume the frame time :math:`\tau` is independent of any other variables. Therefore, we can ignore the :math:`\tau` factor, and the task of maximising acceleration boils down to maximising the new speed :math:`\lVert\mathbf{v}'\rVert`. Looking at :eq:`nextspeed gammas`, observe that the speed is invariant to the transformation :math:`\theta \mapsto -\theta`, because both :math:`\cos\theta` and :math:`\sin^2\theta` are `even functions`_. Therefore, for simplicity, we will consider only :math:`0 \le \theta \le \pi`. Define :math:`\zeta` such that :math:`\theta = \zeta` implies :math:`\mu = \gamma_1 = \gamma_2`, or
+Now, we will assume :math:`\lVert\mathbf{v}\rVert` and :math:`\tau_g` are independent of any other variables. Therefore, we can ignore them, and the task of maximising acceleration boils down to maximising solely the new speed :math:`\lVert\mathbf{v}'\rVert`. Looking at :eq:`nextspeed gammas`, observe that the new speed is invariant to the transformation :math:`\theta \mapsto -\theta`, because both :math:`\cos\theta` and :math:`\sin^2\theta` are `even functions`_. Without loss of generality, we will consider only :math:`0 \le \theta \le \pi`.
 
 .. _`even functions`: https://en.wikipedia.org/wiki/Even_and_odd_functions
 
-.. math:: \cos\zeta = \frac{L - k_e\tau MA}{\lVert\lambda(\mathbf{v})\rVert}
+Before we search for the global optimum, we must understand the behaviours of the piecewise :math:`\lVert\mathbf{v}'\rVert`. Observe that the maximum of :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` occurs at :math:`\sin\theta = 1` or :math:`\cos\theta = 0`, if we consider the entire domain of :math:`-1 \le \cos\theta \le 1`, or
 
-Here, the symbols have already been defined earlier in :ref:`player air ground`. Now, we make a few critical observations.
+.. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert = 0
 
-1. The curves :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}(\theta)` and :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}(\theta)` against :math:`\theta` intersect only at :math:`\theta = \zeta`, provided :math:`\zeta` exists. That is, the two equations for new speed in :eq:`nextspeed gammas` only equal each other when :math:`\theta = \zeta`.
+In addition, we also see that :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly increasing in :math:`-1 \le \cos\theta \le 0` and strictly decreasing in :math:`0 \le \cos\theta \le 1`. Indeed, the plot for :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` against :math:`\cos\theta` forms a semi-ellipse except in degenerate cases.
 
-2. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_1}(\theta)` is decreasing in :math:`0 \le \theta \le \pi`. This is because :math:`\cos\theta` is decreasing in this range.
+.. TODO: maybe plot a graph for this?
 
-3. :math:`\lVert\mathbf{v}'\rVert_{\mu = \gamma_2}(\theta)` is increasing in :math:`0 \le \theta \le \pi/2` and decreasing in :math:`\pi/2 \le \theta \le \pi`. This is because :math:`\sin^2\theta` behaves as such.
+On the other hand, the maximum of :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert`, however, depends on the sign of :math:`k_e\tau MA`. The symbols here have already been defined in :ref:`player air ground`.
 
-4. If :math:`\zeta` exists, :math:`\mu = \gamma_2` if :math:`0 \le \theta \le \zeta`, and :math:`\mu = \gamma_1` if :math:`\zeta < \theta \le \pi`. If :math:`\zeta` does not exist, then for all :math:`0 \le \theta \le \pi`, :math:`\mu = \gamma_1` if :math:`\cos\zeta > 1`, or :math:`\mu = \gamma_2` if :math:`\cos\zeta < -1`.
+.. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert =
+   \begin{cases}
+   1 & k_e\tau MA > 0 \\
+   -1 & k_e\tau MA < 0 \\
+   [-1, 1] & k_e\tau MA = 0
+   \end{cases}
 
-Therefore, we claim that to maximise :math:`\lVert\mathbf{v}'\rVert` we have optimal angle :math:`\theta = \Theta` such that
+If :math:`k_e\tau MA > 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. If :math:`k_e\tau MA < 0`, then :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing.
 
-.. math:: \boxed{\Theta =
-          \begin{cases}
-          \pm\pi/2 & L - k_e \tau MA \le 0 \\
-          \pm\zeta & 0 < L - k_e \tau MA \le \lVert\lambda(\mathbf{v})\rVert \\
-          0 & L - k_e \tau MA > \lVert\lambda(\mathbf{v})\rVert
-          \end{cases}}
+The relative sizes of :math:`\{ 0, \cos\zeta, \cos\bar{\zeta} \}` can vary in various ways, and there are in total :math:`3! = 6` permutations we must consider in order to study the behaviour of the new speed :math:`\lVert\mathbf{v}'\rVert` and therefore the maximum point.
+
+.. FIXME: need to go through these to think about the edge cases at -1, 1, cos\bar\zeta etc
+
+:math:`0 \le \cos\zeta \le \cos\bar{\zeta}`
+   If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \ge 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing with a maximum point at :math:`\cos\theta = \cos\zeta`. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing. However, if :math:`\cos\zeta > 1`, then :math:`\mu = \gamma_1` for the entire range. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = \min(1, \cos\zeta), \quad \mu = \gamma_1
+
+:math:`0 \le \cos\bar{\zeta} \le \cos\zeta`
+   If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing with a maximum point at :math:`\cos\theta = -1`. In :math:`\cos\bar{\zeta} \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. Therefore, we always have
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = -1, \quad \mu = \gamma_1
+
+:math:`\cos\zeta \le 0 \le \cos\bar{\zeta}`
+   If and only if :math:`L - k_e\tau MA \le 0`, :math:`L \ge 0`, and :math:`k_e\tau MA \ge 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, the maximum occurs at :math:`\cos\zeta = 0`. This implies
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = 0, \quad \mu = \gamma_2
+
+:math:`\cos\bar{\zeta} \le 0 \le \cos\zeta`
+   If and only if :math:`L - k_e\tau MA \ge 0`, :math:`L \le 0`, and :math:`k_e\tau MA \le 0`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta} \le \cos\zeta`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert`, which is strictly decreasing because :math:`k_e\tau MA \le 0`. Therefore, the maximum point is at
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      -1 & \cos\bar{\zeta} > -1 \\
+      [-1, 1] & \cos\bar{\zeta} \le -1
+      \end{cases} \qquad \mu = \gamma_1
+
+:math:`\cos\zeta \le \cos\bar{\zeta} \le 0`
+   If and only if :math:`L - k_e\tau MA \le 0`, :math:`L \le 0`, and :math:`k_e\tau MA \ge 0`. In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta} \le 0`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}_{\mu=\gamma_2}\rVert` is also strictly increasing. But since :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}\rVert = 0` at :math:`\cos\theta = \cos\bar{\zeta}`, we conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert = [\max(-1, \cos\bar{\zeta}), 1], \quad \mu = 0
+
+   As we will see later, this case actually yields :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}\rVert`, which is useless. But we will include this case for the sake of completeness.
+
+:math:`\cos\bar{\zeta} \le \cos\zeta \le 0`
+   If and only if :Math:`L - k_e\tau MA \le 0`, :math:`L \le 0`, :math:`k_e\tau MA \le 0`. The rest of the analysis and the result are exactly the same as that in the :math:`\cos\bar{\zeta} \le 0 \le \cos\zeta` case.
+
+Given the case-by-case study of these six permutations, we can summarise that the maximum point of :math:`\lVert\mathbf{v}'\rVert` occurs at
+
+.. math::
+   \begin{aligned}
+   & \cos\theta = \cos\Theta \in
+   \underset{\cos\theta}{\operatorname{argmax}} \lVert\mathbf{v}'\rVert \\
+   &=
+   \begin{cases}
+   \min(1, \cos\zeta) & k_e\tau MA \ge 0 \land L - k_e\tau MA \ge 0 \land L \ge 0 \\
+   0 & k_e\tau MA \ge 0 \land L - k_e\tau MA \le 0 \land L \ge 0 \\
+   [\max(-1, \cos\bar{\zeta}), 1] & k_e\tau MA \ge 0 \land L - k_e\tau MA \le 0 \land L \le 0 \\
+   [-1, 1] & k_e\tau MA \le 0 \land \cos\bar{\zeta} \le -1 \\
+   -1 & k_e\tau MA \le 0 \land \cos\bar{\zeta} > -1
+   \end{cases}
+   \end{aligned}
    :label: maxaccel theta
 
-We can immediately see that there are three distinct cases for the optimal strafing angle.
+To implement :eq:`maxaccel theta`, care must be taken when computing :math:`\cos\zeta` and :math:`\cos\bar{\zeta}`. This is because when :math:`\lVert\lambda(\mathbf{v})\rVert = 0`, we have :math:`\cos\zeta = \pm\infty` and :math:`\cos\bar{\zeta} = \pm\infty`.
 
-Case 2
-++++++
+Optimality
+~~~~~~~~~~
 
-To see the justification for case 2, suppose :math:`\zeta` exists and :math:`0 < \zeta < \pi/2`. This implies the second case in :eq:`maxaccel theta`. By observation 1 and 2, the always decreasing curve of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` intersects that of :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` at :math:`\theta = \zeta`. But crucially, the intersection point lies in the increasing part of the latter curve, keeping in mind that the latter curve is increasing for :math:`0 \le \theta \le \pi/2` due to observation 3. On top of that, to the left of the intersection point where :math:`0 \le \theta \le \zeta` is the domain of the latter curve, which is increasing, while to the right of the intersection point :math:`\zeta < \theta \le \pi` is the domain of the former curve, which is decreasing. Therefore the optimal angle is simply at the point of intersection of the two curves, which happens to be the maximum or the peak within :math:`0 \le \theta \le \pi`.
+We show that the angles given in :eq:`maxaccel theta` actually gives the highest average acceleration over some time :math:`t`, more than just the maximum speed after one frame of strafing. After one frame of strafing, the average acceleration is given by
 
-These deductions assume :math:`\zeta` exists. In order for case 2 in :eq:`maxaccel theta` to hold true, we must have :math:`\lvert\zeta\rvert \le 1` because the cosine of numbers larger than one is undefined in real numbers. This implies
+.. math:: \frac{\lVert\mathbf{v}_1\rVert - \lVert\mathbf{v}_0\rVert}{\tau_g}
 
-.. math:: 0 < \frac{L - k_e\tau MA}{\lVert\lambda(\mathbf{v})\rVert} \le 1
+Since the only variable is :math:`\lVert\mathbf{v}_1\rVert`, clearly the angles in :eq:`maxaccel theta` maximises the acceleration. Now suppose the player has strafed for
+some time :math:`t` at a *maximum* average acceleration possible :math:`\bar{a}` so that the final speed is some :math:`\lVert\mathbf{v}_n\rVert = \bar{a} t`, and it is required to strafe another frame. The new average acceleration after another frame is then
 
-Note that the lower bound is :math:`0` instead of :math:`-1` because we are assuming :math:`0 \le \zeta \le \pi/2`. This inequality may be simplified to
+.. math:: \frac{\lVert\mathbf{v}_{n+1}\rVert - \lVert\mathbf{v}_0\rVert}{t + \tau_g}
 
-.. math:: 0 < L - k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+where :math:`\lVert\mathbf{v}_{n+1}\rVert` is given by the FME with :math:`\lVert\mathbf{v}_n\rVert` as the starting speed. Since the only variable is again :math:`\lVert\mathbf{v}_{n+1}\rVert`, clearly :eq:`maxaccel theta` gives the maximum :math:`\lVert\mathbf{v}_{n+1}\rVert`. We conclude by induction that :eq:`maxaccel theta` gives the maximum average acceleration over some time :math:`t`.
 
-which is exactly the condition for case 2 in :eq:`maxaccel theta`.
+On top of that, we also show that :eq:`maxaccel theta` gives the highest average *speed* over some time :math:`t`. In other words, it admits the shortest time possible to travel any distance :math:`d`. Given an initial speed of :math:`\lVert\mathbf{v}_0\rVert`, the average speed after one frame of strafing is
 
-Case 1
-++++++
+.. math:: \frac{\lVert\mathbf{v}_1\rVert \tau}{\tau_g}
 
-What if this condition for case 2 fails? Then it can fail in three different ways as one of the following failure conditions:
+Clearly :eq:`maxaccel theta` gives the maximum average speed because :math:`\lVert\mathbf{v}_1\rVert` is the only variable. Now, suppose the player has strafed for some time :math:`t` at the maximum possible average speed :math:`\bar{v}` with some final speed :math:`\lVert\mathbf{v}_n\rVert`. After another frame of strafing, the new average speed is
 
-1. :math:`-\lVert\lambda(\mathbf{v})\rVert \le L - k_e\tau MA \le 0`
-2. :math:`L - k_e\tau MA < -\lVert\lambda(\mathbf{v})\rVert`
-3. :math:`L - k_e\tau MA > \lVert\lambda(\mathbf{v})\rVert`
+.. math:: \frac{\bar{v} t + \lVert\mathbf{v}_{n+1}\rVert \tau}{t + \tau_g}
 
-Suppose the condition fails the first way. We have :math:`\zeta \ge \pi/2`, thus breaking our earlier assumption about :math:`\zeta \le \pi/2` in the previous discussions. By observation 3, the two speed curves intersect when the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_2}` curve is decreasing. This means that the maximum of this curve is also the global maximum, which occurs at :math:`\theta = \pi/2`, thus the case 1 in :eq:`maxaccel theta`. Now suppose the condition fails the second way. Then by observation 4, we see that the :math:`\mu = \gamma_2` for all :math:`0 \le \theta \le \pi`. Therefore, again, the global maximum occurs at :math:`\theta = \pi/2`. Since the optimal angle under both failure conditions is the same, we can merge failure conditions 1 and 2 to form the condition for case 1, given simply as
-
-.. math:: L - k_e\tau MA \le 0
-
-which is seen in :eq:`maxaccel theta`.
-
-Case 3
-++++++
-
-Now, suppose the third failure condition holds. Then, by observation 4 again, we simply have :math:`\mu = \gamma_1` for all :math:`0 \le \theta \le \pi`. Since the :math:`\lVert\mathbf{v}'\rVert_{\mu=\gamma_1}` curve is decreasing in this range, the maximum occurs at :math:`\theta = 0`. This is seen in case 3 in :eq:`maxaccel theta`.
-
-Have a look at :numref:`maxaccel theta graphs` which illustrates cases 1 and 2.
-
-.. figure:: images/optang-1.png
-   :name: maxaccel theta graphs
-
-   Graphs of new speed against :math:`\theta` when :math:`\zeta < \pi/2` and when :math:`\zeta > \pi/2`. The green curve represents the new speed if :math:`\mu = \gamma_1` throughout regardless of :math:`\theta`, while the blue curve represents the new speed :math:`\mu = \gamma_2` throughout. The red curve is the actual curve of the new speed by taking :math:`\mu = \min(\gamma_1, \gamma_2)` as per the FME. From these graphs, it becomes clear where the maximum points are in each case.
+where :math:`\lVert\mathbf{v}_{n+1}\rVert` is given by the FME with :math:`\lVert\mathbf{v}_n\rVert` as the starting speed and is the only variable. Again, the angles given by :eq:`maxaccel theta` maximises :math:`\lVert\mathbf{v}_{n+1}\rVert`.
 
 Speed equations
 ~~~~~~~~~~~~~~~
 
-Knowing the formulae for optimal :math:`\Theta`, it is a matter of simple substitutions into :eq:`nextspeed gammas` to obtain the new speed after one frame of strafing as
+Using :eq:`maxaccel theta` we obtain the optimal :math:`\cos\theta` under various situations. We can proceed to eliminate :math:`\theta` and :math:`\mu` from :eq:`nextspeed` to obtain a clean formulae for speed after one frame. Further, we can also obtain formulae for the speed after :math:`n` frames, assuming all the movement variables are held constant.
 
 .. math:: \lVert\mathbf{v}'\rVert =
           \begin{cases}
-          \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} & \Theta = \pm\pi/2 \\
-          \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + k_e \tau MA (2L - k_e \tau MA)} & \Theta = \pm\zeta \\
-          \lVert\lambda(\mathbf{v})\rVert + k_e \tau MA & \Theta = 0
+          \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + k_e \tau MA \left(2L - k_e \tau MA\right)} & \text{case 1} \land \cos\Theta = \cos\zeta \\
+          \lVert\lambda(\mathbf{v})\rVert + k_e\tau MA & \text{case 1} \land \cos\Theta = 1 \\
+          \sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} & \text{case 2} \\
+          \lVert\lambda(\mathbf{v})\rVert & \text{case 3 & 4} \\
+          \lVert\lambda(\mathbf{v})\rVert - k_e \tau MA & \text{case 5}
           \end{cases}
    :label: maxaccel speed
 
-For airstrafing, we can solve the recurrence relations easily and obtain formulae for the speed after :math:`n` frames of strafing as follows:
+For airstrafing where there is no friction (namely :math:`\lambda(\mathbf{v}) = \mathbf{v}`), we can solve the recurrence relations easily and obtain formulae for the speed after :math:`n` frames of strafing as follows:
 
 .. math:: \lVert\mathbf{v}_n\rVert =
           \begin{cases}
-          \sqrt{\lVert\mathbf{v}_0\rVert^2 + nL^2} & \Theta = \pm\pi/2 \\
-          \sqrt{\lVert\mathbf{v}_0\rVert^2 + nk_e \tau MA (2L - k_e \tau MA)} & \Theta = \pm\zeta \\
-          \lVert\mathbf{v}_0\rVert + nk_e \tau MA & \Theta = 0
+          \sqrt{\lVert\mathbf{v}_0\rVert^2 + nk_e \tau MA \left(2L - k_e \tau MA\right)} & \text{case 1} \land \cos\Theta = \cos\zeta \\
+          \lVert\mathbf{v}_0\rVert + nk_e\tau MA & \text{case 1} \land \cos\Theta = 1 \\
+          \sqrt{\lVert\mathbf{v}_0\rVert^2 + nL^2} & \text{case 2} \\
+          \lVert\mathbf{v}_0\rVert & \text{case 3 & 4} \\
+          \lVert\mathbf{v}_0\rVert - nk_e \tau MA & \text{case 5}
           \end{cases}
    :label: air maxaccel speed
 
@@ -217,16 +282,40 @@ For groundstrafing, however, the presence of friction means simple substitutions
 Effects of frame rate
 ~~~~~~~~~~~~~~~~~~~~~
 
-The frame rate can affect the acceleration significantly. Looking at the first case of :eq:`maxaccel speed`, the acceleration per frame is
+The frame rate can affect the acceleration significantly. Looking at the second case of :eq:`maxaccel theta`, the acceleration per frame is
 
-.. math:: \frac{\sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} - \lVert\lambda(\mathbf{v})\rVert}{\tau}
+.. math:: \frac{\sqrt{\lVert\lambda(\mathbf{v})\rVert^2 + L^2} - \lVert\lambda(\mathbf{v})\rVert}{\tau_g}
 
-One can immediately see that the lower the :math:`\tau` (that is, the higher the frame rate), the higher the acceleration. The second case is similar. For the third case, however, frame rate has no effect on the acceleration, because the frame rate simply disappears from the expression for acceleration.
+One can immediately see that the lower the :math:`\tau_g` (that is, the higher the game frame rate), the higher the acceleration. The first case of :eq:`maxaccel theta` and :math:`\cos\Theta = \cos\zeta` also provides greater accelerations at greater game frame rates. The other cases, however, do not admit greater accelerations at higher frame rates.
+
+.. FIXME: similar to the frame rate section, this is misleading because it implies newer engines do not round tau_p.
+
+When :math:`\eta \ne 1`
++++++++++++++++++++++++
+
+Recall in :ref:`frame rate` that, on older game engines, the player frame rate :math:`\tau_p` is the game frame rate rounded towards zero to the nearest 0.001. This is not normally a problem, because speedruns are often run at frame rates such that :math:`\tau_p = \tau_g`, thus eliminating any slowdown. However, at the time of writing (July 2020), there exists an area of contention regarding the WON version of Blue Shift, where the default frame rate is 72 fps and some community rules forbid raising it further via console commands. Clearly, the slowdown factor at 72 fps is less than 1. There is a question of whether it is optimal to
+
+1. use a lower :math:`\tau_g` such that :math:`\tau_p = \tau_g` (which would be :math:`\tau_g = 0.014` or :math:`f_g \approx 71.43` in the WON Blue Shift case), or
+2. use :math:`\tau_g = 1/72` and :math:`\tau_p = 0.013` in some of the frames and switch to :math:`\tau_p = \tau_g = 0.014` in other frames
+
+We claim that it is better to always lower :math:`\tau_g` such that :math:`\tau_p = \tau_g` and :math:`\eta = 1`. Precisely, we claim that the *average speed* over some real time :math:`t` is maximised when :math:`\eta = 1` throughout time :math:`t`. To see why, recall that the average speed is simply the total distance travelled divided by the time taken. The average speed in the first frame is
+
+.. math:: V_1 = \frac{\tau_{p,1} \sqrt{\lVert\mathbf{v}_0\rVert^2 + K^2}}{\tau_{g,1}} = \eta_1 \sqrt{\lVert\mathbf{v}_0\rVert^2 + K^2}
+
+Immediately, we can see that to maximise the average speed, we must have :math:`\tau_{p,1} = \tau_{g,1}` so that :math:`\eta = 1` is as big as possible. Now suppose the player has already travelled for some distance at a *maximum* average speed :math:`V_n`, taking some real time :math:`t`. We need to strafe another frame. The new average speed is then given by
+
+.. math:: V_{n+1} = \frac{tV_n + \tau_{p,n+1} \lVert\mathbf{v}_{n+1}\rVert}{t + \tau_{g,n+1}}
+
+Recall that :math:`\tau_{p,n+1} = 1000^{-1} \left\lfloor 1000 \tau_{g,n+1} \right\rfloor`. Write :math:`\tau_{g,n+1} = \tau_{p,n+1} + \epsilon` for some :math:`0 \le \epsilon < 0.001`. Eliminating :math:`\tau_{g,n+1}`, the new average speed may be rewritten as
+
+.. math:: V_{n+1} = \frac{tV_n + \tau_{p,n+1} \lVert\mathbf{v}_{n+1}\rVert}{t + \tau_{p,n+1} + \epsilon}
+
+Observe that to maximise :math:`V_{n+1}`, we must have :math:`\epsilon = 0` which implies :math:`\tau_{g,n+1} = \tau_{p,n+1}`. By induction, we have proved our claim stated earlier.
 
 Effects of friction
 ~~~~~~~~~~~~~~~~~~~
 
-There is a limit to the speed achievable by perfect groundstrafing alone. There will be a critical speed such that the increase in speed exactly cancels the friction, so that :math:`\lVert\mathbf{v}_{k + 1}\rVert = \lVert\mathbf{v}_k\rVert`, that is the speed reaches steady state. For example, suppose the optimal angle is :math:`\Theta = \pm\zeta` and geometric friction (see :ref:`player friction`) is at play. Then from the second case of :eq:`maxaccel speed` we write
+There is a limit to the speed achievable by maximum-acceleration groundstrafing alone. There will be a critical speed such that the increase in speed exactly cancels the friction, so that :math:`\lVert\mathbf{v}_{k + 1}\rVert = \lVert\mathbf{v}_k\rVert`, namely the speed reaches a steady state. For the common example of default game settings, suppose the :math:`\cos\Theta = \cos\zeta` (the first case of :eq:`maxaccel speed`), :math:`L = M` (see :ref:`player air ground`), and geometric friction (see :ref:`player friction`) is at play. Then we may write
 
 .. math:: \lVert\mathbf{v}\rVert^2 = (1 - \tau k)^2 \lVert\mathbf{v}\rVert^2 + k_e \tau M^2 A (2 - k_e \tau A)
 
@@ -240,16 +329,57 @@ Take the case of default Half-Life settings at 1000 fps, we calculate
 
 This is then the absolute maximum speed achievable by groundstrafing alone in vanilla Half-Life. At another common frame rate of 100 fps, we instead obtain the steady state speed of :math:`\approx 498.2`. There is nothing we can do to groundstrafe beyond this speed!
 
+Interestingly, when there is edge friction, the game sets :math:`k = 8` with the default settings, and the maximum groundstrafe speed is drastically reduced to :math:`\approx 357.6`, which is indeed devastating as previously claimed in :ref:`edgefriction`, because it is not significantly more than the normal running speed of 320.
+
+We also see that when the entity friction :math:`k_e` is less than 1, the effect on the maximum groundstrafe speed is very small. For instance, if :math:`k_e = 0.5`, then :math:`k = 2`. This yields the maximum groundstrafe speed of :math:`\approx 505.6`, barely larger than the normal groundstrafe speed.
+
+Traditionally, jumping is done repeatedly to lift off from the ground to avoid the effects of ground friction. However, the presence of the bunnyhop cap (see :ref:`bunnyhop cap`) compels speedrunners to opt for ducktapping (see :ref:`ducktapping`) instead. Ducktapping has a downside of requiring one frame of ground contact, which introduces one frame of friction. The effect of this one frame of friction can be completely eliminated by setting the frame rate to an extremely high value in that frame alone, which forces :math:`\tau_p = 0` while the player is on the ground. If this is not possible, or forbidden, then the one frame of friction is unavoidable.
+
+It turns out that the single frame of ground friction can be devastating, especially in lower frame rates. In fact, under most circumstances and combinations of movement variables, there exists a fixed point or steady state speed which acts as a limit to the speed a player can maintain indefinitely using only ducktapping and strafing alone. Let :math:`\lVert\mathbf{v}\rVert_S` be this steady state speed. Let :math:`\operatorname{MaxAccel}(\text{type}, v_0, n)` be a function that gives the speed after :math:`n` frames of maximum-acceleration strafing from an initial speed of :math:`v_0`. Denote :math:`T_D` the ducktap "period", or the time the player spends in the air after a ducktap. Define functions
+
+.. math::
+   \begin{aligned}
+   V_A(v_0) &:= \operatorname{MaxAccel}(\text{air}, v_0, T_D \tau^{-1}) \\
+   V_G(v_0) &:= \operatorname{MaxAccel}(\text{ground}, \lambda(V_A(v_0)), 1)
+   \end{aligned}
+
+Then :math:`V_G` gives the speed when the player lands on the ground after a ducktap and airstrafing. In general, to find the steady state speed :math:`\lVert\mathbf{v}\rVert_S`, we solve the equation
+
+.. math:: V_G(\lVert\mathbf{v}\rVert_S) = \lVert\mathbf{v}\rVert_S
+   :label: ducktap steady state
+
+To give some concrete examples, consider ducktapping and strafing in a typical 1000 fps TAS with default Half-Life settings. Assuming :math:`\lVert\mathbf{v}\rVert_S > E` so that the geometric friction is in effect. Then :eq:`ducktap steady state` can be rewritten using :eq:`maxaccel speed` and :eq:`general friction` as
+
+.. math:: \sqrt{\left( \lVert\mathbf{v}\rVert_S^2 + T_D C_A \right) \left(1 - k \tau\right)^2 + C_G} = \lVert\mathbf{v}\rVert_S
+
+where
+
+.. math:: C_A = k_e MA_A \left( 60 - k_e\tau MA_A \right), \quad C_G = k_e\tau M^2 A_G \left( 2 - k_e\tau A_G\right)
+
+Assuming :math:`T_D = 0.2`, we obtain :math:`\lVert\mathbf{v}\rVert_S \approx 2184`. This implies that the player is able to maintain at least the default ``sv_maxvelocity`` at 1000 fps by ducktapping and strafing. Consider, however, ducktapping and strafing at 100 fps, which is a restriction some in the community are in favour of imposing. Here, :eq:`ducktap steady state` may instead be rewritten as
+
+.. math:: \sqrt{\left( \lVert\mathbf{v}\rVert_S^2 + T_D \tau^{-1} 900 \right) \left(1 - k \tau\right)^2 + C_G} = \lVert\mathbf{v}\rVert_S
+
+With :math:`\tau = 0.01` and solving, we instead obtain :math:`\lVert\mathbf{v}\rVert_S \approx 678`, which is substantially lower than that at 1000 fps.
+
+.. _maxaccel growth:
+
 Growth of speed
 ~~~~~~~~~~~~~~~
 
-By obtaining :eq:`air maxaccel speed`, we can immediately make a few important observations. In the absence of friction and if :math:`\Theta \ne 0`, the speed over time grows sublinearly, or :math:`O(\sqrt{n})`. This implies that the acceleration gradually decreases over time, but never reaches zero. It is notable that the acceleration at lower speeds can be substantial (more than linear acceleration) compared to that at higher speeds. To see why, write new speed :math:`v_t = \sqrt{v_0^2 + tK}`, then taking the derivative with respective to :math:`t` to obtain acceleration, yielding
+By obtaining :eq:`air maxaccel speed`, we can immediately make a few important observations. In the absence of friction and if :math:`\lvert\cos\Theta\rvert \ne 1`, the speed over time grows sublinearly, or :math:`O(\sqrt{n})`. This implies that the acceleration gradually decreases over time, but never reaches zero. It is notable that the acceleration at lower speeds can be substantial (more than linear acceleration) compared to that at higher speeds. To see why, write new speed :math:`v_t = \sqrt{v_0^2 + tK}`, then taking the derivative with respective to :math:`t` to obtain acceleration, yielding
 
 .. math:: a_t = \frac{dv_t}{dt} = \frac{K}{2 \sqrt{v_0^2 + tK}}
 
 for some :math:`K`. Now observe that, at :math:`t = 0`, the acceleration :math:`a_t \to \infty` as initial speed decreases :math:`v_0 \to 0`.
 
-.. TODO: ground strafe linear growth until v > E
+When :math:`\lvert\cos\Theta\rvert = 1`, however, possibly in the first case and the fifth case of :eq:`maxaccel theta`, the growth of speed is linear. Even with the presence of ground friction, the growth of speed can be linear under an arithmetic friction. For example, in the default game settings, :math:`\cos\Theta = 1` on the ground when :math:`\lVert\mathbf{v}\rVert \le M \left(1 - k_e\tau A\right)`. In addition, the arithmetic friction is at play when :math:`\lVert\mathbf{v}\rVert < E`. Therefore, the speed at the :math:`n`-th frame is
+
+.. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert + n\tau \left( k_eMA - Ek \right)
+
+as long as :math:`\lVert\mathbf{v}_n\rVert < \min(E, M\left( 1 - k_e\tau A \right))`.
+
+.. _agst:
 
 Air-ground speed threshold
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,29 +398,253 @@ intersects several times, depending even on the initial speed itself. A more
 practical solution in practice is to simply use Equation :eq:`nextspeed` to
 compute the new airstrafe and groundstrafe speeds then comparing them.
 
+It is also important to note that, even if the air acceleration is greater than the ground acceleration for a given speed, it does not mean that it is optimal to actually leave the ground for air acceleration at that particular time. To illustrate, assume the default Half-Life settings and :math:`\tau = 0.001`. Suppose also the player is on the ground, and the speed is very low at :math:`\lVert\mathbf{v}\rVert = 30`. After one frame of groundstrafing, the new speed would be
+
+.. math:: \lVert\mathbf{v}'_\text{ground}\rVert = \lVert\mathbf{v}\rVert + \tau \left( k_eMA - Ek\right) = 30 + 0.001 \cdot \left( 1 \cdot 320 \cdot 10 - 100 \cdot 4 \right) = 32.8
+
+On the other hand, the player could also ducktap or jump to get into the air and airstrafe, which would have yielded a speed of
+
+.. math::
+   \begin{aligned}
+   \lVert\mathbf{v}'_\text{air}\rVert &= \sqrt{\lVert\mathbf{v}\rVert^2 + k_e\tau MA\left(2L - k_e\tau MA\right)} \\
+   &= \sqrt{30^2 + 1 \cdot 0.001 \cdot 320 \cdot 10 \left( 60 - 1 \cdot 0.001 \cdot 320 \cdot 10 \right)} \\
+   &\approx 32.89
+   \end{aligned}
+
+We have :math:`\lVert\mathbf{v}'_\text{air}\rVert > \lVert\mathbf{v}'_\text{ground}\rVert`. If the player actually ducktaps to leave the ground, it would have taken the player approximately 0.25s to land back onto the ground. However, before the player could have done so, the air acceleration would have already diminished owing to the sublinear growth mentioned in :ref:`maxaccel growth`. For example, even with :math:`\lVert\mathbf{v}\rVert = 40`, the next speed is :math:`\approx 42.2` for a speed difference of :math:`\approx 2.2`, which is lower than what would be obtained from groundstrafing.
+
 Effects of bunnyhop cap
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
-It is impossible to avoid this mechanism when jumping.  In speedruns a
-workaround would be to ducktap instead, but each ducktap requires the player to
-slide on the ground for one frame, thereby losing a bit of speed due to
-friction.  In addition, a player cannot ducktap if there is insufficient space
-above him.  In this case jumping is the only way to maintain speed, though
-there are different possible styles to achieve this.
+It is impossible to avoid the bunnyhop cap (see :ref:`bunnyhop cap`) when jumping in later official releases of the game. To lift off the ground and avoid the effects of ground friction, one alternative would be to ducktap instead (see :ref:`ducktapping`). However, each ducktap requires the player to slide on the ground for one frame. Without using very high frame rates to force the frame to be :math:`\tau_p = 0`, the player will lose speed due to friction, especially at lower frame rates. In addition, the player cannot ducktap if there is insufficient clearance above the player. In such cases, jumping is the only way to maintain speed, though there are different possible ways to approach this. Regardless of the movement strategy, we must not trigger the cap itself when jumping, because that would cause an instant and significant reduction in speed.
 
-One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
-The second way would be to accelerate while in the air, then backpedal after
-landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
-off again.  Yet another way would be to accelerate in the air *and* on the
-ground, though the speed will still decrease while on the ground as long as the
-speed is greater than the maximum groundstrafe speed.  To the determine the
-most optimal method we must compare the distance travelled for a given number
-of frames.  We will assume that the maximum groundstrafe speed is lower than
-:math:`1.7M_m`.
+.. constant-speed
+..    The constant-speed strategy is simply maintaining a constant horizontal speed of :math:`1.7M_m`, just below the cap, without performing any type of strafing that changes the speed. This strategy is the simplest to execute. If we need to turn left or right, we simply strafe in a speed-preserving way (see :ref:`speed preserving strafing`).
 
-It turns out that the answer is not as straightforward as we may have thought.
+.. maximum-acceleration on both air and ground
+..    Immediately after a jump, the player begins to perform maximum-acceleration strafing in the air. Eventually, gravity will pull the player back onto the ground, this time with a speed higher than the cap of :math:`1.7 M_m`. The player must not jump at this point to avoid triggering the speed reduction. Instead, the player continues to perform maximum-acceleration groundstrafe. If the landing speed is higher than the air-ground speed threshold (see:`agst`), then the speed on the ground will decay nonetheless, in spite of the "maximum-acceleration" strafing. Once the speed reaches back to :math:`1.7 M_m`, the player jumps again to repeat the cycle.
 
-TODO!!
+.. maximum-acceleration in the air, friction on the ground
+..    Blah
+
+.. maximum-acceleration in the air, maximum-deceleration on the ground
+..    Blah
+
+.. maximum-acceleration in the air, maximum-deceleration in the air
+..    Blah
+
+
+.. One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
+.. The second way would be to accelerate while in the air, then backpedal after
+.. landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
+.. off again.  Yet another way would be to accelerate in the air *and* on the
+.. ground, though the speed will still decrease while on the ground as long as the
+.. speed is greater than the maximum groundstrafe speed.  To the determine the
+.. most optimal method we must compare the distance travelled for a given number
+.. of frames.  We will assume that the maximum groundstrafe speed is lower than
+.. :math:`1.7M_m`.
+
+It turns out that the answer is not as straightforward as we may have thought and would require more investigations.
+
+Maximum deceleration
+--------------------
+
+It is often the case that the player needs to rapidly decelerate in the air or on the ground without any aid using weapons, damage, or solid entities. When the player is on the ground, deceleration is easy to achieve by simply issuing the ``+use`` command, which would exponentially reduce the velocity by a factor of 0.3 per frame. When the player is in the air, however, the player must rely on the pure air movement physics to decelerate as much as possible.
+
+Arguments of the minima
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Using the tools and partial results we built earlier in :ref:`maxaccel`, we can perform a similar case-by-case analysis for the different permutations of :math:`\{0, \cos\zeta, \cos\bar{\zeta}\}`. We will not repeat some of the steps in the following analyses.
+
+:math:`0 \le \cos\zeta \le \cos\bar{\zeta}`
+   If :math:`\cos\zeta \ge 1`, then the minimum point is simply at :math:`\cos\theta = -1` since :math:`\mu = \gamma_1` for all :math:`-1 \le \cos\theta \le 1`.
+
+   Suppose :math:`\cos\zeta < 1` and :math:`\cos\bar{\zeta} > 1`. Then, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing in :math:`\cos\zeta \le \cos\theta \le 1`, so we must consider the points :math:`\cos\theta = \pm 1`. We show that the global minimum is still at :math:`\cos\theta = -1`. Calculate the local minima at :math:`\cos\theta = -1` and :math:`\cos\theta = 1`:
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=-1)\rVert &= \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert \\
+      \lVert\mathbf{v}'(\cos\theta=1)\rVert &= L
+      \end{aligned}
+
+   Suppose the minimum point is at :math:`\cos\theta = 1`. This implies
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=1)\rVert &\le \lVert\mathbf{v}'(\cos\theta=-1)\rVert \\
+      L &\le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+      \end{aligned}
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then this implies
+
+   .. math:: L + k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+
+   which is a contradiction, because our supposition that :math:`\cos\bar{\zeta} > 1` implies :math:`\lVert\lambda(\mathbf{v})\rVert < L`. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we obtain
+
+   .. math:: -\left( L - k_e\tau MA \right) \ge \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`0 \le \cos\zeta` implies :math:`L - k_e\tau MA \ge 0` and clearly :math:`\lVert\lambda(\mathbf{v})\rVert \ge 0`, which is a contradiction. This concludes the proof.
+
+   Suppose :math:`\cos\zeta \le \cos\bar{\zeta} \le 1`. Then in :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing with a minimum point at :math:`\cos\theta = -1`. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is strictly decreasing with a minimum point at :math:`\cos\theta = \cos\bar{\zeta}` and a minimum value of :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert` corresponding to :math:`\mu = 0`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, the value stays at :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We show that the global minimum is yet again at :math:`\cos\theta = -1`. Calculate the local minima corresponding to :math:`\cos\theta = -1` and :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. We have
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'(\cos\theta=-1)\rVert &= \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert \\
+      \lVert\mathbf{v}'(\cos\theta \in [\cos\bar{\zeta},1])\rVert &= \lVert\lambda(\mathbf{v})\rVert
+      \end{aligned}
+
+   Suppose the global minimum is at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. This implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we obtain
+
+   .. math:: 0 \ge k_e\tau MA
+
+   which is a contradiction. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`, which implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \frac{1}{2} k_e\tau MA
+
+   But :math:`\cos\bar{\zeta} \le 1` implies :math:`L \le \lVert\lambda(\mathbf{v})\rVert`. Putting these inequalities together yields
+
+   .. math:: L - \frac{1}{2} k_e\tau MA \le 0
+
+   Since :math:`L \ge 0` and :math:`k_e\tau MA \ge 0`, this further implies that
+
+   .. math:: L - k_e\tau MA < L - \frac{1}{2} k_e\tau MA \le 0
+
+   But :math:`0 \le \cos\zeta` implies :math:`L - k_e\tau MA \ge 0`, which is a contradiction. This concludes the proof.
+
+   We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = -1
+
+:math:`0 \le \cos\bar{\zeta} \le \cos\zeta`
+   In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. If :math:`\cos\bar{\zeta} > 1`, the minimum point is at :math:`\cos\theta = 1` because :math:`\lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = [\min(1,\cos\bar{\zeta}), 1]
+
+:math:`\cos\zeta \le 0 \le \cos\bar{\zeta}`
+   Suppose :math:`\cos\zeta < -1` and :math:`\cos\bar{\zeta} > 1`. Then :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` for all :math:`-1 \le \cos\theta \le 1`. Since :math:`\lVert\mathbf{v}'_{\mu=\gamma_2}` is an even function in :math:`\cos\theta`, we have
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = \{-1, 1\}
+
+   Suppose :math:`\cos\zeta \ge -1` and :math:`\cos\bar{\zeta} > 1`. Then :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing in :math:`-1 \le \cos\theta \le \cos\zeta`, therefore there are also two local minima at :math:`\cos\theta = -1` and :math:`\cos\theta = 1`. We claim that the global minimum is at :math:`\cos\theta = -1`. Suppose the contrary, that is the global minimum is at :math:`\cos\theta = 1`. This implies
+
+   .. math::
+      \begin{aligned}
+      \lVert\mathbf{v}'_{\mu=\gamma_2}(\cos\theta=1)\rVert &\le \lVert\mathbf{v}'_{\mu=\gamma_1}(\cos\theta=-1)\rVert \\
+      L &\le \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+      \end{aligned}
+
+   Assume :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we have
+
+   .. math:: L + k_e\tau MA \le \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`\cos\bar{\zeta} \ge 1` implies :math:`\lVert\lambda(\mathbf{v})\rVert \le L`. Putting these inequalities together yields
+
+   .. math:: k_e\tau MA \le 0
+
+   This contradicts :math:`\cos\zeta \le \cos\bar{\zeta}`. Assume instead that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we have
+
+   .. math:: -\left( L - k_e\tau MA \right) \ge \lVert\lambda(\mathbf{v})\rVert
+
+   But :math:`-1 \le \cos\zeta \le 0` implies that :math:`\lvert L - k_e\tau MA\rvert = -\left( L - k_e\tau MA \right) \le \lVert\lambda(\mathbf{v})\rVert`, which is a contradiction. This concludes the proof.
+
+   Suppose :math:`\cos\zeta < -1` and :math:`\cos\bar{\zeta} \le 1`. In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we simply have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We claim that the global minimum is always at :math:`\cos\theta = -1`. Suppose the contrary, that the global minimum is at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. This implies that
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \lVert\mathbf{v}'_{\mu=\gamma_2}(\cos\theta=-1)\rVert = L
+
+   This contradicts the assumption that :math:`\cos\bar{\zeta} \le 1` from which we deduce that :math:`\lVert\lambda(\mathbf{v})\rVert \ge L`. End of proof.
+
+   Finally, suppose :math:`\cos\zeta \ge -1` and :math:`\cos\bar{\zeta} \le 1`. Then we again claim that the global minimum occurs at :math:`\cos\theta = -1`. Suppose the contrary, that the global minima occur at :math:`\cos\theta \in [\cos\bar{\zeta}, 1]`. Then this implies that
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \lVert\mathbf{v}'_{\mu=\gamma_1}(\cos\theta=-1)\rVert = \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+   Assume that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`. Then we have
+
+   .. math:: \ge k_e\tau MA \le 0
+
+   which contradicts :math:`\cos\zeta \le \cos\bar{\zeta}`. Assume otherwise that :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \le 0`. Then we obtain
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \le \frac{1}{2} k_e\tau MA
+
+   On the other hand, :math:`\cos\zeta \ge -1` implies
+
+   .. math::
+      \begin{aligned}
+      -\left( L - k_e\tau MA \right) &\le \lVert\lambda(\mathbf{v})\rVert \\
+      L &\ge \frac{1}{2} k_e\tau MA
+      \end{aligned}
+
+   But :math:`\cos\bar{\zeta} \le -1` also implies
+
+   .. math:: \lVert\lambda(\mathbf{v})\rVert \ge L \ge \frac{1}{2} k_e\tau MA
+
+   which is a contradiction. End of proof.
+
+   We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      \{ -1, 1 \} & \cos\zeta < -1 \land \cos\bar{\zeta} > 1 \\
+      -1 & \cos\zeta \ge -1 \lor \cos\bar{\zeta} \le 1
+      \end{cases}
+
+:math:`\cos\bar{\zeta} \le 0 \le \cos\zeta`
+   In :math:`-1 \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly decreasing. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = [\max(-1, \cos\bar{\zeta}), 1]
+
+:math:`\cos\zeta \le \cos\bar{\zeta} \le 0`
+   In :math:`-1 \le \cos\theta \le \cos\zeta`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_1}\rVert` is strictly increasing. In :math:`\cos\zeta \le \cos\theta \le \cos\bar{\zeta}`, :math:`\lVert\mathbf{v}'\rVert = \lVert\mathbf{v}'_{\mu=\gamma_2}\rVert` is also strictly increasing and ends with :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert` at :math:`\cos\theta = \cos\bar{\zeta}`. In :math:`\cos\bar{\zeta} \le \cos\theta \le 1`, we have :math:`\lVert\mathbf{v}'\rVert = \lVert\lambda(\mathbf{v})\rVert`. We conclude that
+
+   .. math:: \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert =
+      \begin{cases}
+      -1 & \cos\bar{\zeta} > -1 \\
+      [-1, 1] & \cos\bar{\zeta} \le -1 \\
+      \end{cases}
+
+:math:`\cos\bar{\zeta} \le \cos\zeta \le 0`
+   The analysis and result is exactly the same as that in the :math:`\cos\bar{\zeta} \le 0 \le \cos\zeta` case.
+
+Combining the above case-by-case findings, we have the global minimum at
+
+.. math::
+   \begin{aligned}
+   & \underset{\cos\theta}{\operatorname{argmin}} \lVert\mathbf{v}'\rVert = \\
+   & \begin{cases}
+   -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \ge 0 \\
+   -1 & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land (\cos\zeta \ge -1 \lor \cos\bar{\zeta} \le 1) \\
+   \{ -1, 1 \} & k_e\tau MA \ge 0 \land L \ge 0 \land L - k_e\tau MA \le 0 \land \cos\zeta < -1 \land \cos\bar{\zeta} > 1 \\
+   -1 & k_e\tau MA \ge 0 \land L \le 0 \land L - k_e\tau MA \le 0 \land \cos\bar{\zeta} > -1 \\
+   [-1, 1] & k_e\tau MA \ge 0 \land L \le 0 \land L - k_e\tau MA \le 0 \land \cos\bar{\zeta} \le -1 \\
+   [\min(\max(-1, \cos\bar{\zeta}), 1), 1] & k_e\tau MA \le 0
+   \end{cases}
+   \end{aligned}
+   :label: maxdecel theta
+
+Effects of frame rate
+~~~~~~~~~~~~~~~~~~~~~
+
+In every case in :eq:`maxdecel theta`, the frame rate has no effect on the deceleration if we ignore the effects of friction. For example, suppose :math:`\cos\theta = -1` in the first case. Then the speed in the next frame may be written as
+
+.. math:: \lVert\mathbf{v}'\rVert = \big\lvert \lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \big\rvert
+
+Assuming :math:`\tau = \tau_g`, the absence of friction, and :math:`\lVert\lambda(\mathbf{v})\rVert - k_e\tau MA \ge 0`, then the deceleration in one frame is therefore
+
+.. math:: \frac{\lVert\mathbf{v}\rVert - k_e\tau MA  - \lVert\mathbf{v}\rVert}{\tau_g} = -k_eMA
+
+which is independent of the frame rate.
+
+.. TODO:
+
+.. Maximum projected acceleration
+.. ------------------------------
+
+.. Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
+
+.. _speed preserving strafing:
 
 Speed preserving strafing
 -------------------------

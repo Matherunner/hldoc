@@ -10,6 +10,8 @@ It is essential for any speedrunner to study existing runs and understand how *e
 
 A one-man project, though with support from the community and giants' shoulders to stand on, this is a landmark speedrun in Half-Life history. The tricks and routes demonstrated in this run may look dated to modern viewers, and the airstrafing was not as optimised as one would expect from today's runs, but they are nonetheless executed nearly as well as they could be.
 
+.. _half-life-21:
+
 `Half-Life 21`_ (2014) by quadrazid et al.
 ------------------------------------------
 
