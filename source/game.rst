@@ -102,11 +102,11 @@ When the slowdown factor is less than one, the actual movement speed of the play
 
 For instance, a trick known as the "501 fps slowdown" was implemented in Half-Life 21 (see :ref:`half-life-21`) to permit opening and passing through doors in the Questionable Ethics chapter without stopping dead by the doors before they could be opened fully. The slowdown factor at 501 fps is :math:`\eta = 0.501`, implying the real velocity is roughly half the intended player velocity. On pre-Steam versions of Half-Life and its expansions, the default frame rate is 72 fps (and some speedrunners believe it should not be exceeded), which would give a slowdown factor of :math:`\eta = 117/125 = 0.936`.
 
-It is a well known fact that the slowdown factor :math:`\eta = 1` if and only if :math:`f_g` is a divisor of 1000. This is because as seen in :eq:`slowdown factor`, if :math:`\eta = 1` we must have
+It is a well known fact that the slowdown factor :math:`\eta = 1` if and only if :math:`1000/f_g` is an integer. This is because as seen in :eq:`slowdown factor`, if :math:`\eta = 1` we must have
 
 .. math:: \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{1000}{f_g}
 
-which is only possible if :math:`1000/f_g` is an integer, implying :math:`f_g` divides 1000.
+which is only possible if :math:`1000/f_g` is an integer.
 
 Savestates
 ----------
