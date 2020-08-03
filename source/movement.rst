@@ -131,6 +131,7 @@ The physics governing the player's air and ground movements are of primary impor
 The air or ground accelerations are computed before position update. Assuming :math:`\mathbf{v}'` is the velocity after air or ground acceleration, and :math:`\mathbf{r}` the player position. Ignoring collisions (see :ref:`collision`), the new position is given by
 
 .. math:: \mathbf{r}' = \mathbf{r} + \tau_p \mathbf{v}'
+   :label: player r update
 
 Here, the new velocity :math:`\mathbf{v}'` is given by the *fundamental movement equation* (FME). Let :math:`\mathbf{v}` the initial player velocity in *two dimensions*, namely the velocity immediately before friction and acceleration are applied. Then the FME is simply
 

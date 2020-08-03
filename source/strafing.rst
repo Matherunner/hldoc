@@ -290,9 +290,6 @@ One can immediately see that the lower the :math:`\tau_g` (that is, the higher t
 
 .. FIXME: similar to the frame rate section, this is misleading because it implies newer engines do not round tau_p.
 
-.. TODO: maybe should the effect of slowdown in player movement first, then discuss the proof only here
-.. TODO: also need to discuss and prove that tau_p = tau_g when f_p is a divisor of 1000? mention this in player movement maybe
-
 When :math:`\eta \ne 1`
 +++++++++++++++++++++++
 
@@ -382,6 +379,8 @@ When :math:`\lvert\cos\Theta\rvert = 1`, however, possibly in the first case and
 
 as long as :math:`\lVert\mathbf{v}_n\rVert < \min(E, M\left( 1 - k_e\tau A \right))`.
 
+.. _agst:
+
 Air-ground speed threshold
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -417,18 +416,33 @@ We have :math:`\lVert\mathbf{v}'_\text{air}\rVert > \lVert\mathbf{v}'_\text{grou
 Effects of bunnyhop cap
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-It is impossible to avoid the bunnyhop cap (see :ref:`bunnyhop cap`) when jumping in later official releases of the game. To lift off the ground and avoid the effects of ground friction, one alternative would be to ducktap instead (see :ref:`ducktapping`). However, each ducktap requires the player to slide on the ground for one frame. Without using very high frame rates to force the frame to be :math:`\tau_p = 0`, the player will lose speed due to friction, especially at lower frame rates. In addition, the player cannot ducktap if there is insufficient clearance above the player. In such cases, jumping ist he only way to maintain speed, though there are different possible ways to approach this.
+It is impossible to avoid the bunnyhop cap (see :ref:`bunnyhop cap`) when jumping in later official releases of the game. To lift off the ground and avoid the effects of ground friction, one alternative would be to ducktap instead (see :ref:`ducktapping`). However, each ducktap requires the player to slide on the ground for one frame. Without using very high frame rates to force the frame to be :math:`\tau_p = 0`, the player will lose speed due to friction, especially at lower frame rates. In addition, the player cannot ducktap if there is insufficient clearance above the player. In such cases, jumping is the only way to maintain speed, though there are different possible ways to approach this. Regardless of the movement strategy, we must not trigger the cap itself when jumping, because that would cause an instant and significant reduction in speed.
+
+.. constant-speed
+..    The constant-speed strategy is simply maintaining a constant horizontal speed of :math:`1.7M_m`, just below the cap, without performing any type of strafing that changes the speed. This strategy is the simplest to execute. If we need to turn left or right, we simply strafe in a speed-preserving way (see :ref:`speed preserving strafing`).
+
+.. maximum-acceleration on both air and ground
+..    Immediately after a jump, the player begins to perform maximum-acceleration strafing in the air. Eventually, gravity will pull the player back onto the ground, this time with a speed higher than the cap of :math:`1.7 M_m`. The player must not jump at this point to avoid triggering the speed reduction. Instead, the player continues to perform maximum-acceleration groundstrafe. If the landing speed is higher than the air-ground speed threshold (see:`agst`), then the speed on the ground will decay nonetheless, in spite of the "maximum-acceleration" strafing. Once the speed reaches back to :math:`1.7 M_m`, the player jumps again to repeat the cycle.
+
+.. maximum-acceleration in the air, friction on the ground
+..    Blah
+
+.. maximum-acceleration in the air, maximum-deceleration on the ground
+..    Blah
+
+.. maximum-acceleration in the air, maximum-deceleration in the air
+..    Blah
 
 
-One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
-The second way would be to accelerate while in the air, then backpedal after
-landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
-off again.  Yet another way would be to accelerate in the air *and* on the
-ground, though the speed will still decrease while on the ground as long as the
-speed is greater than the maximum groundstrafe speed.  To the determine the
-most optimal method we must compare the distance travelled for a given number
-of frames.  We will assume that the maximum groundstrafe speed is lower than
-:math:`1.7M_m`.
+.. One way would be to move at constant horizontal speed, which is :math:`1.7M_m`.
+.. The second way would be to accelerate while in the air, then backpedal after
+.. landing on the ground until the speed reduces to :math:`1.7M_m` before jumping
+.. off again.  Yet another way would be to accelerate in the air *and* on the
+.. ground, though the speed will still decrease while on the ground as long as the
+.. speed is greater than the maximum groundstrafe speed.  To the determine the
+.. most optimal method we must compare the distance travelled for a given number
+.. of frames.  We will assume that the maximum groundstrafe speed is lower than
+.. :math:`1.7M_m`.
 
 It turns out that the answer is not as straightforward as we may have thought and would require more investigations.
 
@@ -625,12 +639,12 @@ which is independent of the frame rate.
 
 .. TODO:
 
-..
+.. Maximum projected acceleration
+.. ------------------------------
 
-   Maximum projected acceleration
-   ------------------------------
+.. Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
 
-   Intuitively, it appears that the objective function in the analysis in :ref:`maxaccel` is flawed in practical applications, because it optimises for *speed* in any direction, rather than the speed projected onto some direction vector that points towards the destination.
+.. _speed preserving strafing:
 
 Speed preserving strafing
 -------------------------

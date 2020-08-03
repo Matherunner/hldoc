@@ -75,12 +75,15 @@ game frame rate
 player frame rate
   The player frame rate is the *virtual* frame rate at which the majority of the player movement physics (see :ref:`player movement`) are run, denoted as :math:`f_p = \tau_p^{-1}`. The player frame rate roughly corresponds to the game frame rate. Depending on the engine version, whether the game is paused, and the value of the game frame rate itself, the player frame time :math:`\tau_p` may oscillate between different values, stay at zero, or be rounded towards zero to the nearest 0.001.
 
+Slowdown on older engines
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. TODO: fix this slow down graph, we have defined it to be the inversion?
 
-.. figure:: images/frame_rate_unsync.png
-   :name: frame rate unsync
+.. .. figure:: images/frame_rate_unsync.png
+..    :name: frame rate unsync
 
-   Frame rate dependent slow-down of player movement in older Half-Life engines.
+..    Frame rate dependent slow-down of player movement in older Half-Life engines.
 
 .. FIXME: this is misleading, this implies that on newer engines, the player frame rate is not rounded down. But it still is. It's just that the game also considers frame time remainders.
 
@@ -91,8 +94,19 @@ Suppose the game frame rate is higher than 20 fps. On older game engines, roughl
 The slowdown factor is then defined as
 
 .. math:: \eta = \frac{\tau_p}{\tau_g} = \frac{\left\lfloor 1000\tau_g \right\rfloor}{1000\tau_g} = \frac{f_g}{1000} \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{f_g}{f_p}
+  :label: slowdown factor
 
-For instance, a trick known as the "501 fps slowdown" was implemented in Half-Life 21 (see :ref:`half-life-21`) to permit opening and passing through doors in the Questionable Ethics chapter without stopping dead by the doors before they could be opened fully. The slowdown factor at 501 fps is :math:`\eta = 0.501`. On pre-Steam versions of Half-Life and its expansions, the default frame rate is 72 fps (and some speedrunners believe it should not be exceeded), which would give a slowdown factor of :math:`\eta = 117/125 = 0.936`.
+When the slowdown factor is less than one, the actual movement speed of the player will be lower. The player's position update in :eq:`player r update` uses :math:`\tau_p` but runs at the rate of :math:`\tau_g^{-1}` Hz. Indeed, the real velocity of the player is directly proportional to :math:`\eta`:
+
+.. math:: \frac{\mathbf{r}' - \mathbf{r}}{\tau_g} = \frac{\mathbf{r} + \tau_p \mathbf{v}' - \mathbf{r}}{\tau_g} = \frac{\tau_p}{\tau_g} \mathbf{v}' = \eta \mathbf{v}'
+
+For instance, a trick known as the "501 fps slowdown" was implemented in Half-Life 21 (see :ref:`half-life-21`) to permit opening and passing through doors in the Questionable Ethics chapter without stopping dead by the doors before they could be opened fully. The slowdown factor at 501 fps is :math:`\eta = 0.501`, implying the real velocity is roughly half the intended player velocity. On pre-Steam versions of Half-Life and its expansions, the default frame rate is 72 fps (and some speedrunners believe it should not be exceeded), which would give a slowdown factor of :math:`\eta = 117/125 = 0.936`.
+
+It is a well known fact that the slowdown factor :math:`\eta = 1` if and only if :math:`f_g` is a divisor of 1000. This is because as seen in :eq:`slowdown factor`, if :math:`\eta = 1` we must have
+
+.. math:: \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{1000}{f_g}
+
+which is only possible if :math:`1000/f_g` is an integer, implying :math:`f_g` divides 1000.
 
 Savestates
 ----------

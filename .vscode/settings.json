@@ -131,5 +131,6 @@
         "yshift",
         "zdrytch",
         "zdrytch x"
-    ]
+    ],
+    "restructuredtext.confPath": "${workspaceFolder}/source"
 }
