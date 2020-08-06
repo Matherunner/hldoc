@@ -114,7 +114,7 @@ Admittedly, the difference is very small thanks to the small angle approximation
 Quick weapon switching
 ----------------------
 
-When the player switching to any weapon in Half-Life, the weapon imposes a delay before any attack or reload is permitted. This delay may be called the *switching delay*, and is independent of the attack cycle time or delay between shots, except for the unique case of Gauss described in :ref:`gauss rapid fire`. When the player switches to a weapon, ``CBasePlayer::SelectItem`` or ``CBasePlayerWeapon::SelectLastItem`` will be called. Both of these functions call the ``Deploy`` virtual method of the selected item. In all weapons of Half-Life, the ``CBasePlayerWeapon::DefaultDeploy`` is eventually called, whether or not the ``Deploy`` function is overridden by the weapon derived class. In ``CBasePlayerWeapon::DefaultDeploy``, the switching delay is set to be half a second:
+When the player switches to any weapon in Half-Life, the weapon imposes a delay before any attack or reload is permitted. This delay may be called the *switching delay*, and is independent of the attack cycle time or delay between shots, except for the unique case of Gauss described in :ref:`gauss rapid fire`. When the player switches to a weapon, ``CBasePlayer::SelectItem`` or ``CBasePlayerWeapon::SelectLastItem`` will be called. Both of these functions call the ``Deploy`` virtual method of the selected item. In all weapons of Half-Life, the ``CBasePlayerWeapon::DefaultDeploy`` is eventually called, whether or not the ``Deploy`` function is overridden by the weapon derived class. In ``CBasePlayerWeapon::DefaultDeploy``, the switching delay is set to be half a second:
 
 .. code-block:: c++
    :caption: ``CBasePlayerWeapon::DefaultDeploy``
@@ -145,7 +145,7 @@ This delay is enforced in ``CBasePlayer::ItemPostFrame``:
 
 The ``CLIENT_WEAPONS`` is always defined in the compiler flags. Therefore, as long as the countdown is not up, ``m_pActiveItem->ItemPostFrame`` will not be called, which in turn prevents the reload and attack methods of the weapon being called.
 
-The technique of *quick weapon switching* eliminates the switching delay completely,. This technique is also known as "fastfire" in the community, which frequently causes confusion with gauss rapid fire (:ref:`gauss rapid fire`) and thus must be avoided. To eliminate the switching delay, we simply perform a saveload immediately upon switching to a weapon. Examining ``CBaseMonster::m_SaveData`` in ``monsters.cpp``, we do see ``CBaseMonster::m_flNextAttack`` being saved, which is inherited by the ``CBasePlayer`` derived class:
+The technique of *quick weapon switching* eliminates the switching delay completely. This technique is also known as "fastfire" in the community, which frequently creates confusion with gauss rapid fire (:ref:`gauss rapid fire`) and thus must be avoided. To eliminate the switching delay, we simply perform a saveload immediately upon switching to a weapon. Examining ``CBaseMonster::m_SaveData`` in ``monsters.cpp``, we do see ``CBaseMonster::m_flNextAttack`` being saved, which is inherited by the ``CBasePlayer`` derived class:
 
 .. code-block:: c++
    :caption: ``CBaseMonster::m_SaveData``
@@ -168,6 +168,8 @@ When a game is loaded, the field is restored properly. However, in the overridde
 Since ``CLIENT_WEAPONS`` is defined, ``UTIL_WeaponTimeBase`` simply returns 0. This effectively resets ``CBasePlayer::m_flNextAttack``, bypassing the check in ``CBasePlayer::ItemPostFrame`` described above.
 
 Note that picking up a weapon also incurs the same delay, though the mechanism by which this happens is slightly different: ``CBasePlayer::SwitchWeapon`` is called instead, which in turn also calls the ``Deploy`` virtual method of the new weapon. The subsequent logic follows the descriptions above.
+
+A typical attempt at explaining the quick weapon switch, commonly seen even as of 2020, is to claim that the saveload eliminates the weapon switching animation. This explanation is incorrect, because the delay before being allowed to fire, or indeed any other weapon-related delays including attacks and reloads, are independent of the viewmodel animation. The delays are "invisible".
 
 .. _gauss:
 
