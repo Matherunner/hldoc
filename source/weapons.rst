@@ -725,14 +725,26 @@ The satchel charge has an owner property that remembers who created it. The satc
 
 .. TODO: explain why
 
-Squeak grenade
---------------
+Snarks
+------
 
-The squeak grenade is a weapon the player can carry. Upon release a squeak grenade, it turns hostile and will attack any human, including the player. The weapon only has the primary attack. The velocity of the grenade upon release is
+The snarks is a weapon which, when fired in primary attack, tosses snarks as monsters. The snarks is more useful in speedruns of the past, and has gradually been supplanted by more modern boosting and movement techniques aided by other weapons. Nevertheless, it still sees uses in certain situations as yet another tool available to the speedrunner for manipulating the difficult-to-control vertical movement. In primary attack, the weapon first traces a line from :math:`\mathbf{a}` to :math:`\mathbf{b}`. We have
 
-.. math:: \mathbf{v}_g = \mathbf{v} + 200\mathbf{\hat{f}}
+.. math::
+   \begin{aligned}
+   \mathbf{a} &=
+   \begin{cases}
+   \mathbf{r} + 20 \mathbf{\hat{f}} & \mathit{standing} \\
+   \mathbf{r} + 18\mathbf{\hat{k}} + 20 \mathbf{\hat{f}} & \mathit{ducked}
+   \end{cases} \\
+   \mathbf{b} &= \mathbf{a} + 64 \mathbf{\hat{f}}
+   \end{aligned}
 
-where :math:`\mathbf{v}` is the velocity of the player and :math:`\mathbf{\hat{f}}` is the unit forward view vector of the player.
+where :math:`\mathbf{r}` is the player position, :math:`\mathbf{\hat{f}}` is the player's unit forward vector, and :math:`\mathbf{\hat{k}} = \langle 0,0,1\rangle`. If this line trace is not *allsolid*, and not *startsolid*, and has a trace fraction above 0.25, then a snark monster will be created at the trace end position with an initial velocity of
+
+.. math:: \mathbf{v} + 200 \mathbf{\hat{f}}
+
+where :math:`\mathbf{v}` is the player velocity. The volume of the tossing sound is a quiet 200. After successfully tossing a snark, the player cannot toss another one until 0.3s later. If the tossing is unsuccessful, namely if the line trace above does not meet the requirements, there is no delay to the next primary attack.
 
 The behaviour of the squeak grenade after release is described in :ref:`squeak grenade monster`.
 
