@@ -397,16 +397,117 @@ A scientist can heal the player if the player health is less than or equal to 50
 Snarks
 ------
 
-As monsters, snarks do not attack the player under any circumstances until it
-has bounced off some entity at least once. For example, a snarks that is freshly
-tossed will never seek out the player mid-air until it has landed and bounced
-off the ground.
+As a weapon, the behaviour of snarks has been described in :ref:`snarks weapon`.
 
-Snarks have friction and gravitational modifiers of 0.5, and a health of 2.
-Snarks are set to ``MOVETYPE_BOUNCE`` in each ``HuntThink``, which occurs once
-every 2 seconds. This implies that the bounce coefficient is :math:`b = 2 - 1/2
-= 3/2`. This bounce coefficient can affect how snarks bounce off any surface, as
-dictated by the general collision equation in :ref:`collision`.
+.. TODO: talk about how snarks classify other enemies!
+
+A snark monster has entity friction and gravity of 0.5. In the default game settings, a snark has a health of 2 regardless of the difficulty. Interestingly, despite being classified as a monster, it behaves more like a grenade with complex seeking and touching behaviours. It does not have an AI in the usual sense of running tasks and schedules. When a snark is spawned, it runs the ``CSqueakGrenade::HuntThink`` function after 0.1s, and once every 0.1s subsequently. Whenever the snark touches any entity, the ``CSqueakGrenade::SuperBounceTouch`` will be called.
+
+Touching behaviour
+~~~~~~~~~~~~~~~~~~
+
+When the snark collides with an entity, assuming the movetype is ``MOVETYPE_BOUNCE``, which typically the case if the snark is not underwater, the snark will tend to be bouncy. Recall from :ref:`entity movement` that an entity of ``MOVETYPE_BOUNCE`` will have a bounce coefficient of :math:`b = 2 - k_e` (see :ref:`collision`). Since the snark's entity friction is 0.5, it has :math:`b = 1.5`. This allows snarks to bounce off surfaces very well.
+
+The snark has an owner property. If the snark is tossed by the player, for example, the owner will be set to the player. When ``SuperBounceTouch`` is called, if the owner property is set and the entity that touches the snark is also the owner, it will not run the subsequent logic. In fact, if the owner is set to the player, the snark will not collide with the player at all. However, if the entity that touches the snark is not the owner, then the snark will simply clear the owner property, making it without an owner. Consequently, if the snark touches the ex-owner at some point in the future, the subsequent logic in the ``SuperBounceTouch`` function will run.
+
+.. code-block:: c++
+   :caption: ``CSqueakGrenade::SuperBounceTouch``
+
+   // don't hit the guy that launched this grenade
+   if ( pev->owner && pOther->edict() == pev->owner )
+     return;
+
+   // at least until we've bounced once
+   pev->owner = NULL;
+
+The snark also has a property that prevents running the touching logic too frequently:
+
+.. code-block:: c++
+   :caption: ``CSqueakGrenade::SuperBounceTouch``
+
+   // avoid bouncing too much
+   if (m_flNextHit > gpGlobals->time)
+     return;
+
+If all of the following conditions are true, the snark will inflict damage onto the touched entity:
+
+- If the entity that touches the snark is damageable
+- The snark's next attack delay is over (``m_flNextAttack < gpGlobals->time``)
+- The touched entity is the same as the entity hit by the global trace
+- The touched entity is not another snark
+
+The snark inflicts damage using the multidamage mechanism (see :ref:`damage system`). It first does a *clear* operation. Then, it performs *apply* with a damage of :math:`D = 10` in the default game settings, corresponding to the ``sk_snark_dmg_biteX`` cvars. It also adds 5 damage to its accumulated explosive damage, but without inflicting the touched entity with it yet. Finally, it sets the next attack delay to be 0.5s.
+
+Regardless of whether the snark inflicts damage, it always set the ``m_flNextHit`` to be 0.5s from the current game time, and resets ``m_flNextHunt`` to be the current game time, which allows the hunting logic in ``CSqueakGrenade::HuntThink`` to run the next time the think function is called. It also inserts a sound of ``bits_SOUND_COMBAT`` of differing volume and duration depending on whether the snark is onground.
+
+Hunting behaviour
+~~~~~~~~~~~~~~~~~
+
+The snark has a relatively complex think function and behaviour. It first checks if its position and velocity are acceptable and within bounds, and remove itself is not:
+
+.. code-block:: c++
+   :caption: ``CSqueakGrenade::HuntThink``
+
+   if (!IsInWorld())
+   {
+     SetTouch( NULL );
+     UTIL_Remove( this );
+     return;
+   }
+
+The snark then checks if it is time to kill itself, where ``m_flDie`` has previously been set to 15s from the time it spawned in ``CSqueakGrenade::Spawn``:
+
+.. code-block:: c++
+   :caption: ``CSqueakGrenade::HuntThink``
+
+   // explode when ready
+   if (gpGlobals->time >= m_flDie)
+   {
+     g_vecAttackDir = pev->velocity.Normalize( );
+     pev->health = -1;
+     Killed( pev, 0 );
+     return;
+   }
+
+If the snark's waterlevel is not zero, it will change the movetype to ``MOVETYPE_FLY``, which ignores gravity. Then, the snark's velocity is altered to become
+
+.. math:: 0.9 \mathbf{v}_S + 8 \mathbf{\hat{k}}
+
+where :math:`\mathbf{v}_S` is the current velocity of the snark and :math:`\mathbf{\hat{k}} = \langle 0,0,1\rangle`. If the snark's waterlevel is zero, however, the velocity will remain unchanged but the movetype will be set to ``MOVETYPE_BOUNCE``.
+
+The snark imposes a rate limiting on how frequently it runs the subsequent logic:
+
+.. code-block:: c++
+   :caption: ``CSqueakGrenade::HuntThink``
+
+   // return if not time to hunt
+   if (m_flNextHunt > gpGlobals->time)
+     return;
+
+   m_flNextHunt = gpGlobals->time + 2.0;
+
+Recalled from the description of ``CSqueakGrenade::SuperBounceTouch`` that the snark typically resets ``m_flNextHunt`` to be the current game time when touched by an entity. For example, once the snark touches the ground, it will run the hunting logic as soon as its think function is next called.
+
+.. TODO: finding logic?
+
+Once the snark has found an enemy, it will attempt to jump towards the enemy's eye position. Let :math:`\mathbf{e}` be the enemy's eye position, and :math:`\mathbf{r}_S` be the position of the snark. Then the snark's new velocity will be set to
+
+.. math:: \mathbf{v}_S' = \min\left( 1.2, \frac{50}{\lVert\mathbf{v}_S\rVert + 10} \right) \mathbf{v}_S + 300 \frac{\mathbf{e} - \mathbf{r}_S}{\lVert \mathbf{e} - \mathbf{r}_S \rVert}
+   :label: snark hunt vel
+
+Subsequently, if the snark's current position compared to the previous position when this part of the ``HuntThink`` is run differs by a length of less than 1, the snark will use the non-shared RNG (see :ref:`nonshared rng`) to randomly generate its horizontal velocity:
+
+.. math::
+   \begin{aligned}
+   (S_1, v_{S,x}) &\gets \mathfrak{U}_\mathit{NS}(S_0, -100, 100) \\
+   (S_2, v_{S,y}) &\gets \mathfrak{U}_\mathit{NS}(S_1, -100, 100)
+   \end{aligned}
+
+In :eq:`snark hunt vel`, the maximum speed is achieved when :math:`\mathbf{v}_S` is parallel to :math:`\mathbf{e} - \mathbf{r}_S`. If we then solve for a fixed point by setting :math:`\lVert\mathbf{v}_S'\rVert = \lVert\mathbf{v}_S\rVert`, we obtain the theoretically maximum speed achievable by hunting alone, disregarding gravity or other external factors, to be
+
+.. math:: \max \lVert\mathbf{v}_S\rVert = 10 \left( 17 + \sqrt{319} \right) \approx 348.6
+
+Indeed, we find that hunting with speeds above that results in a lower new speed :math:`\lVert\mathbf{v}_S'\rVert < \lVert\mathbf{v}_S\rVert`.
 
 Houndeye
 --------

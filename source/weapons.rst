@@ -725,6 +725,8 @@ The satchel charge has an owner property that remembers who created it. The satc
 
 .. TODO: explain why
 
+.. _snarks weapon:
+
 Snarks
 ------
 

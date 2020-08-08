@@ -128,11 +128,12 @@ where :math:`g_e` may be called the *entity gravity* which is a modifier associa
 
 However, the vertical position of the entity does not follow classical mechanics. In particular, the position is updated in each frame as
 
-.. math:: z_{n+1} = z_n - v_{n+1} \tau_g
+.. math:: z_{n+1} = z_n + v_{n+1} \tau_g
 
 Solving the recurrence relation, the vertical position at some frame :math:`n` is
 
-.. math:: z_n = z_0 + v_0 n\tau_g - \frac{1}{2} g n^2 \tau_g^2 - \frac{1}{2} g n \tau_g^2
+.. math:: z_n = z_0 + v_0 n\tau_g - \frac{1}{2} g n \left( n + 1 \right) \tau_g^2
+   :label: euler gravity position
 
 Compared to classical mechanics, the entity's vertical position is lower by a magnitude of
 
