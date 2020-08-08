@@ -17,6 +17,8 @@ Not all entities can see, but for those that do, the eyes are the windows to the
 
 .. TODO: origin, velocity, body target, etc
 
+.. _entity movement:
+
 Movement
 --------
 
@@ -116,7 +118,27 @@ are all the possible movetypes in Half-Life:
 Gravity
 -------
 
-.. TODO: player gravity is computed differently, with leapfrog integration
+Entities of certain movetypes experience gravity. Unlike the player's gravity (see :ref:`player gravity`), the gravity for entities is integrated using the Euler's method. This makes the positions of the entity dependent on the frame rate. A free falling entity experiences a gravitational acceleration of :math:`g` which takes the value of
+
+.. math:: \mathtt{sv\_gravity} \times g_e
+
+where :math:`g_e` may be called the *entity gravity* which is a modifier associated with the entity. For instance, grenades tend to have an entity gravity of 0.5, which makes them experience half the intended gravitational acceleration. If :math:`\tau_g` is the game frame time (see :ref:`frame rate`), then the vertical velocity at frame :math:`n` follows classical mechanics, which is
+
+.. math:: v_n = v_0 - gn\tau_g
+
+However, the vertical position of the entity does not follow classical mechanics. In particular, the position is updated in each frame as
+
+.. math:: z_{n+1} = z_n - v_{n+1} \tau_g
+
+Solving the recurrence relation, the vertical position at some frame :math:`n` is
+
+.. math:: z_n = z_0 + v_0 n\tau_g - \frac{1}{2} g n^2 \tau_g^2 - \frac{1}{2} g n \tau_g^2
+
+Compared to classical mechanics, the entity's vertical position is lower by a magnitude of
+
+.. math:: \frac{1}{2} gn \tau_g^2
+
+This type of gravity may be called the *Euler gravity*.
 
 .. _friction:
 
