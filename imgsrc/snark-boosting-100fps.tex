@@ -1,0 +1,54 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\TickLen}{40};
+  \pgfmathsetmacro{\YScale}{10};
+
+  \coordinate (O) at (0,0);
+
+  \foreach \x in {0,1,2,3,4,5,6,7,8,9} {
+    \draw[gray20] (O) +(\TickLen*\x,\YScale*-4) -- +(\TickLen*\x,\YScale*20);
+  }
+  \foreach \y in {-4,0,4,8,12,16,20} {
+    \draw[gray20] (O) +(0,\YScale*\y) -- +(9*\TickLen,\YScale*\y);
+  }
+
+  \draw[->] (O) -- (\TickLen*9.5,0) node[right]{$k$};
+  \draw[->] ($(O) + (0,-4*\YScale)$) -- ($(O) + (0,22*\YScale)$) node[above]{$z$};
+  
+  \foreach \x in {0,1,2,3,4,5,6,7,8,9} {
+    \draw (O) +(\TickLen*\x,-3) -- +(\TickLen*\x,3);
+  }
+  %\foreach \x in {1,2} {
+  %  \draw (O) +(\TickLen*\x,3) node[above]{$\x$};
+  %}
+  \foreach \x in {0,1,2,3,4,5,6,7,8,9} {
+    \draw (O) +(\TickLen*\x,-4*\YScale) node[below]{$\x$};
+  }
+  \foreach \y in {-4,-2,0,2,4,6,8,10,12,14,16,18,20} {
+    \draw (O) +(-3,\YScale*\y) -- +(3,\YScale*\y);
+  }
+  \foreach \y in {-4,0,4,8,12,16,20} {
+    \draw (O) +(-3,\YScale*\y) node[left]{$\y$};
+  }
+
+  \foreach \x/\zp/\zs in {
+    0/0/0,
+    1/17.96/-1.14939,
+    2/17.84/-2.33878,
+    3/17.64/0.16,
+    4/17.36/2.61878,
+    5/17/5.03756,
+    6/16.56/7.41633,
+    7/16.04/9.75511,
+    8/15.44/12.0539,
+    9/14.76/14.3127
+  } {
+    \fill[fill=blue] (\x*\TickLen,0 |- O) ++(0,\zp*\YScale) circle (4);
+    \fill[fill=red] (\x*\TickLen,0 |- O) ++(0,\zs*\YScale) circle (2);
+  }
+\end{tikzpicture}
+
+\end{document}

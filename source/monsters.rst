@@ -535,6 +535,10 @@ In order to achieve the opposite effects of ad-hoc snark boosting, most importan
 
 In the steady state, a cycle begins with the player landing on the snark and becoming onground. Within the same frame, the snark collides with the player, and bounces downward (due to :math:`b = 1.5` given to the general collision equation in :ref:`collision`) with a steady state velocity. In the next frame, the player ducktaps and lifts off into the air, while the snark continues to move downward. Some frames later in the :math:`n_h`-th frame, the snark begins to hunt with the behaviour described in :ref:`snark hunting`, and sets the velocity so that it points upward. At this point, the player is moving downward and the snark is moving upward. Eventually, the player will land on the snark again and the cycle repeats.
 
+.. figure:: images/snark-boosting-100fps.svg
+
+   The positions of the player and the snark in one cycle of snark boosting at 100 fps. The blue dots represent the player position, while the red dots represent the snark positions. Note that both the player and the snark are initially at :math:`z = 0`.
+
 Suppose the player lands and becomes onground in frame :math:`k = 0` and ducktaps in frame :math:`k = 1`. Define :math:`z(0) = 0` the initial player *feet* position. Then the player velocity may be given by
 
 .. math:: v_z(k) = -gk\tau_p
