@@ -730,7 +730,7 @@ The satchel charge has an owner property that remembers who created it. The satc
 Snarks
 ------
 
-The snarks is a weapon which, when fired in primary attack, tosses snarks as monsters. The snarks is more useful in speedruns of the past, and has gradually been supplanted by more modern boosting and movement techniques aided by other weapons. Nevertheless, it still sees uses in certain situations as yet another tool available to the speedrunner for manipulating the difficult-to-control vertical movement. In primary attack, the weapon first traces a line from :math:`\mathbf{a}` to :math:`\mathbf{b}`. We have
+The snarks is a weapon which, when fired in primary attack, tosses snarks as monsters. The snarks is more useful in speedruns of the past thanks to snark boosting (see :ref:`snark boosting`), and has gradually been supplanted by more modern boosting and movement techniques aided by other weapons. Nevertheless, it still sees uses in certain situations as yet another tool available to the speedrunner for manipulating the difficult-to-control vertical movement. In primary attack, the weapon first traces a line from :math:`\mathbf{a}` to :math:`\mathbf{b}`. We have
 
 .. math::
    \begin{aligned}

@@ -403,6 +403,8 @@ As a weapon, the behaviour of snarks has been described in :ref:`snarks weapon`.
 
 A snark monster has entity friction and gravity of 0.5. In the default game settings, a snark has a health of 2 regardless of the difficulty. Interestingly, despite being classified as a monster, it behaves more like a grenade with complex seeking and touching behaviours. It does not have an AI in the usual sense of running tasks and schedules. When a snark is spawned, it runs the ``CSqueakGrenade::HuntThink`` function after 0.1s, and once every 0.1s subsequently. Whenever the snark touches any entity, the ``CSqueakGrenade::SuperBounceTouch`` will be called.
 
+.. _snark touching:
+
 Touching behaviour
 ~~~~~~~~~~~~~~~~~~
 
@@ -439,6 +441,8 @@ If all of the following conditions are true, the snark will inflict damage onto 
 The snark inflicts damage using the multidamage mechanism (see :ref:`damage system`). It first does a *clear* operation. Then, it performs *apply* with a damage of :math:`D = 10` in the default game settings, corresponding to the ``sk_snark_dmg_biteX`` cvars. It also adds 5 damage to its accumulated explosive damage, but without inflicting the touched entity with it yet. Finally, it sets the next attack delay to be 0.5s.
 
 Regardless of whether the snark inflicts damage, it always set the ``m_flNextHit`` to be 0.5s from the current game time, and resets ``m_flNextHunt`` to be the current game time, which allows the hunting logic in ``CSqueakGrenade::HuntThink`` to run the next time the think function is called. It also inserts a sound of ``bits_SOUND_COMBAT`` of differing volume and duration depending on whether the snark is onground.
+
+.. _snark hunting:
 
 Hunting behaviour
 ~~~~~~~~~~~~~~~~~
@@ -508,6 +512,65 @@ In :eq:`snark hunt vel`, the maximum speed is achieved when :math:`\mathbf{v}_S`
 .. math:: \max \lVert\mathbf{v}_S\rVert = 10 \left( 17 + \sqrt{319} \right) \approx 348.6
 
 Indeed, we find that hunting with speeds above that results in a lower new speed :math:`\lVert\mathbf{v}_S'\rVert < \lVert\mathbf{v}_S\rVert`.
+
+.. FIXME: maybe we should really move these to the weapons chapter? and only talk about things like Classify here
+
+.. _snark boosting:
+
+Snark boosting
+~~~~~~~~~~~~~~
+
+Snark boosting refers to a general technique of using snarks to prop the player up to gain vertical height. The mechanism is analogous to "prop flying" in Source engine speedruns, except the snark is not under the player's control once released. There are two ways snark boosting can be done: the ad-hoc way and the standard or "right" way. Many speedrunners never figured out how snark boosting can be done in a consistent and reliable way. They would opt for an ad-hoc way of snark boosting, which are characterised by
+
+- using more than one snark
+- jumping and/or ducking aperiodically or haphazardly
+- inconsistent height gains
+- higher frequency of attacks from the snarks
+
+One example of an ad-hoc snark boosting may be found in `this video`_ by qckdth. An ad-hoc snark boosting may still be optimal under certain circumstances if the sequence of actions are tailored and adapted specifically to them. For example, if the player only needs to perform a jump on a snark to leap over some obstacles, then the ad-hoc method may be preferable over the standard method.
+
+.. _this video: https://youtu.be/Hv_ZlxBbfrk?t=1279
+
+In order to achieve the opposite effects of ad-hoc snark boosting, most importantly being able to gain height consistently and indefinitely, we must instead perform it the standard way. There are two phases in standard snark boosting: the transition and the steady state. The process begins with the transition phase, in which the player positions themselves onto a snark. The snark itself is usually tossed by the player a few moments prior, though it could also be released by the map or the environment. In the transition phase, the snark may attack the player occasionally, and the height gains may not be consistent. Once the player is able to perform a ducktap once every 0.1s and achieve consistent height gains, along with the snark undergoing a periodic behaviour, the transition phase ends and the steady state commences.
+
+In the steady state, a cycle begins with the player landing on the snark and becoming onground. Within the same frame, the snark collides with the player, and bounces downward (due to :math:`b = 1.5` given to the general collision equation in :ref:`collision`) with a steady state velocity. In the next frame, the player ducktaps and lifts off into the air, while the snark continues to move downward. Some frames later in the :math:`n_h`-th frame, the snark begins to hunt with the behaviour described in :ref:`snark hunting`, and sets the velocity so that it points upward. At this point, the player is moving downward and the snark is moving upward. Eventually, the player will land on the snark again and the cycle repeats.
+
+Suppose the player lands and becomes onground in frame :math:`k = 0` and ducktaps in frame :math:`k = 1`. Define :math:`z(0) = 0` the initial player *feet* position. Then the player velocity may be given by
+
+.. math:: v_z(k) = -gk\tau_p
+
+The player vertical feet position may be given by
+
+.. math:: z_p(k) = 18 H(k - 1) - \frac{1}{2} gk^2\tau_p^2
+
+where :math:`H(x)` is the Heaviside step function.
+
+Denote :math:`v_c` the vertical velocity in frame :math:`k = 0`, which is the velocity after the snark collides with the player. Let :math:`v_h(v)` be the hunting velocity given by :eq:`snark hunt vel`, restricted to the vertical axis. The snark vertical velocity may be given by
+
+.. math:: v_{z,s}(k) = \left( v_c - g_sk\tau_g \right) \left( 1 - H(k - n_h) \right) \\
+   {} + \left( v_h(v_c - g_s \left( n_h - 1 \right) \tau_g) - g_s \left(k - n_h + 1\right) \tau_g \right) H(k - n_h)
+
+The snark position at its top is given by the sum
+
+.. math:: z_s(k) = z_s(k-1) + v_{z,s}(k) \tau_g = \tau_g \sum_{i=1}^k v_{z,s}(i)
+
+Suppose the :math:`n_c` is the cycle length, or the number of frames in a cycle. Then using the general collision equation (see :ref:`collision`) we additionally also have
+
+.. math:: v_c = v_{z,s}(n_c) \left( 1 - b_s \right) = v_{z,s}(0)
+
+This is the steady state snark velocity. In order for the standard snark boosting to work, we must have
+
+.. math:: z_p(n_c) - 2 \le z_s(n_c-1) \le z_p(n_c-1)
+   :label: snark climbing inequality
+
+In order words, the player's feet must end up within 2-unit onground layer from the snark's top surface, before the snark collides with the player within the same frame.
+
+As described in :ref:`snark hunting`, the snark hunting frequency is rate limited. The way the snark can eliminate the delay is by having its ``CSqueakGrenade::SuperBounceTouch`` called, as described in :ref:`snark touching`, which allows the hunting to occur the soonest in the next frame. However, there is a 0.1s delay for the touching behaviour as well. This implies the snark must touch the player at least 0.1s since the last touch. This provides a lower bound to the cycle length. In addition, the ``CSqueakGrenade::HuntThink`` also has a 0.1s delay between calls that cannot be reset. In order for snark boosting to work consistently, the hunting must also occur at a constant (on average) offset of frames since the start of the cycle, which is given by :math:`n_h`. This is only possible if the cycle length is 0.1s on average.
+
+Arresting falls
+~~~~~~~~~~~~~~~
+
+Besides damage boosting (see :ref:`damage boosting`), snarks provide the only way of arresting a free fall anywhere mid-air.
 
 Houndeye
 --------
