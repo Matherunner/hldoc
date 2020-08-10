@@ -549,6 +549,7 @@ Denote :math:`v_c` the vertical velocity in frame :math:`k = 0`, which is the ve
 
 .. math:: v_{z,s}(k) = \left( v_c - g_sk\tau_g \right) \left( 1 - H(k - n_h) \right) \\
    {} + \left( v_h(v_c - g_s \left( n_h - 1 \right) \tau_g) - g_s \left(k - n_h + 1\right) \tau_g \right) H(k - n_h)
+   :label: snark boost vel
 
 The snark position at its top is given by the sum
 
@@ -557,15 +558,18 @@ The snark position at its top is given by the sum
 Suppose the :math:`n_c` is the cycle length, or the number of frames in a cycle. Then using the general collision equation (see :ref:`collision`) we additionally also have
 
 .. math:: v_c = v_{z,s}(n_c) \left( 1 - b_s \right) = v_{z,s}(0)
+   :label: snark boost vel cycle
 
 This is the steady state snark velocity. In order for the standard snark boosting to work, we must have
 
-.. math:: z_p(n_c) - 2 \le z_s(n_c-1) \le z_p(n_c-1)
-   :label: snark climbing inequality
+.. math:: z_p(n_c) - 2 \le z_s(n_c-1) \le z_p(n_c-1) - 2
+   :label: snark boosting inequality
 
-In order words, the player's feet must end up within 2-unit onground layer from the snark's top surface, before the snark collides with the player within the same frame.
+This is the snark boosting inequality. In other words, in frame :math:`k = n_c - 1`, the player must end with a position above the 2-unit onground layer of the snark, but in frame :math:`k = n_c`, the player position must either end up within the 2-unit onground layer, or below the snark, which implies a collision has occurred.
 
 As described in :ref:`snark hunting`, the snark hunting frequency is rate limited. The way the snark can eliminate the delay is by having its ``CSqueakGrenade::SuperBounceTouch`` called, as described in :ref:`snark touching`, which allows the hunting to occur the soonest in the next frame. However, there is a 0.1s delay for the touching behaviour as well. This implies the snark must touch the player at least 0.1s since the last touch. This provides a lower bound to the cycle length. In addition, the ``CSqueakGrenade::HuntThink`` also has a 0.1s delay between calls that cannot be reset. In order for snark boosting to work consistently, the hunting must also occur at a constant (on average) offset of frames since the start of the cycle, which is given by :math:`n_h`. This is only possible if the cycle length is 0.1s on average.
+
+Finding a :math:`n_h` that satisfies :eq:`snark boosting inequality` is tedious to carry out analytically. We can therefore solve it numerically instead. The general strategy is to simply check the admissibility of each value of :math:`1 \le n_h \le n_c - 1`. For each iteration, we must solve for the steady state velocity :math:`v_c` iteratively from an initial guess using :eq:`snark boost vel` and :eq:`snark boost vel cycle`. The rate of convergence is typically very rapid.
 
 Arresting falls
 ~~~~~~~~~~~~~~~
