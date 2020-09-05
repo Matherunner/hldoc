@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+	<name>HLPR PDF to SVG</name>
+	<id>com.jwchong.www.hlprpdf2svg</id>
+	<dependency type="executable" location="extensions">hlprpdf2svg.py</dependency>
+
+	<label appearance="header">HLPR PDF to SVG</label>
+	<label>This extension fixes the viewbox after a Poppler/Cairo import and resize it to fit the drawing.</label>
+	<param name="file" type="path" mode="file_new" filetypes="svg" gui-text="Output File"></param>
+
+	<effect needs-live-preview="false">
+		<object-type>all</object-type>
+		<effects-menu>
+			<submenu name="Document"/>
+		</effects-menu>
+	</effect>
+	<script>
+		<command location="inx" interpreter="python">hlprpdf2svg.py</command>
+	</script>
+</inkscape-extension>

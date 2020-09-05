@@ -50,6 +50,8 @@ Alternatively, if Adobe Illustrator is not available:
 6. Go to File -> Save a Copy, choose "Plain SVG" as the format (do not choose "Optimized SVG" as it is not as good as using `svgo`)
 7. Run `svgo --multipass -p 2` on the generated SVG
 
+These steps may be partially automated by installing the `hlprpdf2svg` Inkscape extension.
+
 The file size generated using this method will tend to be bigger. Nevertheless, each glyph is defined as a `<symbol>` and reused throughout by Inkscape, which implies that an image with many characters may be able to keep the file size small, compared to the Illustrator method. That is, as the number of characters increases, there may be a point at which Inkscape would generate smaller files than Illustrator.
 
 ### Technical drawings
