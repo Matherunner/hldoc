@@ -1,0 +1,34 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\PlayerHeight}{130}
+  \pgfmathsetmacro{\PlayerWidth}{32/72*\PlayerHeight}
+  \pgfmathsetmacro{\PlayerHOffset}{0.2*\PlayerWidth}
+
+  \coordinate (OA) at (0,0);
+  \coordinate (OB) at (100,0);
+  \coordinate (OC) at ($(OB) - (0,180)$);
+  \coordinate (PC) at ($(OB) + (\PlayerHOffset,0.5*\PlayerHeight)$);
+  \coordinate (TraceStart) at ($(PC) + (16/32*\PlayerWidth,-0.5*\PlayerHeight)$);
+  \coordinate (TraceEnd) at ($(TraceStart) + (0,-34/72*\PlayerHeight)$);
+  
+  \draw[thick] (OA) -- (OB) node[below left]{edge} -- (OC);
+
+  % Draw player hull
+  \draw[semithick] (PC) node[above]{$\mathbf{r}$} ++(-0.5*\PlayerWidth,-0.5*\PlayerHeight) rectangle ++(\PlayerWidth,\PlayerHeight);
+
+  % Trace start player hull
+  \draw[semithick,densely dotted,darkRed50] (TraceStart) ++(-0.5*\PlayerWidth,-0.5*\PlayerHeight) rectangle ++(\PlayerWidth,\PlayerHeight);
+
+  % Trace end player hull
+  \draw[semithick,densely dotted,darkGreen50] (TraceEnd) ++(-0.5*\PlayerWidth,-0.5*\PlayerHeight) rectangle ++(\PlayerWidth,\PlayerHeight);
+
+  \path[darkRed50] (TraceStart) [fill=darkRed50] circle (2) node[below]{$A$};
+  \path[darkGreen50] (TraceEnd) [fill=darkGreen50] circle (2) node[below]{$B$};
+  \path (TraceEnd) +(0,-0.5*\PlayerHeight) [fill=black] circle (2) node[below]{$C$};
+  \path[fill=black] (PC) circle (2);
+\end{tikzpicture}
+
+\end{document}

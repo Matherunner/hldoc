@@ -59,6 +59,7 @@
 \colorlet{red20}{red!20!white}
 \colorlet{darkBlue50}{blue!50!black}
 \colorlet{blue20}{blue!20!white}
+\colorlet{darkGreen50}{green!50!black}
 \colorlet{green50}{green!50!white}
 \colorlet{green20}{green!20!white}
 \colorlet{brown80}{brown!80!white}

@@ -129,6 +129,11 @@ Here, :math:`\operatorname{diag}(1,1,0)` is a matrix with diagonal entries of :m
 
 See :ref:`ducking` for a descriptions of ducking states. Effectively, this makes :math:`A` level with the player's feet. With :math:`A` and :math:`B` computed, the game performs a player trace from :math:`A` to :math:`B`. If nothing is in the way between the two points, the game will set :math:`e_f` to the value of ``edgefriction``. In the default settings of Half-Life, this amounts to :math:`e_f = 2`, doubling :math:`k` from its normal value.
 
+.. figure:: images/edgefriction-1.svg
+   :name: edgefriction trace
+
+   If the player hull trace from :math:`A` to :math:`B` does not collide with a solid entity, then edgefriction will be applied. Note that :math:`C` is :math:`34 + 36 = 70` units below :math:`A`.
+
 Although doubling :math:`k` seems minor at first glance, the effect is *devastating*. Prolonged groundstrafing towards an edge can drastically reduce the horizontal speed, which in turn affects the overall airstrafing acceleration after jumping off the edge. One way to avoid edgefriction is to jump or ducktap before reaching an edge and start airstrafing. In human speedrunning terms, the technique of ducktapping before an edge is sometimes called *countjump*. However, this is sometimes infeasible due to space or other constraints. The most optimal way to deal with edgefriction is highly dependent on the circumstances. Extensive offline simulations may be desirable.
 
 .. _player air ground:
