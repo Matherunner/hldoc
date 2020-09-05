@@ -111,11 +111,23 @@ In the third case of :eq:`general friction`, where the speed is very low, the sp
 Edgefriction
 ~~~~~~~~~~~~
 
-Edgefriction is a an extra friction applied to the player when the player is sufficiently close to an edge that is sufficiently high above from a lower ground.
+Edgefriction is a an extra friction applied to the player when the player is sufficiently close to an edge that is sufficiently high above from a lower ground. Let :math:`\mathbf{r}` be the player position, and :math:`\mathbf{v}` the player velocity. Define
 
-.. admonition:: TODO
+.. math::
+   \begin{aligned}
+   A &= \mathbf{r} + 16 \mathbf{\hat{v}} \operatorname{diag}(1,1,0) - \langle 0,0,H_z\rangle \\
+   B &= A - \langle 0,0,34\rangle
+   \end{aligned}
 
-   Add maths descriptions
+Here, :math:`\operatorname{diag}(1,1,0)` is a matrix with diagonal entries of :math:`1, 1, 0`. :math:`H_z` is half the hull height of the player, which depends on the ducking state.
+
+.. math:: H_z =
+   \begin{cases}
+   36 & \text{standing} \\
+   18 & \text{ducked}
+   \end{cases}
+
+See :ref:`ducking` for a descriptions of ducking states. Effectively, this makes :math:`A` level with the player's feet. With :math:`A` and :math:`B` computed, the game performs a player trace from :math:`A` to :math:`B`. If nothing is in the way between the two points, the game will set :math:`e_f` to the value of ``edgefriction``. In the default settings of Half-Life, this amounts to :math:`e_f = 2`, doubling :math:`k` from its normal value.
 
 Although doubling :math:`k` seems minor at first glance, the effect is *devastating*. Prolonged groundstrafing towards an edge can drastically reduce the horizontal speed, which in turn affects the overall airstrafing acceleration after jumping off the edge. One way to avoid edgefriction is to jump or ducktap before reaching an edge and start airstrafing. In human speedrunning terms, the technique of ducktapping before an edge is sometimes called *countjump*. However, this is sometimes infeasible due to space or other constraints. The most optimal way to deal with edgefriction is highly dependent on the circumstances. Extensive offline simulations may be desirable.
 
