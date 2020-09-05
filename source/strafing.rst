@@ -392,6 +392,10 @@ a critical speed beyond which the acceleration of airstrafe exceeds that of
 groundstrafe. This is called the *air-ground speed threshold* (AGST), admittedly
 a rather non-descriptive name.
 
+.. figure:: images/agstplot.svg
+
+   Comparison between the accelerations arising from strafing in the air and on the ground at various speeds at default Half-Life settings and 1000 fps. Although the acceleration in the air is greater than that on the ground when the speed is very low, the acceleration in the air rapidly falls as speed increases. The air and ground accelerations cross later at the air-ground speed threshold of approximately 482 ups.
+
 Analytic solutions for AGST are always available, but they are cumbersome to
 write and code. Sometimes the speed curves for airstrafe and groundstrafe
 intersects several times, depending even on the initial speed itself. A more
