@@ -20,7 +20,7 @@ for p in pitch:
     gvels.append(gvel(p))
 gvels = np.array(gvels)
 
-plt.figure(figsize=(6, 4))
+plt.figure(figsize=(8.5, 5.5))
 plt.axes().set_aspect('equal')
 plt.plot(gvels[:, 0], gvels[:, 1], 'k')
 
@@ -30,14 +30,14 @@ for pitch, offs in [[-180, (10, 5)], [-135, (10, -10)], [-90, (0, -30)],
                     [120, (-70, 20)], [150, (15, 15)], [180, (15, 0)]]:
     vel = gvel(pitch)
     plt.plot(vel[0], vel[1], 'ok')
-    paren = '' if pitch != -180 else ' (player pitch)'
-    plt.text(vel[0] + offs[0], vel[1] + offs[1], fr'{pitch}°{paren}'.replace('-', '−'), verticalalignment='center')
+    paren = '' if pitch != -180 else 'player pitch = '
+    plt.text(vel[0] + offs[0], vel[1] + offs[1], fr'{paren}{pitch}°'.replace('-', '−'), verticalalignment='center')
 
 plt.xlim((-550, 500))
 plt.xticks(np.arange(-500, 501, 100))
 plt.xlabel('relative horizontal velocity')
 plt.ylabel('relative vertical velocity')
 plt.grid()
+# plt.tight_layout(pad=0, w_pad=0, h_pad=0)
 plt.tight_layout(pad=0, w_pad=0, h_pad=0)
-plt.savefig('handgrenade-vel-1.png', dpi=200, transparent=True)
-plt.show()
+plt.savefig('handgrenade-vel-1.pdf', transparent=True)

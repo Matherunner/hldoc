@@ -552,9 +552,8 @@ To visualise this equation, we plotted :numref:`handgrenade vel 1` which depicts
 how the handgrenade's relative horizontal speed and vertical velocities vary
 with player pitch.
 
-.. figure:: images/handgrenade-vel-1.png
+.. figure:: images/handgrenade-vel-1.svg
    :name: handgrenade vel 1
-   :scale: 50%
 
    Plot of the relationship between relative horizontal and vertical velocities
    by varying the player pitch :math:`-180^\circ < \varphi \le 180^\circ`.
