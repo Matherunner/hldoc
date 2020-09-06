@@ -133,5 +133,10 @@
         "zdrytch x"
     ],
     "restructuredtext.confPath": "${workspaceFolder}/source",
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "cSpell.words": [
+        "disattenuation",
+        "headshots",
+        "hitbox"
+    ]
 }

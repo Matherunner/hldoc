@@ -49,13 +49,13 @@ The explosion origin as a result of a grenade detonation is more complicated. Wh
 Assuming the trace fraction is not 1, :math:`\mathbf{\hat{n}}` is the normal of the plane hit by the line trace, and :math:`D` is the source damage of the grenade, the new position of the grenade is computed to be
 
 .. math:: \mathbf{r}' = \mathbf{c}_{\mathit{AB}} + \frac{3}{5} \left( D - 24 \right) \mathbf{\hat{n}}
-   :label: new position
+   :label: explosion new position
 
 All numerical constants are hardcoded. Call the coefficient of :math:`\mathbf{\hat{n}}`, or
 
 .. math:: \frac{3}{5} \left( D - 24 \right)
 
-the *pull out distance*, as per the comments in the SDK in ``ggrenade.cpp``. This is so named because a grenade is typically in contact with some plane or ground when it explodes. By modifying the grenade origin this way, it is being pulled out of the plane by that distance. Remarkably, this distance depends on the source damage of the explosion. For instance, an MP5 grenade creates an explosion with a source damage of :math:`D = 100`. It is therefore pulled out of the plane it collided with by 45.6 units at detonation.
+the *pull out distance*, as per the comments in the SDK in ``ggrenade.cpp``. This is so named because a grenade is typically in contact with some plane or ground when it explodes. By modifying the grenade origin this way, it is being pulled out of the plane by that distance. Remarkably, this distance depends on the source damage of the explosion. For instance, an MP5 grenade creates an explosion with a source damage of :math:`D = 100`. Its pull out distance is therefore 45.6 units at detonation.
 
 Having computed the new grenade position :math:`\mathbf{r}'`, the explosion origin for the actual explosion is set to be :math:`\mathbf{r}' + \mathbf{\hat{k}}` where :math:`\mathbf{\hat{k}} = \langle 0, 0, 1\rangle` is the :math:`z` axis unit vector (see [#explosion-origin]_ for an explanation). The rest of the physics is described in :ref:`explosion physics`.
 
@@ -160,10 +160,14 @@ Compared to a timed grenade or an ``env_explosion`` entity, the :math:`B` is loc
 
 .. _nuking:
 
-Nuking
-------
+Nuking and headshots
+--------------------
 
-Nuking refers to the trick of placing explosives in locations confined in a particular way so as to disable damage attenuation computed by :eq:`damage attenuation`. The result is that the original damage :math:`D` will inflict onto all entities found within the sphere of radius :math:`R`, as though the entities coincide with the explosion origin (effectively :math:`\ell = 0`). The usefulness of this trick is obvious. It is important to keep in mind that the explosion radius does not change when nuking. Entities outside the sphere will remain untouched by the explosion.
+There are two techniques that can increase the damage potential of explosions under certain conditions. One of them is commonly referred to in the community as *nuking*, while the other is a simple headshot. These two independent techniques have created some confusions among speedrunners, because "nuking" is misleading and players are generally unaware that an explosion can headshot.
+
+Recall in :ref:`explosion physics` that, in any explosion, the game searches for entities within some radius :math:`R` from the explosion origin to inflict damage. For each entity, the game performs a line trace towards the entity's body target. Similar to a normal gunshot, this line trace can strike any hitbox associated with the entity. If the line trace happens to hit the head, this constitutes a headshot. If the entity receives three times the damage for headshots, the attenuated damage given by :eq:`damage attenuation` will be tripled. In some sense, this phenomenon deserves to be named "nuking", justified by the dramatic increase in inflicted damage.
+
+In the community, *nuking* commonly refers to the trick of placing explosives in locations confined in a particular way so as to disable damage attenuation computed by :eq:`damage attenuation`. The result is that the original source damage :math:`D` will inflict onto all entities found within the sphere of radius :math:`R`, as though all the entities coincide with the explosion origin with effectively :math:`\ell = 0`. If we write :math:`D'(r)` the attenuated damage as a function of :math:`r`, then we have :math:`D'(r) = D`. The usefulness of this trick is obvious. It is important to keep in mind that the source damage :math:`D` and the explosion radius :math:`R` does not change when nuking. Entities outside the sphere will remain untouched by the explosion. It is also possible to headshot entities by nuking, which would deal a damage of :math:`3D` to the entities. Based on the physics of nuking, a more correct name for the technique may be *disattenuation*.
 
 .. figure:: images/explosion-nuking.png
    :scale: 50%
@@ -172,7 +176,7 @@ Nuking refers to the trick of placing explosives in locations confined in a part
    normal explosions and nuking. In both cases, the source damage and the radius
    of explosion are the same.
 
-Nuking is typically achieved by detonating an explosive so that the explosion origin :math:`\mathbf{r}'` is inside some solid entity, which makes startsolid true when tracing a line from the explosion origin to any damageable entity. For example, a MP5 grenade touching the ground with a damage of 100 will explode with the origin 46.6 units above the ground (calculated by :eq:`new position` and adding :math:`\mathbf{\hat{k}}`). If 46.6 units above the contact plane is inside some solid entity, then nuking will occur.
+Nuking is typically achieved by detonating an explosive so that the explosion origin :math:`\mathbf{r}'` given by :eq:`explosion new position` is inside some solid entity, which makes *startsolid* true when tracing a line from the explosion origin to any damageable entity. For example, an MP5 grenade touching the ground with a damage of 100 will explode with the origin :math:`\mathbf{r}'` 46.6 units above the ground. If this position is inside some solid entity, nuking will occur. Similarly, a handgrenade will cause nuking if the point 46.6 units above it is inside a solid entity.
 
 .. rubric:: Footnotes
 
