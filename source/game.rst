@@ -127,6 +127,6 @@ Walking through a frame
 
 This section attempts to outline some of the major events relevant to speedrunning that happen in a frame. Extreme detail on how each part of the game engine works is beyond the scope of this documentation. In fact, some believe that code is documentation! Until Valve releases the source code of Half-Life, one can study the Xash3D engine source or the disassembly of Half-Life.
 
-.. rubric:: Footnote
+.. rubric:: Footnotes
 
 .. [#shared-RNG-float] We omit any mention of the integer version of the shared RNG, ``UTIL_SharedRandomLong``, because no code is calling this function in the SDK. It also behaves very similarly to the floating point version with only minor differences.

@@ -6,6 +6,7 @@ Explosions
 This page details the physics of explosion and explosive weapons, along with some speedrunning tricks that arise of out these aspects of the game. Familiarity with the health and damage system is assumed (see :ref:`health and damage`).
 
 .. figure:: images/explosion-mortar.jpg
+   :name: mortar explosion
 
    A powerful explosion created by a mortar strike in We've Got Hostile that gibbed a human grunt in one hit and inflicted some damage to the player from a distance.
 
@@ -14,65 +15,49 @@ This page details the physics of explosion and explosive weapons, along with som
 General physics
 ---------------
 
-An explosion is a phenomenon in Half-Life that inflicts damage onto surrounding
-entities. An explosion need not be visible, though it is normally accompanied
-with a fiery visual effect. We may describe an explosion in terms of three
-fundamental properties. Namely, as illustrated in :numref:`explosion terms`, an
-explosion has an *origin*, a *source damage*, and a *radius*.
+An explosion, or radius damage, is a phenomenon in Half-Life that inflicts damage onto surrounding entities. In this section, we describe this phenomenon without associated with any entity such as grenades. On its own, an explosion is not visible. For instance, when a gauss beam reflects, an explosion is created at the point of reflection as described in :ref:`gauss`. This explosion is completely invisible in-game, and a casual player would not notice that an explosion has occurred. Nevertheless, the game usually creates a fiery cosmetic effect to accompany an explosion for better gameplay, an example of which may be seen in :numref:`mortar explosion`.
 
 .. figure:: images/explosion-parts.svg
    :name: explosion terms
 
    Illustration of the three main properties used to describe an explosion, namely the origin :math:`O` at the centre of the explosion, the source damage :math:`D` at the origin, and the radius :math:`R` of explosion. Here, it is assumed that nuking (see :ref:`nuking`) is *not* done, and so the damage falls off linearly with distance from origin.
 
-Suppose an explosion occurs. Let :math:`D` be its source damage and :math:`R` its radius, as shown in :numref:`explosion terms`. Suppose there is an entity adjacent to the explosion origin. From gaming experience, we know that the further away this entity is from the explosion origin, the lower the damage inflicted on this entity. In fact, the game only looks for entities within a sphere of radius :math:`R` from the explosion origin, ignoring all entities beyond. In the implementation, this is achieved by calling ``UTIL_FindEntityInSphere`` with the radius as one of the parameters.
+We may describe an explosion in terms of three fundamental properties. Namely, as illustrated in :numref:`explosion terms`, an explosion has an *origin* [#explosion-origin]_, a *source damage*, and a *radius*. Suppose an explosion occurs. Let :math:`D` be its source damage and :math:`R` its radius, as shown in :numref:`explosion terms`. Suppose there is an entity adjacent to the explosion origin. From gaming experience, we know that the further away this entity is from the explosion origin, the lower the damage inflicted on this entity. In fact, the game only looks for entities within a sphere of radius :math:`R` from the explosion origin, ignoring all entities beyond. In the implementation, this is achieved by calling ``UTIL_FindEntityInSphere`` with the radius as one of the parameters.
 
-Assume the entity in question is within :math:`R` units from the explosion origin. First, the game traces a line from the explosion origin to the entity's *body target*. Recall from :ref:`entities` that the body target of an entity is usually, but not always, coincident with the entity's origin. Then, the game computes the distance between this entity's body target and the explosion origin as :math:`\ell`. The damage inflicted onto this entity is thus computed to be
+For each entity within :math:`R` units from the explosion origin, the game traces a line from the explosion origin to the entity's *body target*. Recall from :ref:`entities` that the body target of an entity is usually, but not always, coincident with the entity's origin. Then, assuming the line trace is not *startsolid*, the game computes the distance between this entity's body target and the explosion origin as :math:`\ell`. The damage inflicted onto this entity is given by
 
 .. math:: D \left( 1 - \frac{\ell}{R} \right) \qquad (0 \le \ell \le R)
    :label: damage attenuation
 
-Observe that the damage inflicted attenuates linearly with distance, also illustrated in :numref:`explosion terms`, and not with the square of distance as is the case in the real world. This process is repeated with other entities found within the sphere.
+Observe that the damage inflicted attenuates linearly with distance, also illustrated in :numref:`explosion terms`, rather than the square of distance as is the case in the real world by the inverse square law.
 
-Interestingly, the computed distance :math:`\ell` may not equal to the actual distance between this entity and explosion origin. In particular, if the line trace is startsolid, then the game computes :math:`\ell = 0`. As a result, the damage inflicted on the entity is exactly the source damage of the explosion. Indeed, all entities within the sphere will receive the same damage.
+If the line trace is *startsolid*, however, the game sets :math:`\ell = 0`. As a result, the damage inflicted on the entity exactly equals the source damage of the explosion :math:`D` regardless of the actual distance of the entity from the explosion origin. The line trace being *startsolid* appears to be impossible in the game. Intuitively, we expect explosions to happen not inside a solid body, because grenades collide with solid entities and cannot enter them. Fortunately, this edge case is not hard to exploit in game, the act of which is named *nuking* as will be detailed in :ref:`nuking`. The key to understanding how such exploits might work is to observe that the explosion origin may not coincide with the origin of the entity when the entity detonates. The exact way the explosion origin is computed depends on the type of entity generating the explosion.
 
-The case where the line trace is startsolid is seemingly impossible to achieve. Fortunately, this edge case is not hard to exploit in game, the act of which is named *nuking* as will be detailed in :ref:`nuking`. The key to understanding how such exploits might work is to observe that the explosion origin may not coincide with the origin of the entity just before it detonates. The exact way the explosion origin is computed depends on the type of entity generating the explosion.
+Grenade explosions
+------------------
 
-.. _explosion origin:
+Grenades are the primary source of explosions in Half-Life, and they share similar physics. For example, the explosion radius :math:`R` of all grenades described in this section depends on the source damage :math:`D`, with
 
-Explosion origin
-----------------
+.. math:: R = \frac{5}{2} D
 
-Explosions are always associated with a *source entity*. This entity could be a grenade (of which there are three kinds) or an ``env_explosion``.
+This allows us to rewrite the attenuated damage in :eq:`damage attenuation` for grenades as
 
-Denote :math:`\mathbf{r}` the position of the associated entity. When an explosion occurs, the game will trace a line from :math:`A` to :math:`B`. The exact coordinates of these two points depend on the type of the associated source entity, but they are always, in one way or the other, offset from the source entity's origin. In general, we call :math:`\mathbf{c}` the end position from the line trace. If the trace fraction is not 1, the game will modify the position of the source entity. Otherwise, the position will not be changed, making :math:`\mathbf{r}' = \mathbf{r}`.
+.. math:: D - \frac{2}{5} \ell
 
-Assuming the trace fraction is not 1, the new position of the source entity is
-computed to be
+The explosion origin as a result of a grenade detonation is more complicated. When a grenade explodes, the explosion origin may be different from the origin of the grenade entity. Denote :math:`\mathbf{r}` the position of the grenade. When an explosion occurs, the game will trace a line from :math:`A` to :math:`B`. The exact coordinates of these two points depend on the type of the grenade which will be described in the later parts of this section, but they are always, in one way or the other, offset from the grenade's origin. In general, we call :math:`\mathbf{c}_{\mathit{AB}}` the end position from the line trace. If the trace fraction is not 1, the game will modify the position of the grenade. Otherwise, the position of the grenade will not change and :math:`\mathbf{r}' = \mathbf{r}`.
 
-.. math:: \mathbf{r}' := \mathbf{c} + \frac{3}{5} (D - 24) \mathbf{\hat{n}}
+Assuming the trace fraction is not 1, :math:`\mathbf{\hat{n}}` is the normal of the plane hit by the line trace, and :math:`D` is the source damage of the grenade, the new position of the grenade is computed to be
+
+.. math:: \mathbf{r}' = \mathbf{c}_{\mathit{AB}} + \frac{3}{5} \left( D - 24 \right) \mathbf{\hat{n}}
    :label: new position
 
-All numerical constants are hardcoded. Call the coefficient of
-:math:`\mathbf{\hat{n}}` the *pull out distance*, as per the comments in the
-implementation in ``ggrenade.cpp``. This is so named because if the source
-entity is a grenade, it is typically in contact with some plane or ground when
-it explodes. By modifying the origin this way, the source entity is being pulled
-out of the plane by that distance. Remarkably, this distance depends on the
-source damage of the explosion. For instance, MP5 grenades create explosions
-with a source damage of :math:`D = 100`, therefore MP5 grenades are pulled out
-of the plane by 45.6 units at detonation.
+All numerical constants are hardcoded. Call the coefficient of :math:`\mathbf{\hat{n}}`, or
 
-Subsequently, the source entity will begin to properly explode. The physics
-driving the rest of this event has been described in :ref:`explosion physics`.
-Most importantly, the explosion origin is set to be :math:`\mathbf{r}' +
-\mathbf{\hat{k}}` where :math:`\mathbf{\hat{k}} = \langle 0, 0, 1\rangle` is the
-:math:`z` axis unit vector. Observe how the :math:`\mathbf{\hat{k}}` is added to
-the entity's origin, the purpose of which is to pull non-contact grenades out of
-the ground slightly, as noted in the comments. In the implementation, the
-addition of this term is done in the function responsible for applying explosive
-damage, namely ``RadiusDamage``. Since all explosion code invoke this function,
-this term is always added to the origin for any explosion that happens.
+.. math:: \frac{3}{5} \left( D - 24 \right)
+
+the *pull out distance*, as per the comments in the SDK in ``ggrenade.cpp``. This is so named because a grenade is typically in contact with some plane or ground when it explodes. By modifying the grenade origin this way, it is being pulled out of the plane by that distance. Remarkably, this distance depends on the source damage of the explosion. For instance, an MP5 grenade creates an explosion with a source damage of :math:`D = 100`. It is therefore pulled out of the plane it collided with by 45.6 units at detonation.
+
+Having computed the new grenade position :math:`\mathbf{r}'`, the explosion origin for the actual explosion is set to be :math:`\mathbf{r}' + \mathbf{\hat{k}}` where :math:`\mathbf{\hat{k}} = \langle 0, 0, 1\rangle` is the :math:`z` axis unit vector (see [#explosion-origin]_ for an explanation). The rest of the physics is described in :ref:`explosion physics`.
 
 .. _contact grenades:
 
@@ -111,7 +96,7 @@ includes hand grenades, which explode three seconds after the pin is pulled.
 Denote :math:`\mathbf{r}` the origin of a timed grenade. At detonation, the
 grenade may or may not be lying on a plane. Since the grenade could well be
 resting on the ground with zero velocity, it does not make sense to use the
-velocity in computing the start and end points for the line trace. Instead,
+velocity in computing the start and end points for the line trace as is the case for contact grenades in :ref:`contact grenades`. Instead,
 Valve decided to use :math:`\mathbf{\hat{k}}` to offset those points from the
 grenade origin. So, we have
 
@@ -121,15 +106,12 @@ grenade origin. So, we have
 	B &:= \mathbf{r} - 32 \mathbf{\hat{k}}
 	\end{aligned}
 
-Now, :math:`A` is simply 8 units above the grenade and :math:`B` is 32 units below the grenade. This means that there is a greater chance that this line trace is startsolid and also that the trace fraction is 1. The former can occur if there is a solid entity above the grenade, while the latter can occur if the grenade is sufficiently high above the ground.
+Now, :math:`A` is simply 8 units above the grenade and :math:`B` is 32 units below the grenade. This means that there is a greater chance that this line trace is startsolid and also that the trace fraction is 1. The former can occur if there is a solid entity very close above the grenade, while the latter can occur if the grenade is sufficiently high above the ground.
 
 Explosions by ``env_explosion``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An ``env_explosion`` is an invisible entity that can explode, which may be
-created by monsters, explosive ``func_breakable`` creates, or map designers.
-
-Denote :math:`\mathbf{r}` the origin of the ``env_explosion``. Then
+An ``env_explosion`` is an invisible entity that can explode, which may be created by monsters, explosive ``func_breakable`` creates, or map designers. Although it does not subclass from the grenade class, its explosion physics is very similar. Denote :math:`\mathbf{r}` the origin of the ``env_explosion``. Then
 
 .. math::
    \begin{aligned}
@@ -137,8 +119,7 @@ Denote :math:`\mathbf{r}` the origin of the ``env_explosion``. Then
    B &:= \mathbf{r} - 32 \mathbf{\hat{k}}
    \end{aligned}
 
-Notice that the :math:`A` and :math:`B` for this entity type is similar to that
-of a timed grenade.
+Notice that the :math:`A` and :math:`B` for this entity type is similar to that of a timed grenade.
 
 .. _tripmine explosion:
 
@@ -172,7 +153,7 @@ A detonating grenade is an explosive that can only be detonated via some in-game
 .. math::
    \begin{aligned}
    A &:= \mathbf{r} + 8\mathbf{\hat{k}} \\
-   B &:= \mathbf{r} - 40\mathbf{\hat{k}}
+   B &:= \mathbf{r} - 32\mathbf{\hat{k}}
    \end{aligned}
 
 Compared to a timed grenade or an ``env_explosion`` entity, the :math:`B` is located deeper beneath the entity.
@@ -192,3 +173,14 @@ Nuking refers to the trick of placing explosives in locations confined in a part
    of explosion are the same.
 
 Nuking is typically achieved by detonating an explosive so that the explosion origin :math:`\mathbf{r}'` is inside some solid entity, which makes startsolid true when tracing a line from the explosion origin to any damageable entity. For example, a MP5 grenade touching the ground with a damage of 100 will explode with the origin 46.6 units above the ground (calculated by :eq:`new position` and adding :math:`\mathbf{\hat{k}}`). If 46.6 units above the contact plane is inside some solid entity, then nuking will occur.
+
+.. rubric:: Footnotes
+
+.. [#explosion-origin] To be precise, we define the explosion origin to be the point where the line trace to search for entities nearby starts from, corresponding to the ``UTIL_FindEntityInSphere`` function in the SDK. A careful reader may notice that this position is not the same as the ``vecSrc`` passed into the ``RadiusDamage`` function, as the game adds :math:`\langle 0,0,1\rangle` to ``vecSrc`` before performing the search:
+
+   .. code-block:: cpp
+      :caption: ``RadiusDamage`` in ``combat.cpp``
+
+      vecSrc.z += 1;// in case grenade is lying on the ground
+
+   Despite the comment referring to "grenade", this is done for all explosions regardless of the associated entity, if any.
