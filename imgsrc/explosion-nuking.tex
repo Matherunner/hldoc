@@ -1,0 +1,29 @@
+\documentclass{templates/hlprtikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \coordinate (O) at (0,0);
+  \coordinate (Dstart) at (0,70);
+  \coordinate (Xend) at (300,0);
+  \coordinate (Yend) at ($3.5*(Dstart)$);
+  \coordinate (Dend) at ($(O)!0.85!(Xend)$);
+  \coordinate (DstartHS) at ($3*(Dstart)$);
+
+  \draw[densely dotted,gray20] (Dend) -- (DstartHS -| Dend);
+
+  \foreach \y/\ytext in {1/$D$,2/$2D$,3/$3D$} {
+    \path ($\y*(Dstart)$) node[left]{\ytext};
+  }
+
+  \draw[semithick,<->] (Yend) node[above]{Damage} -- (O) node[below left]{$0$} -- (Xend) node[right]{$r$};
+  \draw[darkBlue50] (Dstart) -- node[sloped,very near start,anchor=north west]{normal} (Dend);
+  \draw[darkRed50] (Dstart) -- node[very near start,anchor=south west]{nuking} (Dstart -| Dend);
+
+  \draw[darkBlue50] (DstartHS) -- node[sloped,very near start,anchor=south west]{normal headshot} (Dend);
+  \draw[darkRed50] (DstartHS) -- node[very near start,anchor=south west]{nuking headshot} (DstartHS -| Dend);
+
+  \path[fill=black] (Dend) node[below]{$R$};
+\end{tikzpicture}
+
+\end{document}

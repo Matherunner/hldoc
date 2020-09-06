@@ -169,12 +169,9 @@ Recall in :ref:`explosion physics` that, in any explosion, the game searches for
 
 In the community, *nuking* commonly refers to the trick of placing explosives in locations confined in a particular way so as to disable damage attenuation computed by :eq:`damage attenuation`. The result is that the original source damage :math:`D` will inflict onto all entities found within the sphere of radius :math:`R`, as though all the entities coincide with the explosion origin with effectively :math:`\ell = 0`. If we write :math:`D'(r)` the attenuated damage as a function of :math:`r`, then we have :math:`D'(r) = D`. The usefulness of this trick is obvious. It is important to keep in mind that the source damage :math:`D` and the explosion radius :math:`R` does not change when nuking. Entities outside the sphere will remain untouched by the explosion. It is also possible to headshot entities by nuking, which would deal a damage of :math:`3D` to the entities. Based on the physics of nuking, a more correct name for the technique may be *disattenuation*.
 
-.. figure:: images/explosion-nuking.png
-   :scale: 50%
+.. figure:: images/explosion-nuking.svg
 
-   Comparison of how damage varies with distance from the explosion origin for
-   normal explosions and nuking. In both cases, the source damage and the radius
-   of explosion are the same.
+   Comparison of how damage varies with distance from the explosion origin for normal explosions, nuking, and their headshots if applicable for the target entity.
 
 Nuking is typically achieved by detonating an explosive so that the explosion origin :math:`\mathbf{r}'` given by :eq:`explosion new position` is inside some solid entity, which makes *startsolid* true when tracing a line from the explosion origin to any damageable entity. For example, an MP5 grenade touching the ground with a damage of 100 will explode with the origin :math:`\mathbf{r}'` 46.6 units above the ground. If this position is inside some solid entity, nuking will occur. Similarly, a handgrenade will cause nuking if the point 46.6 units above it is inside a solid entity.
 
