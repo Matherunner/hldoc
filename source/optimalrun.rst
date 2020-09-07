@@ -1,0 +1,49 @@
+Optimal speedruns
+=================
+
+In this chapter, we will attempt to describe results from mathematical experiments of various common optimisation problems in some popular Half-Life settings. We will describe the optimal straight line paths, optimal path to make sharp turns, optimal turning in water, optimal damage boosting, and other movement controls common encountered in the field. Unlike other chapters in this documentation, most of the problems attacked in this chapter are analytically intractable and difficult to generalise. Readers should therefore exercise caution in applying the results in this chapter in the field, especially when the game settings or assumptions, either explicitly or implicitly stated, differ.
+
+.. TODO: Maybe move surfing here?
+
+Philosophy
+----------
+
+A speedrun is a minimisation problem, with time :math:`t(\mathbf{x})` as the objective or fitness function and a vector of controller inputs :math:`\mathbf{x}` as the variables to optimise over, subject to constraints imposed by the map or game physics :math:`g(\mathbf{x}) \le 0` and :math:`h(\mathbf{x}) = 0`. In theory, this is a problem that can be solved directly, given sufficient computational resources. In fact, for any video game, there must exist a vector of inputs :math:`\mathbf{x}_O`, which may be called "God's moves", that is globally optimal in the sense that for all other possible inputs :math:`\mathbf{x}` we have :math:`t(\mathbf{x}_O) \le t(\mathbf{x})`. While the existence of this sequence of inputs is certain, for most games, it is computationally infeasible to find and beyond the reach of mortals. This is because a direct evaluation of the unsimplified :math:`t(\mathbf{x})` requires running the game from start to end, which is very expensive. In addition, :math:`\mathbf{x}` has a very high dimensionality. To illustrate, a TAS of Half-Life would be strafing almost all the time. If the game is run at 1000 fps, and the TAS is 20 min, then we have at the very least :math:`\dim(\mathbf{x}) \ge 1000 \cdot 20 \cdot 60 = 1,200,000`. This is not including inputs from console commands. Even with attempts to reduce the number of dimensions, coupled with expensive objective function evaluation and highly complex and non-linear constraints, we are forced to be pessimistic towards a direct computation. Many things in life that are certain to exist are impossible to attain.
+
+Speedrunners understandably turn to approximate solutions. Each livestream on Twitch, demo recording, and YouTube premiere of speedruns, is an approximate solution to the time-minimisation problem, sometimes accompanied by a recording of the speedrunner attempting to solve the optimisation problem. Indeed, we can view a speedrunner as a computational device with a very good heuristic global optimisation algorithm executing in the brain. A decent speedrunner can generate a solution to approximate the global minimum of a game relatively quickly, after playing the game no more than a couple hundred or thousand times, which are just function evaluations of :math:`t(\mathbf{x})`. The computational efficiency of a speedrunner is excellent, given the extremely high dimensional and highly non-linear problem he/she is asked to solve.
+
+Numerical methods
+-----------------
+
+strafelib
+~~~~~~~~~
+
+Global optimisation
+~~~~~~~~~~~~~~~~~~~
+
+Capped bunnyhopping
+-------------------
+
+Strafing in a straight line
+---------------------------
+
+Yaw strafing
+~~~~~~~~~~~~
+
+Sharp turns without collision
+-----------------------------
+
+- Air and ground, when speed is low vs high
+- water
+
+Sharp turns with collision
+--------------------------
+
+Surfing
+-------
+
+Health distribution for damage boosting
+---------------------------------------
+
+Edgefriction minimisation
+-------------------------

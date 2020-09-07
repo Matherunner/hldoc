@@ -139,6 +139,7 @@ Contents
    monsters
    triggers
    funcs
+   optimalrun
    casestudies
    practical
    othergames
