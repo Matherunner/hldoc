@@ -131,15 +131,14 @@ Contents
    strafing
    gravitymotion
    surfing
+   ladder
+   automation
    damage
    explosions
-   ladder
    weapons
    monsters
    triggers
    funcs
-   snippets
-   automation
    casestudies
    practical
    othergames
