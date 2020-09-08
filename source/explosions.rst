@@ -24,7 +24,7 @@ An explosion, or radius damage, is a phenomenon in Half-Life that inflicts damag
 
 We may describe an explosion in terms of three fundamental properties. Namely, as illustrated in :numref:`explosion terms`, an explosion has an *origin* [#explosion-origin]_, a *source damage*, and a *radius*. Suppose an explosion occurs. Let :math:`D` be its source damage and :math:`R` its radius, as shown in :numref:`explosion terms`. Suppose there is an entity adjacent to the explosion origin. From gaming experience, we know that the further away this entity is from the explosion origin, the lower the damage inflicted on this entity. In fact, the game only looks for entities within a sphere of radius :math:`R` from the explosion origin, ignoring all entities beyond. In the implementation, this is achieved by calling ``UTIL_FindEntityInSphere`` with the radius as one of the parameters.
 
-For each entity within :math:`R` units from the explosion origin, the game traces a line from the explosion origin to the entity's *body target*. Recall from :ref:`entities` that the body target of an entity is usually, but not always, coincident with the entity's origin. Then, assuming the line trace is not *startsolid*, the game computes the distance between this entity's body target and the explosion origin as :math:`\ell`. The damage inflicted onto this entity is given by
+For each entity within :math:`R` units from the explosion origin, the game traces a line from the explosion origin to the entity's *body target*, which is explained in :ref:`body target`. Assuming the line trace is not *startsolid*, the game computes the distance between this entity's body target and the explosion origin as :math:`\ell`. The damage inflicted onto this entity is given by
 
 .. math:: D \left( 1 - \frac{\ell}{R} \right) \qquad (0 \le \ell \le R)
    :label: damage attenuation
@@ -32,6 +32,29 @@ For each entity within :math:`R` units from the explosion origin, the game trace
 Observe that the damage inflicted attenuates linearly with distance, also illustrated in :numref:`explosion terms`, rather than the square of distance as is the case in the real world by the inverse square law.
 
 If the line trace is *startsolid*, however, the game sets :math:`\ell = 0`. As a result, the damage inflicted on the entity exactly equals the source damage of the explosion :math:`D` regardless of the actual distance of the entity from the explosion origin. The line trace being *startsolid* appears to be impossible in the game. Intuitively, we expect explosions to happen not inside a solid body, because grenades collide with solid entities and cannot enter them. Fortunately, this edge case is not hard to exploit in game, the act of which is named *nuking* as will be detailed in :ref:`nuking`. The key to understanding how such exploits might work is to observe that the explosion origin may not coincide with the origin of the entity when the entity detonates. The exact way the explosion origin is computed depends on the type of entity generating the explosion.
+
+.. _body target:
+
+Body target of entities
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Every entity in Half-Life has a *body target*, which is a coordinate vector in the global coordinate system. In the SDK, this is implemented as a virtual function in the ``CBaseEntity`` base class. For most entities in Half-Life, the body target is just the centre of the entity's bounding box :math:`\mathbf{c}`. The most common of such entities is ``func_breakable`` (:ref:`func_breakable`). However, most monster entities have a different body target of
+
+.. math:: \frac{3}{4} \mathbf{c} + \frac{1}{4} \mathbf{e}
+
+.. TODO: need to figure out what this eye position is, and how the maths really worked
+
+where :math:`\mathbf{e}` is the *eye position*. There are exceptions, a notable one being the headcrab (:ref:`headcrab`), which has a body target of
+
+.. math:: \mathbf{r}_H + \langle 0,0,6\rangle
+
+where :math:`\mathbf{r}_H` is the headcrab's origin.
+
+The most interesting body target is that of the player entity, given by
+
+.. math:: \mathbf{c} + \mathfrak{U}_{\mathit{NS}}(S, 0.5, 1.1) \mathbf{w}
+
+where :math:`\mathbf{w}` is the player's *view offset*, and :math:`\mathfrak{U}_{\mathit{NS}}(S,l,h)` is the non-shared RNG described in :ref:`nonshared rng`. Due to the randomness of the player's body target, the damage and boost direction received by the player when hit by an explosion is random.
 
 Grenade explosions
 ------------------

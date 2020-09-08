@@ -444,6 +444,7 @@ where :math:`\mathbf{\hat{f}}` is the last ``gpGlobals->v_forward``, and :math:`
 ..
    Assuming :math:`g = 800` and the player views vertically downward so that :math:`\mathbf{\hat{f}} = \langle 0,0,-1\rangle`, we can make the houndeye jump with an upward speed of 440 ups. This is a relatively high jumping speed, almost twice of that of the player (see :ref:`jumping`).
 
+.. _headcrab:
 
 Headcrab
 --------
