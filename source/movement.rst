@@ -251,7 +251,7 @@ Waterlevel
 The player has a *waterlevel* ranging from 0 to 3, inclusive. Higher levels indicate being more "immersed" in water. The setting of waterlevel is done by ``PM_CheckWater``, which is called from various points in the player movement code, a notable one being ``PM_CatagorizePosition``. As a high level description,
 
 waterlevel is 1
-   When 1 unit above the player's feet, or equivalently, :math:`\mathbf{r} - \left( H_z - 1 \right) \langle 0,0,1\rangle`, is under water, where :math:`H_z` is half the height of the player hull
+   When 1 unit above the player's feet, or equivalently, :math:`\mathbf{r} - \left( H_z + 1 \right) \langle 0,0,1\rangle`, is under water, where :math:`H_z` is half the height of the player hull
 
 waterlevel is 2
    When the centre of the player hull, equivalent to the position :math:`\mathbf{r}`, is under water
@@ -324,7 +324,7 @@ where :math:`\mathbf{\hat{\bar{f}}}` is simply the normalised :math:`\mathbf{\ba
    D &= C + 24 \mathbf{\hat{\bar{f}}}
    \end{aligned}
 
-The game then performs a trace from :math:`C` to :math:`D`. If there is no obstruction, waterjumping will be initiated by setting :math:`v_z = 225` and various other flags and properties.
+where :math:`H_z` is half the player hull height. The game then performs a trace from :math:`C` to :math:`D`. If there is no obstruction, waterjumping will be initiated by setting :math:`v_z = 225` and various other flags and properties.
 
 .. TODO: talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
 
