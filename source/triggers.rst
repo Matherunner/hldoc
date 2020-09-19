@@ -100,6 +100,20 @@ where :math:`\mathbf{b}` is the current basevelocity of the entity. If ``FL_BASE
 
 Subsequently, the ``FL_BASEVELOCITY`` flag will be set for the entity, which is important for the player entity.
 
+Boosting by rapid touching
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There exists a function in the closed source engine code, ``SV_CheckMovingGround``, which is called unconditionally before all of player physics. At a high level, this function modifies the player velocity and/or basevelocity depending on various conditions. One such condition is when the player stands on a conveyor belt, which is described in :ref:`func_conveyor`. Another condition is when the ``FL_BASEVELOCITY`` flag is *not* set in the player entity. In this case, the player velocity and basevelocity will be modified to be
+
+.. math::
+   \begin{aligned}
+   \mathbf{v} &\gets \mathbf{v} + \left( 1 + \frac{1}{2} \tau_p \right) \mathbf{b} \\
+   \mathbf{b} &\gets \mathbf{0}
+   \end{aligned}
+   :label: player basevelocity exit
+
+Equation :eq:`player basevelocity exit` may be referred to as the *basevelocity exit equation*. One frame after the player exits a push field (or any entity that imparts a basevelocity), the ``FL_BASEVELOCITY`` flag will no longer be set by the ``trigger_push``. Since this flag is always reset every frame, :eq:`player basevelocity exit` will be invoked in the beginning of the next frame. If the player is able to repeatedly enter and leave a push trigger, the basevelocity will be added to the player velocity rapidly, resulting in a massive acceleration. This has been used to great effect in many Half-Life speedruns, typically achieved by ducking and unducking rapidly above a ``trigger_push``, which changes the player hull repeatedly (see :ref:`ducking`). If the ducking and unducking sequence is done at an extremely high frame rate, the resulting acceleration is one of the highest possible in the game.
+
 trigger_hurt
 ------------
 

@@ -175,6 +175,8 @@ solid entities when touching it. Indeed, recall from :ref:`collision` that the
 bounce coefficient :math:`b` is affected by the player friction modifier.
 Sometimes, the increased bounce may be an unintended side effect.
 
+.. _func_conveyor:
+
 func_conveyor
 -------------
 
@@ -193,3 +195,5 @@ If ``FL_BASEVELOCITY`` is not set for the player, however, the new basevelocity 
 .. math:: \mathbf{b} \gets \mathbf{b}_c
 
 In either of these cases, the ``FL_BASEVELOCITY`` flag will be set for the player.
+
+Similar to the push trigger, whenever the player leaves a conveyor belt, the player velocity and basevelocity will be modified by :eq:`player basevelocity exit`. This can result in some additional acceleration at least, and potentially massive acceleration. One way to achieve this is to ducktap repeatedly off a conveyor belt. If there is very small clearance above the player, the player could also rapidly jump off the conveyor belt to leave and touch the conveyor belt repeatedly.
