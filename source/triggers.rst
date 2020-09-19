@@ -82,6 +82,24 @@ trigger_changelevel
 trigger_push
 ------------
 
+A push trigger or a push field is associated with a basevelocity :math:`\mathbf{b}_p` set by the map designer. It imparts :math:`\mathbf{b}_p` onto the velocity of each of the entities that touches it, provided the entities in question satisfy certain conditions written in ``CTriggerPush::Touch`` in the Half-Life SDK. The push trigger also sets the ``FL_BASEVELOCITY`` flag in the entities it touches.
+
+If the touching entities satisfy the necessary conditions, the behaviour differs slightly depending on the spawn flags of the trigger. Let :math:`\mathbf{v}` be the velocity of a touching entity. If ``SF_TRIG_PUSH_ONCE`` is set, then we have
+
+.. math:: \mathbf{v} \gets \mathbf{v} + \mathbf{b}_p
+
+Then, the push trigger will remove itself.
+
+On the other hand, if ``SF_TRIG_PUSH_ONCE`` is not set, then if ``FL_BASEVELOCITY`` is set in the flags of the entity, the new velocity is given by
+
+.. math:: \mathbf{b} \gets \mathbf{b} + \mathbf{b}_p
+
+where :math:`\mathbf{b}` is the current basevelocity of the entity. If ``FL_BASEVELOCITY`` is not set for the entity, then we instead have
+
+.. math:: \mathbf{b} \gets \mathbf{b}_p
+
+Subsequently, the ``FL_BASEVELOCITY`` flag will be set for the entity, which is important for the player entity.
+
 trigger_hurt
 ------------
 
