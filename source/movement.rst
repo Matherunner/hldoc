@@ -241,6 +241,8 @@ inputs, :math:`\gamma_2` will become negative. This always sets :math:`\mu = 0`,
 resulting in zero acceleration. In the absence of acceleration, the friction
 will reduce the speed rapidly.
 
+It is worth noting that there is no restriction in the magnitude of player velocity while the waterlevel is 2 or above. This is because ``PM_CheckVelocity`` is never called at any point in the code path associated with water physics. Although it is rare for the player to achieve great speeds under water, it is possible with means such as rapid ducking over push trigger, as described in :ref:`trigger_push`.
+
 .. _waterjump:
 
 Waterjump
