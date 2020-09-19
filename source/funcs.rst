@@ -174,3 +174,22 @@ modifier. The second less obvious purpose is to make the player bounce off other
 solid entities when touching it. Indeed, recall from :ref:`collision` that the
 bounce coefficient :math:`b` is affected by the player friction modifier.
 Sometimes, the increased bounce may be an unintended side effect.
+
+func_conveyor
+-------------
+
+The conveyor entity is a common sight in the Residue Processing chapter. Behaviourally it is reminiscent of the push trigger (see :ref:`trigger_push`), in that it imparts some base velocity to entities that intersect with it and meet certain necessary conditions. The conveyor entity is the only entity that has the ``FL_CONVEYOR`` flag set. When the player stands on another entity with that flag set, ``SV_CheckMovingGround`` in the engine will modify the player's basevelocity.
+
+.. figure:: images/conveyor-residue-processing.jpg
+
+   A famous scene of the conveyor belts in the Residue Processing chapter.
+
+Let :math:`\mathbf{b}` the player's basevelocity and :math:`\mathbf{b}_c` the "velocity" of the conveyor. If the player already has ``FL_BASEVELOCITY`` set, the new player basevelocity is given by
+
+.. math:: \mathbf{b} \gets \mathbf{b} + \mathbf{b}_c
+
+If ``FL_BASEVELOCITY`` is not set for the player, however, the new basevelocity will be
+
+.. math:: \mathbf{b} \gets \mathbf{b}_c
+
+In either of these cases, the ``FL_BASEVELOCITY`` flag will be set for the player.
