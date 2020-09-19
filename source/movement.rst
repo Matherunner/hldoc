@@ -261,6 +261,8 @@ waterlevel is 3
 
 Note that the conditions for a particular level must also encompass the conditions for earlier levels. For example, the waterlevel will not be 2 if the conditions for waterlevel to be 1 is not met. If none of these conditions are satisfied, the waterlevel is 0.
 
+.. _sharking:
+
 Sharking
 ~~~~~~~~
 
@@ -298,7 +300,31 @@ this is sometimes called "sharking" in speedrunning.
 Waterjump
 ~~~~~~~~~
 
-Waterjumping refers to the phenomenon where the player vertical velocity is set to positive 255 without any movement inputs or actually issuing ``+jump`` when being near a wall.
+Waterjumping refers to the phenomenon where the player vertical velocity is set to positive 255 without any movement inputs or actually issuing ``+jump`` when being near a wall. This phenomenon is not to be confused with sharking (:ref:`sharking`) or the literal "jumping out of the water" or basevelocity related techniques (:ref:`trigger_push`). The function responsible of initiating waterjumping is ``PM_CheckWaterJump`` in the SDK. As a high level description, set
+
+.. math::
+   \begin{aligned}
+   \mathbf{\bar{v}} &= \mathbf{v} \operatorname{diag}(1,1,0) \\
+   \mathbf{\bar{f}} &= \mathbf{\hat{f}} \operatorname{diag}(1,1,0)
+   \end{aligned}
+
+where :math:`\mathbf{\hat{f}}` is the player's unit forward vector, and :math:`\operatorname{diag}(1,1,0)` is a diagonal matrix with :math:`1,1,0` as the diagonal entries. Define further
+
+.. math::
+   \begin{aligned}
+   A &= \mathbf{r} + \langle 0,0,8\rangle \\
+   B &= A + 24 \mathbf{\hat{\bar{f}}}
+   \end{aligned}
+
+where :math:`\mathbf{\hat{\bar{f}}}` is simply the normalised :math:`\mathbf{\bar{f}}`. The game then performs a player trace using the point hull from :math:`A` to :math:`B`. If this collides with a wall, defined as a plane with normal :math:`n_z < 0.1` or equivalently, one which is slanted by roughly :math:`57^\circ`, then define
+
+.. math::
+   \begin{aligned}
+   C &= \mathbf{r} + \langle 0,0,H_z\rangle \\
+   D &= C + 24 \mathbf{\hat{\bar{f}}}
+   \end{aligned}
+
+The game then performs a trace from :math:`C` to :math:`D`. If there is no obstruction, waterjumping will be initiated by setting :math:`v_z = 225` and various other flags and properties.
 
 .. TODO: talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
 
