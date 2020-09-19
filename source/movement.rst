@@ -23,7 +23,7 @@ where :math:`g_e` is may be called the *entity gravity*, which is a modifier tha
 
 Recall that the Half-Life universe runs at quantised time, that is assuming constant frame rate we may write :math:`t = n\tau`. Or, :math:`t = \tau` after one frame. In Half-Life physics, the new position is not updated directly using the position equation above, but rather, it is obtained by integrating the velocity, namely :math:`\mathbf{r}' = \mathbf{r} + \tau \mathbf{v}'`. This position update step is done in the ``PM_FlyMove`` function in ``pm_shared.c``.
 
-Looking closely at the code of ``PM_PlayerMove``, we see that the game applies *half gravity* to the player *before* position update by ``PM_AddCorrectGravity``, and another half gravity *after* by ``PM_FixupGravityVelocity``. To see why, ignoring :ref:`basevelocity`, we write the vertical velocity after the first half of gravity as
+Looking closely at the code of ``PM_PlayerMove``, we see that the game applies *half gravity* to the player *before* position update by ``PM_AddCorrectGravity``, and another half gravity *after* by ``PM_FixupGravityVelocity``. To see why, ignoring basevelocity, we write the vertical velocity after the first half of gravity as
 
 .. math:: \tilde{v}_z' = v_z - \frac{1}{2} g\tau
 
@@ -46,23 +46,6 @@ On the other hand, the straightforward way of integrating gravity is to calculat
 In other words, the new vertical position :math:`r_z'` is incorrect, because the term in red is incorrect compared to :eq:`gravity kinematics`. Essentially, this approach is equivalent to the `Euler's method`_ of integrating a differential equation. Not only would the errors accumulate over time, but also that the jump height will be dependent on the frame rate.
 
 .. _Euler's method: https://en.wikipedia.org/wiki/Euler_method
-
-.. _basevelocity:
-
-Basevelocity
-------------
-
-The basevelocity :math:`\mathbf{b}` is an extra velocity added to the player velocity for certain physics computations. For air and ground movement, the basevelocity is added only during the position update step of :math:`\mathbf{r}' = \mathbf{r} + \mathbf{v}'\tau`. That is, the correct position update equation is actually
-
-.. math:: \mathbf{r}' = \mathbf{r} + \left( \mathbf{v}' + \mathbf{b} \right) \tau
-
-This extra velocity is usually provided by a push trigger (see :ref:`trigger_push`) or a conveyor belt. For water movement, however, the basevelocity is added during both the acceleration step *and* position update step.
-
-TODO
-
-TODO
-
-TODO
 
 .. _player friction:
 
@@ -145,12 +128,7 @@ The physics governing the player's air and ground movements are of primary impor
 
 .. note:: All vectors in this section are two dimensional on the :math:`xy` plane unless stated otherwise.
 
-The air or ground accelerations are computed before position update. Assuming :math:`\mathbf{v}'` is the velocity after air or ground acceleration, and :math:`\mathbf{r}` the player position. Ignoring collisions (see :ref:`collision`), the new position is given by
-
-.. math:: \mathbf{r}' = \mathbf{r} + \tau_p \mathbf{v}'
-   :label: player r update
-
-Here, the new velocity :math:`\mathbf{v}'` is given by the *fundamental movement equation* (FME). Let :math:`\mathbf{v}` the initial player velocity in *two dimensions*, namely the velocity immediately before friction and acceleration are applied. Then the FME is simply
+The air or ground accelerations are computed before position update (see :ref:`player position update`). Let :math:`\mathbf{v}` the initial player velocity in *two dimensions*, namely the velocity immediately before friction and acceleration are applied. Then the FME is simply
 
 .. math:: \mathbf{v}' = \lambda(\mathbf{v}) + \mu\mathbf{\hat{a}}
 
@@ -191,6 +169,14 @@ Now observe that if :math:`\lVert\lambda(\mathbf{v})\rVert < L`, then this condi
 .. math:: \lvert\theta\rvert \le \arccos \frac{L}{\lVert\lambda(\mathbf{v})\rVert}
 
 This is just one of the consequences of the FME. Exploitations of this equation will be detailed in :ref:`strafing`.
+
+Having computed the new velocity :math:`\mathbf{v}'`, the basevelocity :math:`\mathbf{b}` will be added to the player velocity as
+
+.. math:: \mathbf{v}' \gets \mathbf{v} + \mathbf{b}
+
+Then, a position update will be performed as described in :ref:`player position update`. Once the position is updated, the basevelocity will be "removed" from the velocity by
+
+.. math:: \mathbf{v}' \gets \mathbf{v} - \mathbf{b}
 
 Water movements
 ---------------

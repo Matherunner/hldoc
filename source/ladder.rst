@@ -26,8 +26,7 @@ near the beginning of ``PM_PlayerMove``. If the player is on a ladder, the
 ``PM_LadderMove`` function will be called soon after, which handles the physics
 of moving on a ladder and set the ``movetype`` to ``MOVETYPE_FLY``. This means
 that the gravity, friction, and other player movement physics described in
-:ref:`player movement` are completely skipped. Nevertheless, the basevelocity
-(see :ref:`basevelocity`) and collision (see :ref:`collision`) still apply and
+:ref:`player movement` are completely skipped. Nevertheless, the basevelocity and collision (see :ref:`collision`) still apply and
 ``PM_FlyMove`` is called to update the player position. The fact that no gravity
 is exerted under ``MOVETYPE_FLY`` is significant, as will be explained in
 :ref:`ladder exit`.
