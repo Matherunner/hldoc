@@ -96,7 +96,7 @@ The slowdown factor is then defined as
 .. math:: \eta = \frac{\tau_p}{\tau_g} = \frac{\left\lfloor 1000\tau_g \right\rfloor}{1000\tau_g} = \frac{f_g}{1000} \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{f_g}{f_p}
   :label: slowdown factor
 
-When the slowdown factor is less than one, the actual movement speed of the player will be lower. The player's position update in :eq:`player r update` uses :math:`\tau_p` but runs at the rate of :math:`\tau_g^{-1}` Hz. Indeed, the real velocity of the player is directly proportional to :math:`\eta`:
+When the slowdown factor is less than one, the actual movement speed of the player will be lower. The player's position update described in :ref:`player position update` uses :math:`\tau_p` but runs at the rate of :math:`\tau_g^{-1}` Hz. Indeed, the real velocity of the player is directly proportional to :math:`\eta`:
 
 .. math:: \frac{\mathbf{r}' - \mathbf{r}}{\tau_g} = \frac{\mathbf{r} + \tau_p \mathbf{v}' - \mathbf{r}}{\tau_g} = \frac{\tau_p}{\tau_g} \mathbf{v}' = \eta \mathbf{v}'
 
