@@ -12,7 +12,7 @@ In this chapter, we will focus on the fundamental governing equations for the ai
 Gravity
 -------
 
-Like other entities in the Half-Life universe, the player experiences gravity. Whenever the player is in the air, a constant downward acceleration will be applied. The gravity in the Half-Life universe works in a similar way to the Newtonian gravity in the real world. Namely, a free falling object experiences a *constant* acceleration of :math:`g`, with value specified by
+Like other entities in the Half-Life universe, the player experiences gravity. Whenever the player is in the air, the waterlevel is less than 2, and not waterjumping (see :ref:`waterjump`), a constant downward acceleration will be applied. The gravity in the Half-Life universe works in a similar way to the Newtonian gravity in the real world. Namely, a free falling object experiences a *constant* acceleration of :math:`g`, with value specified by
 
 .. math:: \mathtt{sv\_gravity} \times g_e
 
@@ -21,9 +21,21 @@ where :math:`g_e` is may be called the *entity gravity*, which is a modifier tha
 .. math:: v_t = v_0 - gt, \quad s_t = s_0 + v_0 t - \frac{1}{2} g t^2
    :label: gravity kinematics
 
-Recall that the Half-Life universe runs at quantised time, that is assuming constant frame rate we may write :math:`t = n\tau`. Or, :math:`t = \tau` after one frame. In Half-Life physics, the new position is not updated directly using the position equation above, but rather, it is obtained by integrating the velocity, namely :math:`\mathbf{r}' = \mathbf{r} + \tau \mathbf{v}'`. This position update step is done in the ``PM_FlyMove`` function in ``pm_shared.c``.
+Recall that the Half-Life universe runs at quantised time, that is assuming constant frame rate we may write :math:`t = n\tau`. Or, :math:`t = \tau` after one frame. In Half-Life physics, the new position is not updated directly using the position equation above, but rather, it is obtained by a position update step described in :ref:`player position update`.
 
-Looking closely at the code of ``PM_PlayerMove``, we see that the game applies *half gravity* to the player *before* position update by ``PM_AddCorrectGravity``, and another half gravity *after* by ``PM_FixupGravityVelocity``. To see why, ignoring basevelocity, we write the vertical velocity after the first half of gravity as
+Looking closely at the code of ``PM_PlayerMove``, we see that the game applies *half gravity* to the player *before* acceleration and position update by using ``PM_AddCorrectGravity``, which modifies the vertical velocity and the vertical basevelocity by
+
+.. math::
+   \begin{aligned}
+   v_z &\gets v_z - \frac{1}{2} g\tau_p + b_z\tau_p \\
+   b_z &\gets 0
+   \end{aligned}
+
+where :math:`b_z` is the vertical :math:`z` component of the basevelocity :math:`\mathbf{b}`. After position update, the the second half of gravity will be added using ``PM_FixupGravityVelocity``, altering the vertical velocity by
+
+.. math:: v_z \gets v_z - \frac{1}{2} g\tau_p
+
+To see the game splits the gravity computation into halves like so, ignoring basevelocity, we write the vertical velocity after the first half of gravity as
 
 .. math:: \tilde{v}_z' = v_z - \frac{1}{2} g\tau
 
@@ -228,6 +240,8 @@ when the speed is sufficiently high, then regardless of view angles or other
 inputs, :math:`\gamma_2` will become negative. This always sets :math:`\mu = 0`,
 resulting in zero acceleration. In the absence of acceleration, the friction
 will reduce the speed rapidly.
+
+.. _waterjump:
 
 Waterjump
 ~~~~~~~~~
