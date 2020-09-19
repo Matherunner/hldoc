@@ -195,14 +195,15 @@ This is just one of the consequences of the FME. Exploitations of this equation 
 Water movements
 ---------------
 
-Water movement in Half-Life cannot be exploited to move faster than intended.
-Nevertheless, we will describe the physics here for completeness. Here, we
-assumes all vectors to be three dimensional.
-
 .. TODO: talk about waterlevel
 
-Assuming a waterlevel of 2 or above. In player water physics, the acceleration
-vector is such that
+Water movement has less exploitation potential than air and ground movement. Nonetheless, due to its ability to slow the player down, we should strive to understand its physics. Here, all vectors are three dimensional and the waterlevel must be 2 or above to run water physics.
+
+Let :math:`\mathbf{v}` be the player velocity and :math:`\mathbf{b}` the basevelocity. Then the game first modifies the velocity as such:
+
+.. math:: \mathbf{v} \gets \mathbf{v} + \mathbf{b}
+
+Subsequently, the acceleration vector is computed as
 
 .. math:: \mathbf{a} =
           \begin{cases}
@@ -210,17 +211,15 @@ vector is such that
           \langle 0, 0, -60 \rangle & F = 0 \land S = 0 \land U = 0
           \end{cases}
 
-And similar but not identical to that in the air or ground movement physics,
-:math:`M` is defined to be
+Similar, but not identical to that in the air or ground movement physics, :math:`M` is defined to be
 
-.. math:: M = 0.8 \min\left( M_m, \lVert\mathbf{a}\rVert \right)
+.. math:: M = \frac{4}{5} \min\left( M_m, \lVert\mathbf{a}\rVert \right)
 
-The only difference is the presence of the :math:`0.8` factor. Then, the new
-velocity after water movement is given by
+The only difference is the presence of the :math:`4/5` factor. Then, velocity is updated as
 
-.. math:: \mathbf{v}' = (1 - k_e k \tau) (\mathbf{v} + \mathbf{b}) + \mu \mathbf{\hat{a}}
+.. math:: \mathbf{v} \gets \left(1 - k_e k \tau\right) \mathbf{v} + \mu \mathbf{\hat{a}}
 
-where :math:`\mathbf{b}` is the basevelocity (see :ref:`basevelocity`) and
+where
 
 .. math:: \mu =
           \begin{cases}
@@ -228,14 +227,17 @@ where :math:`\mathbf{b}` is the basevelocity (see :ref:`basevelocity`) and
           0 & \gamma_2 \le 0 \lor M < 0.1
           \end{cases}
 
-and let :math:`A` be ``sv_accelerate``,
+and :math:`A` is the value of ``sv_accelerate``, such that
 
-.. math:: \gamma_1 = k_e \tau MA \qquad \gamma_2 = M - (1 - k_e k\tau) \lVert\mathbf{v} + \mathbf{b}\rVert
+.. math:: \gamma_1 = k_e \tau MA \qquad \gamma_2 = M - \left(1 - k_e k\tau\right) \lVert\mathbf{v}\rVert
 
-Note that, unlike air and ground movement, the basevelocity is added *before*
-acceleration, rather than after.
+Note that, unlike air and ground movement, the basevelocity is added *before* acceleration, rather than after the acceleration.
 
-To see why it is impossible to accelerate beyond a certain speed, observe that
+Next, the player tries to swim up a step based on ``sv_stepsize``. This is followed by a position update. In the final step, the basevelocity is "removed" from the velocity by
+
+.. math:: \mathbf{v}' \gets \mathbf{v} - \mathbf{b}
+
+To see why it is impossible to accelerate beyond a certain speed without external help, observe that
 when the speed is sufficiently high, then regardless of view angles or other
 inputs, :math:`\gamma_2` will become negative. This always sets :math:`\mu = 0`,
 resulting in zero acceleration. In the absence of acceleration, the friction
