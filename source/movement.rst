@@ -233,7 +233,7 @@ and :math:`A` is the value of ``sv_accelerate``, such that
 
 Note that, unlike air and ground movement, the basevelocity is added *before* acceleration, rather than after the acceleration.
 
-Next, the player tries to swim up a step based on ``sv_stepsize``. This is followed by a position update. In the final step, the basevelocity is "removed" from the velocity by
+Next, the player tries to swim up a step based on ``sv_stepsize``. This is followed by a position update as explained in :ref:`player position update`. In the final step, the basevelocity is "removed" from the velocity by
 
 .. math:: \mathbf{v}' \gets \mathbf{v} - \mathbf{b}
 
@@ -281,3 +281,16 @@ place.
 .. TODO talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
 
 TODO
+
+.. _player position update:
+
+Position update
+---------------
+
+Having a high speed is useless if the player position does not actually get updated. The player position is updated in the ``PM_FlyMove`` function in the SDK. This function is also responsible of handling collisions, which usually causes velocity to change as described in :ref:`collision`. In the simplest case, which is what is assumed in most simulations and analyses of player movement, is to compute the new position as
+
+.. math:: \mathbf{r}' \gets \mathbf{r} + \tau_p \mathbf{v}'
+
+where :math:`\mathbf{r}` is the current position, :math:`\tau_p` is the player frame time (see :ref:`frame rate`), and :math:`\mathbf{v}'` is the velocity computed after the acceleration step.
+
+At a higher level, in each iteration :math:`i` the function performs a player trace from :math:`\mathbf{r}` to :math:`\mathbf{r} + \tau_p \mathbf{v}' \prod_{k=1}^{i-1} \left( 1 - f_k \right)`. This trace will produce a trace fraction :math:`f_i` within :math:`[0, 1]`, and the position will be set to the end position of the trace. If :math:`f_t = 1`, which implies the player does not collide with any entity, then the iteration will be stopped. Otherwise, the general collision equation described in :ref:`collision` will be used to modify the velocity. The iteration will continue, for a total of four times.
