@@ -243,10 +243,26 @@ will reduce the speed rapidly.
 
 It is worth noting that there is no restriction in the magnitude of player velocity while the waterlevel is 2 or above. This is because ``PM_CheckVelocity`` is never called at any point in the code path associated with water physics. Although it is rare for the player to achieve great speeds under water, it is possible with means such as rapid ducking over push trigger, as described in :ref:`trigger_push`.
 
-.. _waterjump:
+.. _waterlevel:
 
-Waterjump
-~~~~~~~~~
+Waterlevel
+~~~~~~~~~~
+
+The player has a *waterlevel* ranging from 0 to 3, inclusive. Higher levels indicate being more "immersed" in water. The setting of waterlevel is done by ``PM_CheckWater``, which is called from various points in the player movement code, a notable one being ``PM_CatagorizePosition``. As a high level description,
+
+waterlevel is 1
+   When 1 unit above the player's feet, or equivalently, :math:`\mathbf{r} - \left( H_z - 1 \right) \langle 0,0,1\rangle`, is under water, where :math:`H_z` is half the height of the player hull
+
+waterlevel is 2
+   When the centre of the player hull, equivalent to the position :math:`\mathbf{r}`, is under water
+
+waterlevel is 3
+   When :math:`\mathbf{r} + \mathbf{w}` is under water, where :math:`\mathbf{w}` is the player's view offset
+
+Note that the conditions for a particular level must also encompass the conditions for earlier levels. For example, the waterlevel will not be 2 if the conditions for waterlevel to be 1 is not met. If none of these conditions are satisfied, the waterlevel is 0.
+
+Sharking
+~~~~~~~~
 
 Pressing the jump key in water has interested physics behaviour in Half-Life,
 though not one we can exploit to great effect for speedrunning. When the
@@ -277,12 +293,14 @@ applies some amount of water friction to the player. It is likely that at frame
 :math:`m + 2`, the player will be back in air again. The cycle will repeat, and
 this is sometimes called "sharking" in speedrunning.
 
-When the player is close a ground, a different kind of "jumping" physics takes
-place.
+.. _waterjump:
 
-.. TODO talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
+Waterjump
+~~~~~~~~~
 
-TODO
+Waterjumping refers to the phenomenon where the player vertical velocity is set to positive 255 without any movement inputs or actually issuing ``+jump`` when being near a wall.
+
+.. TODO: talk about jumping out of water to land type of jump, and also jumping water onto a ceiling to boost
 
 .. _player position update:
 
