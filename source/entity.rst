@@ -123,8 +123,8 @@ Gravity
 Friction
 --------
 
-Hitboxes
---------
+.. Hitboxes
+.. --------
 
 .. TODO: hitboxes briefly but refer reader to damage chapter
 
@@ -140,37 +140,28 @@ world Newtonian physics.  The process of changing the velocity is usually
 referred to as *velocity clipping*.  Collision is one of the most common events
 in Half-Life, so it is worthwhile to study its physics.
 
-Collision is detected by determining the planes that run into the way of a line
-traced from the moving entity's position to the future position.  The future
-position depends on the frame rate, the velocity and the base velocity
-associated with the colliding entity.  Let :math:`\mathbf{\hat{n}}` be the
+Collisions occur in the position update step of an entity. The player entity's position update is described in :ref:`player position update`. A collision is detected by performing a player trace and checking if the trace strikes a plane. Let :math:`\mathbf{\hat{n}}` be the
 plane normal and let :math:`\mathbf{v}` be the velocity at the instant of
-collision.  Let :math:`b` be the *bounce coefficient* which, under certain
-conditions, depends on ``sv_bounce`` (denoted as :math:`B`) and :math:`k_e`
+collision.  Let :math:`b(C_b, k_e)` be the *bounce coefficient* which, in general, depends on ``sv_bounce`` (denoted as :math:`C_b`) and :math:`k_e`
 (see :ref:`friction`).  The bounce coefficient controls how the velocity is
 reflected akin to a light ray.  If :math:`\mathbf{v}'` is the velocity
 resulting from the collision, then the *general collision equation* (GCE) can
 be written as
 
-.. math:: \mathbf{v}' = \mathbf{v} - b (\mathbf{v} \cdot \mathbf{\hat{n}})
+.. math:: \mathbf{v}' = \mathbf{v} - b(C_b, k_e) \left( \mathbf{v} \cdot \mathbf{\hat{n}} \right)
           \mathbf{\hat{n}}
+   :label: general collision equation
 
-Before we proceed, we must point out that this equation may be applied multiple
-times per frame.  The functions responsible of actually displacing entities are
-``SV_FlyMove`` for non-players and ``PM_FlyMove`` for players.  These functions
-perform at most four aforementioned line tracing, each time potentially calling
-the velocity clipping function.
+Before we proceed, we must point out that this equation may be applied multiple times per frame when computing the position update for an entity.
 
 .. figure:: images/collision-overbounce.svg
    :name: collision overbounce
 
-   Depiction of a general case of collision, where the player collides with plane :math:`\mathit{OW}` at :math:`A`.
+   Depiction of a general case of collision, where the player collides with plane :math:`\mathit{OW}` with normal :math:`\mathbf{n}` at :math:`A` with velocity :math:`\mathit{AB}`.
 
-Collision in the general case is depicted in :numref:`collision overbounce`. The point at which collision occurs is :math:`A`, and let the arrow :math:`\mathit{AB}` the velocity vector :math:`\mathbf{v}`. Then, the length of :math:`\mathit{AB'}` represents the dot product :math:`\mathbf{v} \cdot \mathbf{\hat{n}}`, and :math:`B'` is a projection of :math:`B` onto the line :math:`\mathit{AB'}`, which is parallel to the plane normal. In general, this dot product is scaled by :math:`b`, causing the final velocity vector to point out of the plane, shown by :math:`\mathit{AC}`. If :math:`b = 1` instead, then :math:`\mathit{AC'}` would be the final vector.
+Collisions in the general case is depicted in :numref:`collision overbounce`. The point at which collision occurs is :math:`A`, and let the arrow :math:`\mathit{AB}` the velocity vector :math:`\mathbf{v}`. Then, the length of :math:`\mathit{AB'}` represents the dot product :math:`\mathbf{v} \cdot \mathbf{\hat{n}}`, and :math:`B'` is a projection of :math:`B` onto the line :math:`\mathit{AB'}`, which is parallel to the plane normal. In general, this dot product is scaled by :math:`b`, causing the final velocity vector to point out of the plane, shown by :math:`\mathit{AC}`. If :math:`b = 1` instead, then :math:`\mathit{AC'}` would be the final vector.
 
-In most cases, players have :math:`b = 1` because :math:`k_e = 1` and so is
-:math:`B`.  In general, :math:`b` for players is computed by :math:`b = 1 + B
-(1 - k_e)`.  The case of :math:`b \ne 1` is more common for other entities.
+In most cases, players have :math:`b = 1` because :math:`C_b = 1` in the default Half-Life settings and :math:`k_e = 1` if there is no ``func_friction`` that modifies it (see :ref:`func_friction`). The value of :math:`b` and its dependence on :math:`C_b` and :math:`k_e` for the player is described in :ref:`player position update`. The case of :math:`b \ne 1` is more common for other entities.
 For example, snarks have :math:`b = 3/2` and :math:`k_e = 1/2`.  In general, if
 the movement type of an entity is designated as ``MOVETYPE_BOUNCE``, then
 :math:`b = 2 - k_e`.

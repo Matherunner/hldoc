@@ -14,7 +14,7 @@ Gravity
 
 Like other entities in the Half-Life universe, the player experiences gravity. Whenever the player is in the air, the waterlevel is less than 2, and not waterjumping (see :ref:`waterjump`), a constant downward acceleration will be applied. The gravity in the Half-Life universe works in a similar way to the Newtonian gravity in the real world. Namely, a free falling object experiences a *constant* acceleration of :math:`g`, with value specified by
 
-.. math:: \mathtt{sv\_gravity} \times g_e
+.. math:: g = \mathtt{sv\_gravity} \cdot g_e
 
 where :math:`g_e` is may be called the *entity gravity*, which is a modifier that scales the default gravity. Typically, :math:`g_e = 1`, though it can take a fractional value in Xen, for example. The consequence of a constant acceleration is that the velocity and position of the object at time :math:`t` is
 
@@ -68,7 +68,7 @@ When the player is moving on the ground, friction will be applied to reduce the 
 
 Let :math:`E` be the *stop speed*, the value of ``sv_stopspeed`` which is typically 100. Let :math:`k` be the value of
 
-.. math:: \mathtt{sv\_friction} \times k_e \times e_f
+.. math:: k = \mathtt{sv\_friction} \cdot k_e \cdot e_f
 
 which is usually 4 and where :math:`k_e` is called the *entity friction*. The entity friction can be modified by a friction entity (see :ref:`func_friction`). The :math:`e_f` is the *edgefriction* which will be described in a moment. It is usually 1 but can often be 2. The two dimensional player velocity immediately after applying friction (but before air or ground acceleration) is now
 
@@ -266,10 +266,8 @@ Note that the conditions for a particular level must also encompass the conditio
 Sharking
 ~~~~~~~~
 
-Pressing the jump key in water has interested physics behaviour in Half-Life,
-though not one we can exploit to great effect for speedrunning. When the
-waterlevel is 2, and the jump key is held, then ``PM_Jump`` sets the vertical
-velocity to 100 ups, and leaving the horizontal components intact. This means
+When the waterlevel is 2, and the jump key is held, then ``PM_Jump`` sets the vertical
+velocity to :math:`v_z = 100`, and leaving the horizontal components intact. This means
 that :math:`F` and :math:`S` will not be scaled down unlike the case where
 :math:`U \ne 0`. A good thing about pressing the jump key instead of ``+moveup``
 to swim up is that the jump key *sets* the vertical velocity upwards
@@ -339,4 +337,15 @@ Having a high speed is useless if the player position does not actually get upda
 
 where :math:`\mathbf{r}` is the current position, :math:`\tau_p` is the player frame time (see :ref:`frame rate`), and :math:`\mathbf{v}'` is the velocity computed after the acceleration step.
 
-At a higher level, in each iteration :math:`i` the function performs a player trace from :math:`\mathbf{r}` to :math:`\mathbf{r} + \tau_p \mathbf{v}' \prod_{k=1}^{i-1} \left( 1 - f_k \right)`. This trace will produce a trace fraction :math:`f_i` within :math:`[0, 1]`, and the position will be set to the end position of the trace. If :math:`f_t = 1`, which implies the player does not collide with any entity, then the iteration will be stopped. Otherwise, the general collision equation described in :ref:`collision` will be used to modify the velocity. The iteration will continue, for a total of four times.
+At a higher level, in each iteration :math:`1 \le i \le 4` the function performs a player trace from :math:`\mathbf{r}` to :math:`\mathbf{r} + \tau_p \mathbf{v}' \prod_{k=1}^{i-1} \left( 1 - f_k \right)`. This trace will produce a trace fraction :math:`f_i` within :math:`[0, 1]`, and the position will be set to the end position of the trace. If :math:`f_t = 1`, which implies the player does not collide with any entity, then the iteration will be stopped. Otherwise, the general collision equation described in :ref:`collision` will be used to modify the velocity. The iteration will continue, for a total of four iterations.
+
+Whenever a collision occurs, recall from :eq:`general collision equation` that the new velocity depends on the bounce coefficient :math:`b(C_b, k_e)`. The exact form of the bounce coefficient depends on various conditions. Given a plane the player collides with, if
+
+.. math:: \mathtt{MOVETYPE\_WALK} \land \left( \text{in the air} \lor k_e \ne 1 \right) \land n_z \le 0.7
+   :label: bounce condition
+
+then we have
+
+.. math:: b(C_b, k_e) = 1 + C_b \left( 1 - k_e \right)
+
+If :eq:`bounce condition` is not met, then we always have :math:`b = 1`.
