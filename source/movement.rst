@@ -300,7 +300,7 @@ this is sometimes called "sharking" in speedrunning.
 Waterjump
 ~~~~~~~~~
 
-Waterjumping refers to the phenomenon where the player vertical velocity is set to positive 255 without any movement inputs or actually issuing ``+jump`` when being near a wall. This phenomenon is not to be confused with sharking (:ref:`sharking`) or the literal "jumping out of the water" or basevelocity related techniques (:ref:`trigger_push`). The function responsible of initiating waterjumping is ``PM_CheckWaterJump`` in the SDK. As a high level description, set
+Waterjumping refers to the phenomenon where the player vertical velocity is set to :math:`v_z = 225` without any movement inputs or actually issuing ``+jump`` when being near a wall. This phenomenon is not to be confused with sharking (:ref:`sharking`) or the literal "jumping out of the water" or basevelocity related techniques (:ref:`trigger_push`). The function responsible of initiating waterjumping is ``PM_CheckWaterJump`` in the SDK. This function is only called when the waterlevel is exactly 2, implying that waterjumping will not be initiated when the waterlevel is not 2. As a high level description, set
 
 .. math::
    \begin{aligned}
@@ -316,7 +316,7 @@ where :math:`\mathbf{\hat{f}}` is the player's unit forward vector, and :math:`\
    B &= A + 24 \mathbf{\hat{\bar{f}}}
    \end{aligned}
 
-where :math:`\mathbf{\hat{\bar{f}}}` is simply the normalised :math:`\mathbf{\bar{f}}`. The game then performs a player trace using the point hull from :math:`A` to :math:`B`. If this collides with a wall, defined as a plane with normal :math:`n_z < 0.1` or equivalently, one which is slanted by roughly :math:`57^\circ`, then define
+where :math:`\mathbf{\hat{\bar{f}}}` is simply the normalised :math:`\mathbf{\bar{f}}`. The game then performs a player trace using the point hull from :math:`A` to :math:`B`. If this collides with a wall, defined as a plane with normal :math:`n_z < 0.1` or roughly, one which is slanted by more than :math:`84.3^\circ`, then define
 
 .. math::
    \begin{aligned}
