@@ -100,6 +100,8 @@ or
 
 Assuming the entity gravity is 1 and the value of ``sv_gravity`` is 800, then we have :math:`t \approx 0.663`.
 
+The physics for jumping under water has been described in :ref:`sharking`.
+
 .. _bunnyhop cap:
 
 Bunnyhop cap
@@ -108,6 +110,26 @@ Bunnyhop cap
 Denote :math:`M_m` the value of ``sv_maxspeed``. Keep in mind that it is not always the case that :math:`M_m = M` (where :math:`M` has been defined in :ref:`player air ground`), since :math:`M` is dependent on the duckstate (see :ref:`ducking`) and the values of :math:`F`, :math:`S`, and :math:`U`.
 
 Consider player velocity vectors in the *3D space*, :math:`\mathbf{v} \in \mathbb{R}^3`. All, or at least, most, Steam versions of Half-Life have an infamous "cap" on speed which is triggered only when jumping off a ground with speed :math:`\lVert\mathbf{v}\rVert > 1.7M_m`. When this mechanism is triggered, the new velocity will become :math:`\mathbf{v}' = 1.105 M_m \mathbf{\hat{v}}`. Again, note that this speed "cap" is a not *horizontal* speed cap, but rather, a cap on the magnitude of the entire 3D vector. This distinguish is very important when performing jumpbugs (see :ref:`jumpbug`) in the presence of bunnyhop cap.
+
+Jumping up to a slope
+~~~~~~~~~~~~~~~~~~~~~
+
+When there is a sloped plane above the player and the player is able to jump and collide with it, it will result in a respectable horizontal speed boost. This technique works both on the ground and underwater, though the effect is more pronounced and continuous underwater. This technique has been implemented in Half-Life speedruns, especially in the Residue Processing chapter. The horizontal speed tends towards a maximum that depends on the angle of inclination of the plane above. We will consider the underwater case here.
+
+.. figure:: images/sloped-plane-jump.svg
+   :name: sloped plane jump
+
+   :math:`\mathit{OZCH}` is a rectangle. :math:`\mathit{OC}` represents the sloped plane. :math:`\mathit{OV_i}` is the velocity vector at frame :math:`i` after ``+jump`` has been issued, but before water movement physics. The height of :math:`\mathit{OZ}` is the vertical velocity set when ``+jump`` is issued underwater, as explained in :ref:`sharking`. :math:`V_i'` is the projected point of :math:`V_i` on the line :math:`\mathit{OC}`, and :math:`V_i''` is the projected point of :math:`V_i'` onto the line :math:`\mathit{OH}`. The line :math:`V_iV_i'` is perpendicular to :math:`OC`.
+
+Refer to :numref:`sloped plane jump` underwater and ignore water friction for simplicity. Suppose ``+jump`` is held down. In the first :math:`i = 1` frame, the velocity vector shortly before water physics is :math:`\mathit{OV_1}`. By the general collision equation :eq:`general collision equation`, the velocity after collision is given by :math:`OV_1'`. In the next frame :math:`i = 2`, ``+jump`` will cause the vertical velocity to be set to the length of :math:`\mathit{OZ}` again, altering the velocity vector to become :math:`OV_2`. After collision, the new velocity is :math:`OV_2'`. Notice that the new horizontal speed is greater than that in the previous frame, that is :math:`\lvert OV_2''\rvert > \lvert OV_1''\rvert`. As the process repeats, :math:`\lvert OV_i''\rvert \to \lvert OH\rvert`. We therefore trivially obtain the formula for the limit of the horizontal speed as
+
+.. math:: V_{h,\max} = \lvert OH\rvert = \frac{\lvert CH\rvert}{\tan\angle COH} \quad (\angle COH \ne 0)
+
+Observe that :math:`V_{h,\max}` is inversely proportional to the angle :math:`\angle COH`.
+
+In practice, water inflicts some friction in each frame, causing the actual :math:`\lvert OV_i''\rvert` to be slightly less than what is depicted in :numref:`sloped plane jump`. However, by increasing the frame rate, this difference should tend to zero, which justifies the approximations made in this analysis.
+
+The analysis presented here is also roughly applicable to the case of jumping off the ground onto a ceiling. Though, it takes time for the player to land on the ground and make another jump again, so the horizontal acceleration is much lower than that underwater.
 
 .. _jumpbug:
 

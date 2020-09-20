@@ -190,10 +190,10 @@ Then, a position update will be performed as described in :ref:`player position 
 
 .. math:: \mathbf{v}' \gets \mathbf{v} - \mathbf{b}
 
+.. _water movement:
+
 Water movements
 ---------------
-
-.. TODO: talk about waterlevel
 
 Water movement has less exploitation potential than air and ground movement. Nonetheless, due to its ability to slow the player down, we should strive to understand its physics. Here, all vectors are three dimensional and the waterlevel must be 2 or above to run water physics.
 

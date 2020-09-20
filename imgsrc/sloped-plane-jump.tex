@@ -1,0 +1,45 @@
+\documentclass{templates/hlprtikz}
+\usepackage{ifthen}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro{\PlaneLen}{400}
+  \pgfmathsetmacro{\PlaneAng}{35}
+  \pgfmathsetmacro{\InitVAng}{80}
+
+  \coordinate (O) at (0,0);
+  \coordinate (plane-end) at (\PlaneAng:\PlaneLen);
+  \coordinate (vv-start) at (O |- plane-end);
+  \coordinate (h-end) at (O -| plane-end);
+
+  \draw[name path=vvel-guide] (O) -- (vv-start) node[left]{$Z$} -- (plane-end) -- (h-end) node[right]{$H$}-- cycle;
+  \draw (O) node[left]{$O$} -- (plane-end) node[right]{$C$};
+
+  \path[name path=initial-ray] (O) -- (\InitVAng:\PlaneLen |- plane-end);
+  \path[name intersections={of=vvel-guide and initial-ray}];
+
+  \coordinate (V) at (intersection-2);
+  \foreach \i in {1,...,20} {
+    \coordinate (V') at ($(O)!(V)!(plane-end)$);
+    \coordinate (V'p) at (V' |- O);
+    \ifthenelse{\i < 4}{
+      \draw (O) -- (V);
+      \draw (V') -- (V'p);
+      \path (V) node[above]{$V_\i$};
+      \path (V') node[below right]{$V_\i'$};
+      \path (V'p) node[below]{$V_\i''$};
+    }{}
+    \ifthenelse{\i = 4}{
+      \path (V) node[above=5]{$\cdots$};
+      \path (O) -- node[below right=10,sloped,at end]{$\cdots$} (V');
+      \path (V'p) node[below=7]{$\cdots$};
+    }{}
+    \draw (V) -- (V');
+    \draw (V'p) circle (1);
+    \coordinate (V) at (V' |- vv-start);
+    \draw (V') -- (V);
+  }
+\end{tikzpicture}
+
+\end{document}
