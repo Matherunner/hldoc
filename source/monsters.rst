@@ -169,7 +169,81 @@ TODO
 Gonarch
 -------
 
-The gonarch is a complex monster.
+The Gonarch, also known as "big momma", is one of the more complex monsters in Half-Life. In casual gameplay, a player would typically fight the Gonarch with an abundance of explosives and high powered weaponries, forcing her to move around and flee through the levels. However, closer examinations reveal substantially different descriptions of its behaviours and how a player might approach this fight.
+
+Gonarch nodes
+~~~~~~~~~~~~~
+
+Most speedrunners understood that the ``info_bigmomma`` entities placed around the map choreograph the movements of the Gonarch. An ``info_bigmomma`` node will be referred to as a *Gonarch node* in this document (not to be confused with the nodes in an AI node graph). Each Gonarch node is endowed with a number of important attributes which influence the Gonarch's behaviour. The reader is encouraged to examine the relevant code in ``dlls/bigmomma.cpp`` in the Half-Life SDK for details. To name a few relevant attributes, a node has a range, a health, and a target, among others. The node range controls how close Gonarch has to be from the node in order for the monster to have "reached" the node. The node health controls how much health Gonarch will attain upon reaching it. The node target is the name of the next node in the series.
+
+A Gonarch node does not possess the Gonarch like a ``scripted_sequence`` entity does. The Gonarch has to have a target entity that points to a node to kick start the process of moving towards it. Assuming the Gonarch has a target, it will run the "Big Node" schedule. At a high level, this schedule charts a route to the target node, waits for the monster to walk to the node, fires targets upon reaching the node, and gives the Gonarch health dependent on the node health. After reaching the target node, the monster's subsequent behaviour depends on the health it gained from the node. If the node has zero health, instances of which can be found in Half-Life, the Gonarch will immediately target the next node in the series, restarting the process over again. If the node has a non-zero health, the monster will not move to the next node until it receives a damage greater or equal to its current health. This is seen in the following from the Half-Life SDK:
+
+.. code-block:: c++
+   :caption: ``CBigMomma::TakeDamage`` in ``dlls/bigmomma.cpp``
+   :emphasize-lines: 9-12
+
+   int CBigMomma :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType )
+   {
+    // Don't take any acid damage -- BigMomma's mortar is acid
+    if ( bitsDamageType & DMG_ACID )
+      flDamage = 0;
+
+    if ( !HasMemory(bits_MEMORY_PATH_FINISHED) )
+    {
+      if ( pev->health <= flDamage )
+      {
+        pev->health = flDamage + 1;
+        Remember( bits_MEMORY_ADVANCE_NODE | bits_MEMORY_COMPLETED_NODE );
+        ALERT( at_aiconsole, "BM: Finished node health!!!\n" );
+      }
+    }
+
+    return CBaseMonster::TakeDamage( pevInflictor, pevAttacker, flDamage, bitsDamageType );
+   }
+
+By setting ``bits_MEMORY_ADVANCE_NODE``, and assuming ``m_nodeTime < gpGlobals->time``, the ``CBigMomma::ShouldGoToNode`` will return true, prompting the monster to run "Big Node" again to move to the next node. The identity of the next node is determined entirely by the current node, which implies that the Gonarch cannot move from node to node out of order. There is no known way of deviating from the ordering enforced by the level designer.
+
+Strategy of c4a2
+~~~~~~~~~~~~~~~~
+
+The Gonarch is first seen in Half-Life in the map of c4a2. This is normally considered a boring and yet risky [#GonarchRisk]_ part of Half-Life speedrunning. It may be considered boring because it has been known since the early days of Half-Life speedrunning that attacking the Gonarch at a node location is sufficient to force it to move to the next node location. Being the bottleneck in this map, transiting from node to node as quickly as possible is critical. Attacking it in the midst of transiting is a waste of ammunition. This intuition is right, because as mentioned above, the Gonarch's health is reset at each node, the amount of which depends on the node health. Unfortunately, as of 2021, speedrunners do not go beyond this optimisation even at the highest levels.
+
+Back in 2014, the landmark Half-Life 21 speedrun (see :ref:`half-life-21`) demonstrated a breakthrough in the c4a2 strategy, which saved roughly 11 seconds from the previous record. The strategy implemented for this map is extraordinarily difficult, which is not helped by a dearth of information regarding its details, and no known runner has managed to reproduce it as of April 2021. In 2018 in the SourceRuns Team Discord server, Maxam, a Half-Life speedrunner, asked crashfort about the "second trick" implemented for this map. The speedrunner crashfort, who ran the segments for the map, explained that
+
+   "it took so many days to just get it once, and only once"
+
+   "i remember getting the gonarch to the first satchel was what would never ever work"
+
+Details were scant because
+
+   "this was like 5 years ago i  dont really remember the small details :confused:"
+
+In Half-Life 21, the strategy began by attacking the Gonarch as soon as the map loaded. This was done because the Gonarch commenced the "Idle Trigger" schedule at spawn, which contained a ``TASK_WAIT`` of five seconds. Attacking the Gonarch interrupted the "Idle Trigger" schedule. This put the Gonarch in the Alert state and made it run "Big Node" and walk slowly to the first node. Since the first node had zero health, upon reaching it, the Gonarch started walking to the second node located just in front of the first. As soon as it reached the second node, crashfort ran up to the Gonarch to obstruct its route, which induced a failure to ``TASK_MOVE_TO_NODE_RANGE`` in "Big Node". This failure caused the "NodeFail" schedule to run, which set ``m_nodeTime`` to 10 seconds from the current time. This timer prevented the "Big Node" schedule from starting for 10 seconds. In the meantime, the Gonarch was free to run any other schedule. The first task to run was "Alert Stand", which contained a glacial ``TASK_WAIT`` of 20 seconds. The ``TASK_WAIT`` set ``m_flWaitFinished`` to 20 seconds from the current time. This will be important later.
+
+During this critical 10 seconds controlled by ``m_nodeTime``, the Gonarch identified the player as an enemy and started running schedules associated with attack behaviours. One such schedule was "Chase Enemy". While the Gonarch was chasing him, crashfort bunnyhopped around a mountain. He was manipulating the Gonarch into running towards the next node. Then, he fired several shots at the Gonarch with a .357, the second of which stopped Gonarch on her tracks, presumably due to the "Chase Enemy" schedule interrupted by ``bits_COND_HEAR_SOUND``. Simultaneously, he blocked Gonarch's route the second time, though this was not at all obvious in the video. This was the critical step. By blocking the Gonarch the second time, it ran the common "Fail" schedule. This schedule contained a ``TASK_WAIT`` of two seconds and overrode the ``m_flWaitFinished`` set earlier by any prior ``TASK_WAIT``. Here, the prior ``TASK_WAIT`` came from the "Alert Stand" schedule ran earlier when the Gonarch was first blocked.
+
+At this point, the Gonarch had a failed schedule, but it immediately started attacking the player again by running attack schedules. Since crashfort stopped the Gonarch short of the next node's location, he manipulated it to run "Chase Enemy" again until it ended up within the range of the intended node. He waited for a brief moment for the 10 seconds ``m_nodeTime`` timer to expire. When the time was up, the Gonarch executed the "Big Node" schedule, but because it was already in position, the schedule finished almost immediately. It was at this moment that crashfort triggered the explosives placed earlier and wiping out its health, compelling it to run to the next node.
+
+As mentioned, blocking Gonarch's route the second time is critical in Half-Life 21's strategy. Had that not been done, the Gonarch would run standstill on the node for many seconds after the uninterruptible "Big Node" schedule started. This behaviour is due to a presumed bug:
+
+.. code-block:: c++
+   :caption: ``CBigMomma::RunTask`` in ``dlls/bigmomma.cpp``
+   :emphasize-lines: 5
+
+   case TASK_WAIT_NODE:
+   if ( m_hTargetEnt != NULL && (m_hTargetEnt->pev->spawnflags & SF_INFOBM_WAIT) )
+     return;
+
+   if ( gpGlobals->time > m_flWaitFinished )
+     TaskComplete();
+   ALERT( at_aiconsole, "BM: The WAIT is over!\n" );
+   break;
+
+The bug lies in checking for ``m_flWaitFinished``, rather than ``m_flWait`` set earlier by ``CBigMomma::StartTask`` in the case of ``TASK_WAIT_NODE``.
+
+There are a multitude of reasons attributed to the extreme difficulty in implementing Half-Life 21's strategy in a human run. Performing the first obstruction quickly is challenging. The AI is fairly adept at computing paths around obstacles, rendering it hard to fail. Then, manipulating the Gonarch's routes while chasing the player is difficult to execute with precision, because the route is highly dependent on the player and the Gonarch positions, along with the positions of various obstacles such as headcrabs. If the Gonarch ends up too far from the next node, the window of time available to manipulate it further to the node is more limited. In Half-Life 21's strategy, obstructing the Gonarch the second time is critical. If this step fails, the strategy will not yield any meaningful time saves. This is also the most difficult trick, as crashfort alluded to in his replies to Maxam, because it entails being in a position that could obstruct the Gonarch successfully while approaching it from behind at a high speed. The correct position is also highly dependent on the Gonarch's current position and route, which themselves are highly variable without tool assistance. After succeeding in obstructing the monster, the player has to make the monster run the "Chase Enemy" schedule and manipulate the monster to run into the node's range, which is difficult to execute consistently. This sequence of tricks must be done within 10 seconds. When the 10-second timer is up, if the monster is not in the range of the target node, it will walk slowly to the node and eliminate the upsides of implementing this strategy.
+
+One way to lessen the difficulty of the original strategy is to save and reload the game on map load, rather than attacking the Gonarch. Saving and reloading interrupts the "Idle Trigger" schedule. When the game loads, it runs "Idle Stand" instead, soon followed by "Big Node". Running "Idle Stand" in place of "Alert Stand" is beneficial because the ``TASK_WAIT`` in "Idle Stand" only waits for five seconds, instead of 20. This removes the need to obstruct the Gonarch the second time, because with this improvement the 5-second ``m_flWaitFinished`` timer should expire before the 10-second ``m_nodeTime`` timer. As a result, when the Gonarch reaches the destination node, it will not wait and run standstill, and it will be able to proceed with the next schedule immediately.
 
 .. _nihilanth:
 
@@ -513,3 +587,6 @@ That is, roughly, the damage dealt will be cut by a flat value of 20. In additio
 
    Zombies are one of the most iconic monsters in Half-Life as well. They do not have particularly interesting behaviour in the speedrunning context, though there is a notable aspect when receiving damage. Namely, a damage :math:`D` that is of pure ``DMG_BULLET`` type will only deal :math:`0.3D` to the zombie's health. This can be an important consideration when killing zombies as fast as possible is a concern. It is important to note that this only applies when the damage type is purely ``DMG_BULLET`` without other bits like ``DMG_NEVERGIB`` set.
 
+.. rubric:: Footnotes
+
+.. [#GonarchRisk] The risk comes from the potential for the Gonarch to run at the same spot for many seconds. This can be caused by attacking the Gonarch at the wrong time or the player being in the wrong positions, among other factors. This is commonly misattributed to soft locking in the community. This attribution is demonstrably false by simply waiting for the Gonarch to stop running. There is no known soft locks associated with the Gonarch.
