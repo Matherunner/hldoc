@@ -132,9 +132,7 @@ Gibbing
 ~~~~~~~
 
 Gibbing monsters in Half-Life is inherently fun from a gameplay point of view,
-but it can be critical for speedrunning as well.
-
-TODO
+but it can be critical for speedrunning as well. Due to the narrow corridors commonly found in Half-Life and its mods, killing monsters are sometimes necessary to allow uninterrupted passages. However, killing is not enough, as the dying monster tends to leave behind a large invisible obstruction for about one second. Gibbing instantly deletes any obstruction posed to the player.
 
 A damage may contain flags to indicate how it gibs monsters. These flags are
 ``DMG_NEVERGIB`` and ``DMG_ALWAYSGIB``. The names are self-explanatory. When the
@@ -142,7 +140,42 @@ damage is inflicted onto a living monster (i.e. not a corpse) and neither of
 these flags are set for the damage, then the monster will only gib if its health
 gets below ``GIB_HEALTH_VALUE``, defined to be :math:`-30` in ``cbase.h``.
 
-.. TODO discuss various ways to gib monsters, like shotgun + crowbar
+Sometimes, inflicting a massive damage to a monster does not gib it, even though the health falls below :math:`-30`. This is usually because the monster is running a script under the script monster state. Examining ``CBaseMonster::TakeDamage``, we see the following:
+
+.. code-block::
+   :caption: ``CBaseMonster::TakeDamage`` in ``dlls/combat.cpp``
+
+   // do the damage
+   pev->health -= flTake;
+
+   // HACKHACK Don't kill monsters in a script.  Let them break their scripts first
+   if ( m_MonsterState == MONSTERSTATE_SCRIPT )
+   {
+     SetConditions( bits_COND_LIGHT_DAMAGE );
+     return 0;
+   }
+
+This early return is located just before the gibbing code. Assuming the script is interruptible, the early return provided a chance to interrupt the script with the ``bits_COND_LIGHT_DAMAGE`` set. Usually, the game ends up calling ``CBaseMonster::CineCleanup``, which contains the following code:
+
+.. code-block::
+   :caption: ``CBaseMonster::CineCleanup`` in ``dlls/scripted.cpp``
+
+   if ( pev->health > 0 )
+     m_IdealMonsterState = MONSTERSTATE_IDLE; // m_previousState;
+   else
+   {
+     // Dropping out because he got killed
+     // Can't call killed() no attacker and weirdness (late gibbing) may result
+     m_IdealMonsterState = MONSTERSTATE_DEAD;
+     SetConditions( bits_COND_LIGHT_DAMAGE );
+     pev->deadflag = DEAD_DYING;
+     FCheckAITrigger();
+     pev->deadflag = DEAD_NO;
+   }
+
+With the ideal monster state set to dead, the monster state will in turn be dead in the next AI iteration, causing the "Die" schedule to run. From taking the *coup de grâce* to running the "Die" schedule, the game does not call any gibbing code on the monster in question.
+
+There are several ways to deal with this problem, even though none of them are always possible in all circumstances. We could simply wait for the script to finish before dealing the death blow. We could plant an explosive, deal the death blow, and trigger the explosive to gib the corpse. We could also deal the death blow so that the health falls below :math:`-30` and attack with a crowbar or other weapons that allow gibbing.
 
 Damage types
 ------------
