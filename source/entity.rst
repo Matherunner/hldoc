@@ -116,12 +116,32 @@ are all the possible movetypes in Half-Life:
 Gravity
 -------
 
-.. TODO: player gravity is computed differently, with leapfrog integration
+Some entities in Half-Life experience gravity. A ``func_pushable`` box, when pushed off an edge, falls to the ground. However, the game computes gravity for these entities in a way that differs from the gravity for the player (see :ref:`player gravity`). Entity gravity is integrated using the simplest form of the Euler's method. Suppose an entity has vertical velocity :math:`v` and position :math:`x` at the start of a frame. Provided this entity's movetype is set to experience gravity, the new vertical velocity and position after one frame are given by
+
+.. math:: v' = v - g\tau_g \qquad x' = x + v'\tau_g = x + v\tau_g - g\tau_g^2
+
+where :math:`g` is the effective gravitational acceleration and :math:`\tau_g` is the game frame rate (see :ref:`frame rate`). Readers familiar with Newtonian mechanics will note the fact that :math:`x'` differs from what one would expect. A simple rewriting yields
+
+.. math:: x' = \left( x + v\tau_g - \frac{1}{2} g\tau_g^2 \right) - \frac{1}{2} g\tau_g^2
+
+where the terms in the brackets match the prediction from Newtonian mechanics. Indeed, after :math:`n` frames of gravity, we can write
+
+.. math:: x_n = \left( x_0 + vn\tau_g - \frac{1}{2} gn^2 \tau_g^2 \right) - \frac{1}{2} g\tau_g^2
+
+Let :math:`\tilde{x}_n` be the Newtonian prediction after :math:`n` frames of gravity. Then we first observe that :math:`\tilde{x}_n > x_n`. In addition, the difference :math:`\tilde{x}_n - x_n` is directly proportional to the frame time :math:`\tau_g` and inversely proportional to the frame rate :math:`f_g`. The lower the frame rate, the smaller :math:`x_n` becomes relative to :math:`\tilde{x}_n`, which manifests as lower vertical positions in the game. This may be understood in many different ways. For example, a falling entity would reach the ground sooner. An MP5 grenade would travel a shorter horizontal distance before landing.
+
+.. TODO: remove the duplicated explanation in player gravity
 
 .. _friction:
 
 Friction
 --------
+
+Entities of movetype ``MOVETYPE_STEP`` experience ground friction in a similar way as the player. The friction is similar to what is given in :ref:`player friction`, except with edgefriction :math:`e_f = 1`.
+
+.. TODO: walk about LinearMove and AngularMove?
+
+.. TODO: walk about water, buoyancy
 
 .. Hitboxes
 .. --------
