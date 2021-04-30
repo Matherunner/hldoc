@@ -128,6 +128,8 @@ The *apply* operation corresponding to ``ApplyMultiDamage`` is also straightforw
 
 The *add* operation is slightly trickier. The corresponding ``AddMultiDamage`` accepts the target entity as an input. It first checks if the target entity is the same as ``pEntity`` in the global state. If the target entity is different from that in the global state, then the *apply* operation will be done, followed by zeroing out the damage amount and storing the target entity to ``pEntity``. Regardless of whether the target entity is the same, this function adds the input damage to the ``amount`` field.
 
+.. _gibbing:
+
 Gibbing
 ~~~~~~~
 
@@ -176,6 +178,54 @@ This early return is located just before the gibbing code. Assuming the script i
 With the ideal monster state set to dead, the monster state will in turn be dead in the next AI iteration, causing the "Die" schedule to run. From taking the *coup de grâce* to running the "Die" schedule, the game does not call any gibbing code on the monster in question.
 
 There are several ways to deal with this problem, even though none of them are always possible in all circumstances. We could simply wait for the script to finish before dealing the death blow. We could plant an explosive, deal the death blow, and trigger the explosive to gib the corpse. We could also deal the death blow so that the health falls below :math:`-30` and attack with a crowbar or other weapons that allow gibbing.
+
+Dying monster obstruction
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most Half-Life players, even casual ones, have experienced a dying monster obstructing the player. The obstruction usually persists for about a second, even after the death animation seemingly ended. A dying body that continues to exhibit collision is undoubtedly an annoyance in speedrunning. In any Half-Life speedrun, the first instance of this is in the Office Complex chapter, where a dying headcrab would obstruct the speedrunner in the vent leading away from the flooded room.
+
+Assuming the death blow does not gib the monster (see :ref:`gibbing`), the ``CBaseMonster::Killed`` function is usually called. This function sets the ideal monster state to dead, which sets the stage for the dying process. The code eventually arrives at running the ``TASK_DIE`` of the "Die" schedule in ``CBaseMonster::StartTask`` and ``CBaseMonster::RunTask``. In the ``StartTask`` method, the death activity is set. Then looking at the code of ``RunTask``, it is clear why a dying monster continues to obstruct entities:
+
+.. code-block:: c++
+   :caption: ``CBaseMonster::RunTask`` in ``dlls/schedule.cpp``
+
+   case TASK_DIE:
+   {
+     if ( m_fSequenceFinished && pev->frame >= 255 )
+     {
+       pev->deadflag = DEAD_DEAD;
+
+       SetThink ( NULL );
+       StopAnimation();
+
+       if ( !BBoxFlat() )
+       {
+         // a bit of a hack. If a corpses' bbox is positioned such that being left solid so that it can be attacked will
+         // block the player on a slope or stairs, the corpse is made nonsolid.
+   //              pev->solid = SOLID_NOT;
+         UTIL_SetSize ( pev, Vector ( -4, -4, 0 ), Vector ( 4, 4, 1 ) );
+       }
+       else // !!!HACKHACK - put monster in a thin, wide bounding box until we fix the solid type/bounding volume problem
+         UTIL_SetSize ( pev, Vector ( pev->mins.x, pev->mins.y, pev->mins.z ), Vector ( pev->maxs.x, pev->maxs.y, pev->mins.z + 1 ) );
+
+       if ( ShouldFadeOnDeath() )
+       {
+         // this monster was created by a monstermaker... fade the corpse out.
+         SUB_StartFadeOut();
+       }
+       else
+       {
+         // body is gonna be around for a while, so have it stink for a bit.
+         CSoundEnt::InsertSound ( bits_SOUND_CARCASS, pev->origin, 384, 30 );
+       }
+     }
+     break;
+   }
+
+Observe that the entire block does not run unless ``m_fSequenceFinished`` and ``pev->frame >= 255``. This implies that ``TASK_DIE`` continues to run until the death activity completes. This gives rise to why a dying monster retains the original bounding box.
+
+Assuming the death activity has completed, the size of the monster is set to have only a height of one. This prevents the body from colliding with the player entity, matching the experience of players where running over a dead body does not result in collisions or speed losses. Nonetheless, the one-unit high body still collides with some other entities such as boxes and doors. This again corresponds to gaming experience where dead bodies do obstruct the movements of boxes and doors.
+
 
 Damage types
 ------------
