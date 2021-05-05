@@ -4,10 +4,7 @@
 
 [![hldoc](https://circleci.com/gh/Matherunner/hldoc.svg?style=svg)](https://app.circleci.com/pipelines/github/Matherunner/hldoc)
 
-This repo contains the source files for the Half-Life physics documentation hosted at
-
-* https://www.jwchong.com/hl/ (or [bit.ly/hlphysics](https://bit.ly/hlphysics))
-* https://tastools.rtfd.io (mirror)
+This repo contains the source files for the Half-Life physics documentation hosted at **https://www.jwchong.com/hl/**.
 
 ## Building
 
@@ -111,7 +108,6 @@ A monster refers to an entity that has an AI, both friendly and unfriendly. Rese
 
 | Topic | Issues | Difficulty |
 | --- | --- | --- |
-| Reproducing HL21's gonarch | | Very high |
 | Node graphs and monster movements | | High |
 | Enemy behaviour | | High |
 | Talkmonster behaviour | | High |
@@ -126,3 +122,9 @@ TAS topics are generally long term.
 | --- | --- | --- |
 | Better TAS process and tools | | Very high |
 | Application of ML | | Extremely high |
+
+## Licence
+
+[![Creative Commons License](https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
+
+This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
