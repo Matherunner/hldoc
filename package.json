@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "html-minifier-terser": "^5.1.1",
-    "jsdom": "^16.2.2",
+    "jsdom": "^16.5.0",
     "mathjax-node-page": "^3.2.0"
   }
 }
