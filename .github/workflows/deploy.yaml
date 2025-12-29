@@ -64,4 +64,4 @@ jobs:
 
       - name: Sync to S3
         run: |
-          aws s3 sync build/html s3://jwchong.com/hl --exclude ".buildinfo"
+          aws s3 sync build/html s3://jwchong.com/hl --exclude ".buildinfo" --delete
