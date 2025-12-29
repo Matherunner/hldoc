@@ -13,9 +13,6 @@ def postprocess_html(root):
         for file in files:
             if file.endswith('.html'):
                 to_process.append(os.path.join(root, file))
-
-    # FIXME: DEBUG ONLY
-    # to_process = ['build/html/strafing.html']
     subprocess.run(['npm', 'run', 'mjrender', *to_process]).check_returncode()
 
     print('Fixing up alabaster.css')
