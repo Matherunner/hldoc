@@ -6,6 +6,9 @@ on:
       - master
       - fix-ci  # FIXME: delete before merge
 
+permissions:
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
