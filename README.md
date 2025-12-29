@@ -2,7 +2,7 @@
 
 ![Gordon and Scientist](https://raw.githubusercontent.com/Matherunner/hldoc/master/source/images/gordon-scientist.jpg)
 
-![Build status](https://github.com/Matherunner/hldoc/actions/workflows/deploy.yml/badge.svg)
+![Build status](https://github.com/Matherunner/hldoc/actions/workflows/deploy.yaml/badge.svg)
 
 This repo contains the source files for the Half-Life physics documentation hosted at **https://www.jwchong.com/hl/**.
 
