@@ -59,9 +59,9 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::234768120399:role/GithubHLDoc
-          role-session-name: github-hldoc-push
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: ${{ vars.AWS_SESSION_NAME }}
 
       - name: Sync to S3
         run: |
-          aws s3 sync build/html s3://jwchong.com/hl --exclude ".buildinfo" --delete
+          aws s3 sync build/html ${{ vars.S3_DEPLOY_PATH }} --exclude ".buildinfo" --delete
