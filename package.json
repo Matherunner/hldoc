@@ -1,11 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "mjrender": "node ./scripts/mjrender"
+    "mjrender": "node ./scripts/mjrender.mjs"
   },
   "dependencies": {
-    "html-minifier-terser": "^5.1.1",
-    "jsdom": "^16.2.2",
-    "mathjax-node-page": "^3.2.0"
+    "@mathjax/src": "^4.1.0",
+    "html-minifier-terser": "^7.2.0"
   }
 }

@@ -24,9 +24,7 @@ exclude_patterns = ["_build", "venv"]
 
 root_doc = "index"
 
-# Enable figure numbering.
 numfig = True
-
 numfig_format = {
     "figure": "Fig. %s.",
 }
@@ -39,13 +37,28 @@ html_theme = "alabaster"
 html_theme_options = {
     "logo": "hlprlogo.png",
     "description": "An attempt to document and exploit the in-game physics of Half-Life.",
-    "font_size": "13pt",
-    "font_family": '"minion pro", georgia, serif',
+    "font_size": "18px",
+    "font_family": "sans-serif",
+    "page_width": "1150px",
+    "sidebar_width": "250px",
     "code_font_size": "85%",
     "base_bg": "#fafaf4",
+    "body_text": "rgb(59, 50, 40)",
     "analytics_id": "UA-67469786-1",
+}
+
+html_sidebars = {
+    "**": [
+        "about.html",
+        "extraabout.html",
+        "navigation.html",
+        "searchbox.html",
+    ]
 }
 
 html_last_updated_fmt = "%b %d, %Y"
 
-html_static_path = ["_static"]
+html_static_path = ["static"]
+
+html_copy_source = False
+html_show_sourcelink = False
