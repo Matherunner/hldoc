@@ -90,7 +90,6 @@ A vector of length one is called a *unit vector*. So the unit vector in the dire
 
 There are three special unit vectors, namely
 
-
 .. math:: \mathbf{\hat{i}} \quad \mathbf{\hat{j}} \quad \mathbf{\hat{k}}
 
 These vectors point towards the positive :math:`x`, :math:`y` and :math:`z` axes respectively.
@@ -114,7 +113,7 @@ Contact
 
 This documentation is currently a one-man project. `Contact me`_.
 
-.. _Contact me: jwcchong@gmail.com
+.. _Contact me: jw@jwchong.com
 
 Contents
 --------
