@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "mjrender": "node ./scripts/mjrender.mjs"
+    "mjrender": "node ./scripts/mjrender.main.mjs"
   },
   "dependencies": {
     "@mathjax/src": "^4.1.0",
