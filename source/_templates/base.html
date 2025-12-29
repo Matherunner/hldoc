@@ -1,0 +1,25 @@
+{% extends "!base.html" %}
+
+{% block body %}
+<style>
+    mjx-container[display] {
+        margin: 0;
+        margin-bottom: 0.15rem;
+    }
+</style>
+
+<script>
+    document.body.dataset.theme = 'light'
+</script>
+{% endblock %}
+
+{% block theme_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const elems = document.getElementsByClassName('theme-toggle-container')
+        for (let i = 0; i < elems.length; ++i) {
+            elems[i].innerHTML = ''
+        }
+    })    
+</script>
+{% endblock %}

@@ -9,21 +9,11 @@ import subprocess
 def postprocess_html(root):
     print('Rendering MathJax')
     to_process = []
-    for root, _dirs, files in os.walk(root):
+    for root, _, files in os.walk(root):
         for file in files:
             if file.endswith('.html'):
                 to_process.append(os.path.join(root, file))
     subprocess.run(['npm', 'run', 'mjrender', *to_process]).check_returncode()
-
-    print('Fixing up alabaster.css')
-    with open('build/html/_static/alabaster.css', 'r+') as cssfile:
-        lines = cssfile.readlines()
-        for i, line in enumerate(lines):
-            if line.startswith('@import url("basic.css");'):
-                lines[i] = '@import "./basic.css";\n'
-                break
-        cssfile.seek(0, 0)
-        cssfile.writelines(lines)
 
     print('Delete unused files')
     for file in glob.glob('build/html/_static/underscore-*.js'):

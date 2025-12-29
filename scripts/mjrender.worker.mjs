@@ -42,14 +42,15 @@ async function run() {
     await html.renderPromise()
 
     // Remove CDN link to mathjax for unnecessary client-side rendering
-    for (const elem of adaptor.head(html.document).children) {
-        if (elem.kind === 'script' && elem.attributes.src?.includes('mathjax')) {
+    const scriptElems = adaptor.tags(adaptor.root(html.document), 'script')
+    for (const elem of scriptElems) {
+        if (elem.attributes.src?.includes('mathjax')) {
             adaptor.remove(elem)
             break
         }
     }
 
-    var htmlStr = adaptor.doctype(html.document) + '\n' + adaptor.outerHTML(adaptor.root(html.document))
+    var htmlStr = '<!doctype html>' + adaptor.outerHTML(adaptor.root(html.document))
 
     htmlStr = await minifyHTML(htmlStr, {
         removeComments: true,
