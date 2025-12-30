@@ -44,6 +44,8 @@ html_theme_options = {
         "color-background-primary": "#fcfcf6",
         "color-background-secondary": "#f9f9f0",
         "color-table-header-background": "#f2f2ee",
+        "admonition-font-size": "100%",
+        "admonition-title-font-size": "100%",
     },
 }
 
