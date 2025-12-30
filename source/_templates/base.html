@@ -1,5 +1,26 @@
 {% extends "!base.html" %}
 
+{% block extrahead %}
+<style>
+    .proof p.admonition-title {
+        padding-left: .5rem;
+    }
+
+    .proof :last-child {
+        margin-bottom: 0;
+    }
+
+    div#proof :first-child {
+        margin-top: 0;
+    }
+
+    div#proof {
+        padding-top: .5rem !important;
+        padding-bottom: .5rem !important;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <style>
     mjx-container[display] {
@@ -15,11 +36,30 @@
 
 {% block theme_scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    function removeThemeToggle() {
         const elems = document.getElementsByClassName('theme-toggle-container')
-        for (let i = 0; i < elems.length; ++i) {
-            elems[i].innerHTML = ''
+        for (const elem of elems) {
+            elem.innerHTML = ''
         }
-    })    
+    }
+
+    function italiciseProofs() {
+        // A hack to italicise the "Proof." word in a proof without changing the extension source code.
+        const elems = document.querySelectorAll('#proof')
+        for (const elem of elems) {
+            const child = elem.firstElementChild
+            const innerHTML = child.innerHTML
+            const idx = innerHTML.indexOf('. ')
+            if (idx == -1) {
+                continue
+            }
+            const proofWord = innerHTML.substring(0, idx + 1)
+            const restHTML = innerHTML.substring(idx + 2)
+            child.innerHTML = '<em>' + proofWord + '</em> ' + restHTML
+        }
+    }
+
+    removeThemeToggle()
+    italiciseProofs()
 </script>
 {% endblock %}
