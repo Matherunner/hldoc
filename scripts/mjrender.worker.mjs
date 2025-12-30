@@ -14,10 +14,11 @@ import '@mathjax/src/js/input/tex/base/BaseConfiguration.js';
 import '@mathjax/src/js/input/tex/ams/AmsConfiguration.js';
 import '@mathjax/src/js/input/tex/newcommand/NewcommandConfiguration.js';
 import '@mathjax/src/js/input/tex/noundefined/NoUndefinedConfiguration.js';
+import '@mathjax/src/js/input/tex/color/ColorConfiguration.js';
 
 function createInputOutputJax() {
     const tex = new TeX({
-        packages: ['base', 'ams', 'newcommand', 'noundefined'],
+        packages: ['base', 'ams', 'newcommand', 'noundefined', 'color'],
         formatError(jax, err) { console.error(err.message); return jax.formatError(err) },
     })
     const chtml = new CHTML({

@@ -43,6 +43,7 @@ html_theme_options = {
         "color-foreground-primary": "rgb(59, 50, 40)",
         "color-background-primary": "#fcfcf6",
         "color-background-secondary": "#f9f9f0",
+        "color-table-header-background": "#f2f2ee",
     },
 }
 

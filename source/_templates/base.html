@@ -20,17 +20,33 @@
     }
 
     article figure {
-        margin-top: .5rem;
-        margin-bottom: .5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
 
     article figure figcaption {
+        margin-top: .5rem;
+        margin-bottom: 1rem;
         margin-left: auto;
         margin-right: auto;
         padding-left: .5rem;
         padding-right: .5rem;
+        padding-bottom: .5rem;
         max-width: 40em;
         text-align: left;
+    }
+
+    article .caption-number {
+        font-style: italic;
+        margin-right: .5em;
+    }
+
+    article code.literal {
+        font-size: var(--font-size--small);
+    }
+
+    .sidebar-scroll .sidebar-tree {
+        margin-bottom: 2rem;
     }
 </style>
 {% endblock %}
