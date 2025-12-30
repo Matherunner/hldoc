@@ -34,11 +34,17 @@ numfig_format = {
 
 html_theme = "furo"
 
-html_logo = "static/hlprlogo.png"
+html_logo = "static/hlprlogo.svg"
 
 html_title = "Half-Life Physics Reference"
 
-html_theme_options = {}
+html_theme_options = {
+    "light_css_variables": {
+        "color-foreground-primary": "rgb(59, 50, 40)",
+        "color-background-primary": "#fcfcf6",
+        "color-background-secondary": "#f9f9f0",
+    },
+}
 
 html_last_updated_fmt = "%b %d, %Y"
 

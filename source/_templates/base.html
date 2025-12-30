@@ -1,6 +1,6 @@
 {% extends "!base.html" %}
 
-{% block extrahead %}
+{% block extra_styles %}
 <style>
     .proof p.admonition-title {
         padding-left: .5rem;
@@ -18,7 +18,29 @@
         padding-top: .5rem !important;
         padding-bottom: .5rem !important;
     }
+
+    article figure {
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+    }
+
+    article figure figcaption {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        max-width: 40em;
+        text-align: left;
+    }
 </style>
+{% endblock %}
+
+{% block extrahead %}
+<link rel="icon" type="image/ico" href="https://www.jwchong.com/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.jwchong.com/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.jwchong.com/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://www.jwchong.com/android-chrome-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://www.jwchong.com/apple-touch-icon.png">
 {% endblock %}
 
 {% block body %}
