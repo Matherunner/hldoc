@@ -128,7 +128,7 @@ where the terms in the brackets match the prediction from Newtonian mechanics. I
 
 .. math:: x_n = \left( x_0 + vn\tau_g - \frac{1}{2} gn^2 \tau_g^2 \right) - \frac{1}{2} g\tau_g^2
 
-Let :math:`\tilde{x}_n` be the Newtonian prediction after :math:`n` frames of gravity. Then we first observe that :math:`\tilde{x}_n > x_n`. In addition, the difference :math:`\tilde{x}_n - x_n` is directly proportional to the frame time :math:`\tau_g` and inversely proportional to the frame rate :math:`f_g`. The lower the frame rate, the smaller :math:`x_n` becomes relative to :math:`\tilde{x}_n`, which manifests as lower vertical positions in the game. This may be understood in many different ways. For example, a falling entity would reach the ground sooner. An MP5 grenade would travel a shorter horizontal distance before landing.
+Let :math:`\tilde{x}_n` be the Newtonian prediction after :math:`n` frames of gravity. Then we first observe that :math:`\tilde{x}_n > x_n`. In addition, the difference :math:`\tilde{x}_n - x_n` is directly proportional to the frame time :math:`\tau_g` and inversely proportional to the frame rate :math:`f_g`. The lower the frame rate, the smaller :math:`x_n` becomes relative to :math:`\tilde{x}_n`, which manifests as lower vertical positions in the game. This may be understood in many different ways. For example, a falling entity would reach the ground sooner than what the Newtonian prediction suggests. An MP5 grenade would travel a shorter horizontal distance before landing.
 
 .. TODO: remove the duplicated explanation in player gravity
 
@@ -150,27 +150,25 @@ Entities of movetype ``MOVETYPE_STEP`` experience ground friction in a similar w
 
 .. _collision:
 
-Collision
----------
+Player collision
+----------------
 
 Many entities in Half-Life collide with one another.  The velocity of the
 colliding entity usually changes as a result, while the position and velocity
-of the entity receiving the collision usually stay constant, countering real
+of the entity receiving the collision usually stay constant, unlike real
 world Newtonian physics.  The process of changing the velocity is usually
-referred to as *velocity clipping*.  Collision is one of the most common events
+referred to as *velocity clipping*.  Collision between the player entity and a non-player entity is one of the most common and consequential events
 in Half-Life, so it is worthwhile to study its physics.
 
-Collisions occur in the position update step of an entity. The player entity's position update is described in :ref:`player position update`. A collision is detected by performing a player trace and checking if the trace strikes a plane. Let :math:`\mathbf{\hat{n}}` be the
-plane normal and let :math:`\mathbf{v}` be the velocity at the instant of
-collision.  Let :math:`b(C_b, k_e)` be the *bounce coefficient* which, in general, depends on ``sv_bounce`` (denoted as :math:`C_b`) and :math:`k_e`
-(see :ref:`friction`).  The bounce coefficient controls how the velocity is
-reflected akin to a light ray.  If :math:`\mathbf{v}'` is the velocity
-resulting from the collision, then the *general collision equation* (GCE) can
-be written as
+Collisions occur in the position update step of an entity. The player entity's position update is described in :ref:`player position update`. A collision is detected by performing a player trace and checking if the trace strikes a plane.
 
-.. math:: \mathbf{v}' = \mathbf{v} - b(C_b, k_e) \left( \mathbf{v} \cdot \mathbf{\hat{n}} \right)
-          \mathbf{\hat{n}}
-   :label: general collision equation
+.. prf:definition:: Generation collision equation
+   :label: generation collision equation
+
+   Let :math:`\mathbf{\hat{n}}` be the plane normal and let :math:`\mathbf{v}` be the velocity at the instant of collision.  Let :math:`b : \mathbb{R} \times \mathbb{R} \to \mathbb{R}` written as :math:`b(C_b, k_e)` be the *bounce coefficient function* which, in general, depends on ``sv_bounce`` (denoted as :math:`C_b`) and :math:`k_e` (see :ref:`friction`).  The bounce coefficient controls how the velocity is reflected akin to a light ray.  If :math:`\mathbf{v}'` is the velocity resulting from the collision, then the *general collision equation* (GCE) can be written as
+
+   .. math:: \mathbf{v}' = \mathbf{v} - b(C_b, k_e) \left( \mathbf{v} \cdot \mathbf{\hat{n}} \right) \mathbf{\hat{n}}.
+      :label: general collision equation
 
 Before we proceed, we must point out that this equation may be applied multiple times per frame when computing the position update for an entity.
 
@@ -233,8 +231,7 @@ In Half-Life, we can sometimes find concave walls made out of multiple planes
 that approximate a circular arc. Examples can be found in some Office Complex
 maps such as the wall shown in :numref:`arc wall c1a2`. Circular walls can be a
 blessing for speedrunners because they allow making sharp turns without losing
-too much speed. In fact, if the number of planes increases, the approximation
-will improve, and so the speed will be better preserved.
+too much speed. In fact, the higher the number of planes, the better preserved the player speed.
 
 .. figure:: images/speed-preserving-c1a2.jpg
    :name: arc wall c1a2
@@ -255,17 +252,17 @@ coincident with the first wall. Assume also that :math:`0 \le \beta / (n-1) \le
 the velocity does not change due to other external factors throughout the
 collisions, then
 
-.. math:: \lVert\mathbf{v}_{i+1}\rVert = \lVert\mathbf{v}_i\rVert \cos \left(
-          \frac{\beta}{n - 1} \right)
+.. math:: \lVert\mathbf{v}_{i+1}\rVert = \lVert\mathbf{v}_i\rVert \cos\!\left(
+          \frac{\beta}{n - 1} \right).
 
 The general equation at frame :math:`n` is simply
 
-.. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert \cos^{n-1} \left(
-          \frac{\beta}{n-1} \right)
+.. math:: \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert \cos^{n-1}\!\left(
+          \frac{\beta}{n-1} \right).
 
-It can be verified that
+.. prf:theorem::
 
-.. math:: \lim_{n \to \infty} \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert
+   Assume that :math:`0 \le \beta \le \pi/2` with the meaning defined earlier. As the number of walls :math:`n` approximating an arc goes to infinity, we have :math:`\lVert\mathbf{v}_n\rVert \to \lVert\mathbf{v}_0\rVert`. Written equivalently, :math:`\lim_{n\to\infty} \lVert\mathbf{v}_n\rVert = \lVert\mathbf{v}_0\rVert`.
 
 This demonstrates the speed preserving property of circular walls. Observe also
 that the final speed is completely independent of the radius of the arc.

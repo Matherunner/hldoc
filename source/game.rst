@@ -89,24 +89,38 @@ Slowdown on older engines
 
 Suppose the game frame rate is higher than 20 fps. On older game engines, roughly before build 6027, the player frame rate equals the game frame rate rounded towards zero to the nearest 0.001, as mentioned above. Namely, we have
 
-.. math:: \tau_p = \frac{\left\lfloor 1000 \tau_g \right\rfloor}{1000}
+.. math:: \tau_p = \frac{\left\lfloor 1000 \tau_g \right\rfloor}{1000}.
 
-The slowdown factor is then defined as
-
-.. math:: \eta = \frac{\tau_p}{\tau_g} = \frac{\left\lfloor 1000\tau_g \right\rfloor}{1000\tau_g} = \frac{f_g}{1000} \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{f_g}{f_p}
+.. prf:definition:: Slowdown factor
   :label: slowdown factor
 
-When the slowdown factor is less than one, the actual movement speed of the player will be lower. The player's position update described in :ref:`player position update` uses :math:`\tau_p` but runs at the rate of :math:`\tau_g^{-1}` Hz. Indeed, the real velocity of the player is directly proportional to :math:`\eta`:
+  The slowdown factor is defined as the fraction
 
-.. math:: \frac{\mathbf{r}' - \mathbf{r}}{\tau_g} = \frac{\mathbf{r} + \tau_p \mathbf{v}' - \mathbf{r}}{\tau_g} = \frac{\tau_p}{\tau_g} \mathbf{v}' = \eta \mathbf{v}'
+  .. math:: \eta = \frac{\tau_p}{\tau_g} = \frac{\left\lfloor 1000\tau_g \right\rfloor}{1000\tau_g} = \frac{f_g}{1000} \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{f_g}{f_p}.
+    :label: slowdown factor
 
-For instance, a trick known as the "501 fps slowdown" was implemented in Half-Life 21 (see :ref:`half-life-21`) to permit opening and passing through doors in the Questionable Ethics chapter without stopping dead by the doors before they could be opened fully. The slowdown factor at 501 fps is :math:`\eta = 0.501`, implying the real velocity is roughly half the intended player velocity. On pre-Steam versions of Half-Life and its expansions, the default frame rate is 72 fps (and some speedrunners believe it should not be exceeded), which would give a slowdown factor of :math:`\eta = 117/125 = 0.936`.
+When the slowdown factor is less than one, the actual movement speed of the player will be lower. The player's position update described in :ref:`player position update` uses :math:`\tau_p` but runs at the rate of :math:`\tau_g^{-1}` Hz. Indeed, the real velocity of the player is directly proportional to :math:`\eta`, since
 
-It is a well known fact that the slowdown factor :math:`\eta = 1` if and only if :math:`1000/f_g` is an integer. This is because as seen in :eq:`slowdown factor`, if :math:`\eta = 1` we must have
+.. math:: \frac{\mathbf{r}' - \mathbf{r}}{\tau_g} = \frac{\mathbf{r} + \tau_p \mathbf{v}' - \mathbf{r}}{\tau_g} = \frac{\tau_p}{\tau_g} \mathbf{v}' = \eta \mathbf{v}'.
 
-.. math:: \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{1000}{f_g}
+For instance, a trick known as the "501 fps slowdown" was implemented in Half-Life 21 (see :ref:`half-life-21`) to permit opening and passing through doors in the Questionable Ethics chapter without stopping dead by the doors before they could be opened fully. The slowdown factor at 501 fps is :math:`\eta = 0.501`. With this slowdown factor, the real velocity is roughly half the developer-intended player velocity.
 
-which is only possible if :math:`1000/f_g` is an integer.
+It's also worth noting that on pre-Steam versions of Half-Life and its expansions, the default frame rate is 72 fps (and some speedrunners believe it should not be exceeded), which would give a slowdown factor of :math:`\eta = 117/125 = 0.936`. It's interesting that some retail releases made the player move roughly 7% slower than the intended speed.
+
+The following theorem is a well known fact among speedrunners: by setting an appropriate value for the game frame rate :math:`f_g`, the player would experience no slowdown.
+
+.. prf:theorem:: No-slowdown frame rate
+  :label: no-slowdown frame rate
+
+  The slowdown factor :math:`\eta = 1` if and only if :math:`1000/f_g` is an integer.
+
+.. prf:proof::
+
+  By the last equality in :eq:`slowdown factor`, :math:`\eta = 1` if and only if :math:`f_g = f_p` if and only if
+
+  .. math:: \left\lfloor \frac{1000}{f_g} \right\rfloor = \frac{1000}{f_g},
+
+  which is only possible if :math:`1000/f_g` is an integer.
 
 Savestates
 ----------

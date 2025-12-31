@@ -52,41 +52,168 @@ One way to change the yaw and pitch is by moving the mouse. This is not useful f
 Anglemod
 ~~~~~~~~
 
-When the viewangles are sent to the server, their values *in degrees* are rounded slightly using the *anglemod* function, which will be denoted :math:`\mathfrak{A}`. The *degrees-anglemod* function may be mathematically written as
+When the viewangles are sent to the server, their values *in degrees* are rounded slightly using the *anglemod* function, which will be denoted :math:`\mathfrak{A}`. We'll define the function precisely as follows.
 
-.. math:: \mathfrak{A}_d(x) = \frac{360}{65536} \left( \operatorname{int}\left( x \frac{65536}{360} \right) \mathbin{\mathtt{AND}} 65535 \right)
+.. prf:definition:: Integer truncation
+   :label: integer truncation
 
-where :math:`\operatorname{int}(x)` denotes the integer part of :math:`x`. Similarly, the *radians-anglemod* function may be written as
+   For all :math:`x \in \mathbb{R}`, define :math:`\operatorname{int} : \mathbb{R} \to \mathbb{I}_n` the *integer part* or *integer truncation* function as
 
-.. math:: \mathfrak{A}_r(x) = \frac{2\pi}{65536} \left( \operatorname{int}\left( x \frac{65536}{2\pi} \right) \mathbin{\mathtt{AND}} 65535 \right)
+   .. math:: \operatorname{int}(x) =
+         \begin{cases}
+         \left\lfloor x\right\rfloor & x \ge 0 \\
+         \left\lceil x\right\rceil & x < 0,
+         \end{cases}
 
-Observe that :math:`0^\circ \le \mathfrak{A}_d(x) < 360^\circ` and :math:`0 \le \mathfrak{A}_r(x) < 2 \pi`, regardless of :math:`x`. To see this, first assume :math:`x \ge 0`. Then, the ``AND`` operation extracts only the lower 16 bits of the first integer argument. This is mathematically equivalent to modulo :math:`65536`. Now if :math:`x < 0`, then recall from the two's complement representation that the *signed* integer representing some negative value :math:`-a` (with :math:`a > 0`) has a positive value of :math:`2^{32} - a` if interpreted as an *unsigned* integer. Now,
+   where :math:`\mathbb{I}_n \subset \mathbb{Z}` is an :math:`n`-bit integer in two's complement. We will assume in this documentation that :math:`n > 16`.
 
-.. math::
-   \begin{aligned}
-   (2^{32} - a) \mathbin{\mathtt{AND}} (2^{16} - 1)
-   &= (2^{32} - a) \bmod 2^{16} \\
-   &= 2^{32} - a - \left\lfloor \frac{2^{32} - a}{2^{16}} \right\rfloor 2^{16} \\
-   &= 2^{32} - a - \left\lfloor 2^{16} - \frac{a}{2^{16}} \right\rfloor 2^{16} \\
-   &= 2^{32} - a - 2^{32} + \left\lceil \frac{a}{2^{16}} \right\rceil 2^{16} \\
-   &= \left\lceil \frac{a}{2^{16}} \right\rceil 2^{16} - a
-   \end{aligned}
+.. prf:definition:: Degrees-anglemod
+   :label: degrees anglemod
 
-To proceed further, write :math:`a = q 2^{16} + r` where :math:`q` and :math:`r` are integers and :math:`0 \le r < 2^{16}` is the integer remainder when :math:`a` is divided by :math:`2^{16}` (remember that :math:`a \ge 0`). Then
+   The *degrees-anglemod* function :math:`\mathfrak{A}_d : \mathbb{R} \to \mathbb{R}` may be written as
 
-.. math:: \left\lceil \frac{a}{2^{16}} \right\rceil 2^{16} - a
-   = \left\lceil q + \frac{r}{2^{16}} \right\rceil 2^{16} - 2^{16} q - r
-   = \left\lceil \frac{r}{2^{16}} \right\rceil 2^{16} - r
+   .. math:: \mathfrak{A}_d(x) = \frac{360}{65536} \left( \operatorname{int}\!\left( x \frac{65536}{360} \right) \mathbin{\mathtt{AND}} 65535 \right)
 
-Since :math:`0 \le r = a \bmod 2^{16} < 2^{16}`, this simplifies to
+   where ``AND`` is the bitwise AND binary operator.
 
-.. math:: -a \mathbin{\mathtt{AND}} 2^{16} =
-   \begin{cases}
-   2^{16} - r & r \ne 0 \\
-   0 & r = 0
-   \end{cases}
+.. prf:definition:: Radians-anglemod
+   :label: radians anglemod
 
-Anglemod introduces a loss of precision in setting angles. This can result in a loss of optimality in strafing. There are two ways to reduce the effects of anglemod, namely by the *simple anglemod compensation* and the more advanced *vectorial compensation*. These techniques will be described in :ref:`vectorial compensation`.
+   The *radians-anglemod* function :math:`\mathfrak{A}_r : \mathbb{R} \to \mathbb{R}` may be written as
+
+   .. math:: \mathfrak{A}_r(x) = \frac{2\pi}{65536} \left( \operatorname{int}\!\left( x \frac{65536}{2\pi} \right) \mathbin{\mathtt{AND}} 65535 \right).
+
+To illustrate, we have the following examples of the output of degrees-anglemod.
+
+==============  =========================  ======================
+:math:`x`       :math:`\mathfrak{A}_d(x)`  :math:`x \bmod 360`
+==============  =========================  ======================
+:math:`0`       :math:`0`                  :math:`0`
+:math:`1`       :math:`0.99975586`         :math:`1`
+:math:`20`      :math:`19.995117`          :math:`20`
+:math:`45`      :math:`45`                 :math:`45`
+:math:`89`      :math:`88.99475`           :math:`89`
+:math:`400`     :math:`39.995728`          :math:`40`
+:math:`-0.005`  :math:`0`                  :math:`359.995`
+:math:`-1`      :math:`359.00024`          :math:`359`
+:math:`-20`     :math:`340.00488`          :math:`340`
+:math:`-45`     :math:`315`                :math:`315`
+:math:`-400`    :math:`320.00427`          :math:`320`
+==============  =========================  ======================
+
+The philosophy behind the anglemod function is to "wrap" the input angle into the range of :math:`[0^\circ, 360^\circ)` (for the degrees version). Except, rather than implementing the function in the most straightforward way using conditional branches and floating point divisions, the game *approximates* the result with a combination of integer bitwise operations and floating point multiplications, presumably to improve performance on 1990s hardware. On modern hardware, one could simply call the ``fmod`` standard library function in C. Incidentally, the CryEngine 1 also contains small uses of anglemod, though it's not used for view computation.
+
+.. prf:definition:: Real version of modulo
+   :label: real modulo
+
+   A version of the modulo binary operator :math:`x \bmod y` may be defined for :math:`x \in \mathbb{R}` and :math:`y \in \mathbb{Z}^+` with :math:`y > 0` such that :math:`x = yq + r` where :math:`q \in \mathbb{Z}` and :math:`r \in \mathbb{R}` with :math:`0 \le r < y`.
+
+Anglemod, then, is an approximation of :math:`x \bmod 360` with :math:`x \in \mathbb{R}` for the version in degrees.
+
+:prf:ref:`bitwise and equivalence` is useful for converting the bitwise AND operation into the mathematically more well understood and convenient :math:`\bmod` operator. Since we assume the :math:`\operatorname{int}` operator produces :math:`\mathbb{I}_n` where :math:`n > 16`, this lemma is applicable to the anglemod function as it computes an integer of more than 16 bits modulo :math:`65536 = 2^{16}` with :math:`m = 16`. This will be useful in the subsequent proofs.
+
+.. prf:lemma:: Equivalence of bitwise AND and modulo
+   :label: bitwise and equivalence
+
+   Let :math:`x` be an :math:`n`-bit integer in two's complement and :math:`m < n` an integer. Then :math:`x \mathbin{\mathtt{AND}} \left(2^m - 1\right) = x \bmod 2^m = r`, such that :math:`x = 2^m q + r` with :math:`0 \le r < 2^m`.
+
+.. prf:proof::
+
+   Assume :math:`x \ge 0` with :math:`n` bits. We may write :math:`x = \sum_{k=0}^n b_k 2^k`. Then :math:`x \mathbin{\mathtt{AND}} \left(2^m - 1\right) = \sum_{k=0}^{m-1} b_k 2^k` as this is equivalent to "masking out" the least significant :math:`m` bits. Separately, note that :math:`x \bmod 2^m` removes higher order terms :math:`\sum_{k=m}^n b_k 2^k` because :math:`2^m` divides the sum, hence :math:`x \bmod 2^m = \sum_{k=0}^{m-1} b_k 2^k = x \mathbin{\mathtt{AND}} \left(2^m - 1\right)`, as required.
+
+   Now assume :math:`x < 0`. Since :math:`x` is stored in two's complement, if we *reinterpret* the bits as an *unsigned* integer, we obtain :math:`\tilde{x} = 2^n + x > 0`. Now since :math:`m < n`, we have
+
+   .. math:: \tilde{x} \mathbin{\mathtt{AND}} \left(2^m - 1\right) = \left(2^n + x\right) \mathbin{\mathtt{AND}} \left(2^m - 1\right)
+         = \left(2^n + x - 2^n\right) \mathbin{\mathtt{AND}} \left(2^m - 1\right)
+         = x \mathbin{\mathtt{AND}} \left(2^m - 1\right).
+
+   Namely, the most significant sign bit will be cleared as a result of masking out the least significant :math:`n - 1` bits at most. On the other hand,
+
+   .. math:: \tilde{x} \mathbin{\mathtt{AND}} \left(2^m - 1\right)
+         = \left( 2^n + x \right) \mathbin{\mathtt{AND}} \left(2^m - 1\right) = \left( 2^n + x \right) \bmod 2^m = x \bmod 2^m
+
+   as required.
+
+.. prf:lemma:: Partial periodicity of anglemod
+   :label: periodicity of anglemod
+
+   The degrees-anglemod :math:`\mathfrak{A}_d` is "partially" periodic with a period of :math:`p = 360` in the sense that
+
+   .. math::
+      \begin{aligned}
+      \mathfrak{A}_d(x) &= \mathfrak{A}_d(x + p) & x &\ge 0 \\
+      \mathfrak{A}_d(x) &= \mathfrak{A}_d(x - p) & x &< 0.
+      \end{aligned}
+
+.. prf:proof::
+
+   Assume :math:`x \ge 0`. By :prf:ref:`bitwise and equivalence` and :prf:ref:`integer truncation`, we have
+
+   .. math::
+      \begin{aligned}
+      \mathfrak{A}_d(x + p) &= \frac{360}{65536} \left( \left\lfloor x \frac{65536}{360} + 65536 \right\rfloor \bmod 65536 \right) \\
+      &= \frac{360}{65536} \left( \left( \left\lfloor x \frac{65536}{360} \right\rfloor + 65536 \right) \bmod 65536 \right) \\
+      &= \frac{360}{65536} \left( \left\lfloor x \frac{65536}{360} \right\rfloor \bmod 65536 \right) \\
+      &= \mathfrak{A}_d(x).
+      \end{aligned}
+
+   Now assume :math:`x < 0`. We similarly have
+
+   .. math::
+      \begin{aligned}
+      \mathfrak{A}_d(x - p) &= \frac{360}{65536} \left( \left\lceil x \frac{65536}{360} - 65536 \right\rceil \bmod 65536 \right) \\
+      &= \frac{360}{65536} \left( \left( \left\lceil x \frac{65536}{360} \right\rceil - 65536 \right) \bmod 65536 \right) \\
+      &= \frac{360}{65536} \left( \left\lceil x \frac{65536}{360} \right\rceil \bmod 65536 \right) \\
+      &= \mathfrak{A}_d(x).
+      \end{aligned}
+
+.. prf:theorem:: Error bounds of anglemod
+   :label: anglemod error bounds
+
+   Let :math:`x \in \mathbb{R}`. Assume :math:`x \bmod 360` to carry the meaning defined in :prf:ref:`real modulo`. The error bounds on degrees-anglemod are given as follows.
+
+   .. math::
+      \begin{aligned}
+      \displaystyle 0 \le \left( x \bmod 360 \right) - \mathfrak{A}_d(x) &< \frac{360}{65536} & \displaystyle \text{for } & x \ge 0 \\[1ex]
+      \displaystyle 0 < 360 - \left( x \bmod 360 \right) - \mathfrak{A}_d(x) &< \frac{360}{65536} & \displaystyle \text{for } & {-\frac{360}{65536}} < x < 0 \\[1ex]
+      \displaystyle 0 \le \mathfrak{A}_d(x) - \left( x \bmod 360 \right) &< \frac{360}{65536} & \displaystyle \text{for } & x \le -\frac{360}{65536}.
+      \end{aligned}
+
+.. prf:proof::
+
+   Let :math:`f(x) = \left( x \bmod 360 \right) - \mathfrak{A}_d(x)`.
+
+   Suppose :math:`x \ge 0`. By inspection and :prf:ref:`periodicity of anglemod`, we only need to consider :math:`0 \le x < 360`, as any :math:`x \ge 360` can be reduced to these bounds by subtracting a multiple of :math:`360`. This allows us to simplify and write :math:`f = x - \mathfrak{A}_d(x)`. By :prf:ref:`integer truncation`, we can also replace the integer truncation function :math:`\operatorname{int}` with the simpler floor function :math:`\lfloor \cdot \rfloor` in :math:`\mathfrak{A}_d`. Now
+
+   .. math::
+      \begin{aligned}
+      f &= \frac{360}{65536} \left( x \frac{65536}{360} - \left( \left\lfloor x \frac{65536}{360} \right\rfloor \bmod 65536 \right) \right) \\
+      &= \frac{360}{65536} \left( y - \left( \left\lfloor y \right\rfloor \bmod 65536 \right) \right)
+      \end{aligned}
+
+   where we have set :math:`y = x \cdot 65536 / 360`. The assumption :math:`0 \le x < 360` implies :math:`0 \le \left\lfloor y\right\rfloor < 65536` and :math:`\left\lfloor y\right\rfloor \bmod 65536 = \left\lfloor y\right\rfloor`, so
+
+   .. math:: 0 \le f = \frac{360}{65536} \left( y - \left\lfloor y\right\rfloor \right) < \frac{360}{65536}.
+
+   Suppose :math:`-360/65536 < x < 0`. Observe that :math:`\mathfrak{A}_d(x) = 0` but :math:`x \bmod 360 = 360 - x`. So :math:`360 - \left( x \bmod 360 \right) = x`, as required.
+
+   Finally, suppose :math:`-360 < x \le -360/65536`. Again with :prf:ref:`periodicity of anglemod`, any :math:`x \le -360` can be reduced to these bounds or the case above by adding a multiple of :math:`360`. So :math:`f = 360 + x - \mathfrak{A}_d(x)`. We can replace the :math:`\operatorname{int}` function with :math:`\left\lceil \cdot \right\rceil` in :math:`\mathfrak{A}_d` by :prf:ref:`integer truncation`. So similarly,
+
+   .. math::
+      \begin{aligned}
+      f &= \frac{360}{65536} \left( 65536 + x \frac{65536}{360} - \left( \left\lceil x \frac{65536}{360} \right\rceil \bmod 65536 \right) \right) \\
+      &= \frac{360}{65536} \left( 65536 + y - \left( \left\lceil y\right\rceil \bmod 65536 \right) \right) \\
+      &= \frac{360}{65536} \left( 65536 + y - \left( -\left\lfloor \left\lvert y\right\rvert \right\rfloor \bmod 65536 \right) \right).
+      \end{aligned}
+
+   Note that the assumption :math:`-360 < x \le -360/65536` implies :math:`-65536 < y \le -1`. This allows us to reduce :math:`-\left\lfloor \left\lvert y\right\rvert\right\rfloor \bmod 65536 = 65536 - \left\lfloor \left\lvert y\right\rvert\right\rfloor`. Hence,
+
+   .. math:: f = \frac{360}{65536} \left( 65536 + y - \left(65536 - \left\lfloor \left\lvert y\right\rvert\right\rfloor \right) \right)
+      = \frac{360}{65536} \left( \left\lfloor \left\lvert y\right\rvert \right\rfloor - \left\lvert y\right\rvert \right).
+
+   This gives us the bounds :math:`0 \le -f < 360/65536`.
+
+As stated by :prf:ref:`anglemod error bounds`, anglemod introduces a loss of precision in setting angles. This can result in a loss of optimality in strafing. There are two ways to reduce the effects of anglemod, namely by the *simple anglemod compensation* and the more advanced *vectorial compensation*. These techniques will be described in :ref:`vectorial compensation`.
 
 .. _view vectors:
 
