@@ -134,6 +134,8 @@ Anglemod, then, is an approximation of :math:`x \bmod 360` with :math:`x \in \ma
 
    as required.
 
+.. danger:: In the following proofs, we will ignore overflows.
+
 .. prf:lemma:: Partial periodicity of anglemod
    :label: periodicity of anglemod
 
