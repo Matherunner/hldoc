@@ -80,7 +80,7 @@ are all the possible movetypes in Half-Life:
 ``MOVETYPE_BOUNCE``
    This movetype is used by entities that can bounce off other entities. A
    prominent example is the hand grenade (:ref:`handgrenade`), but satchel
-   charges (:ref:`satchel`), MP5 greandes, and others use this movetype as well.
+   charges (:ref:`satchel`), MP5 grenades, and others use this movetype as well.
    Similar to ``MOVETYPE_TOSS``, ``SV_Physics_Toss`` is called for this
    movetype, but with the bounce coefficient (see :ref:`collision`) computed by
    :math:`b = 2 - k_e`.
@@ -93,7 +93,7 @@ are all the possible movetypes in Half-Life:
 
 ``MOVETYPE_FOLLOW``
    Entities of this movetype tracks the movement of the entity given by
-   ``pev->aiment``. For example, the ``CBasePlayerItem`` class, subclassed by
+   ``pev->aiment``. For example, the ``CBasePlayerItem`` class, inherited by
    all player weapons, follows the player and is set to this movetype. Entities
    of this movetype does not experience gravity or collision.
    ``SV_Physics_Follow`` runs its physics code, and consists of calling
