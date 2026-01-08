@@ -6,24 +6,21 @@ Half-Life Physics Reference
 
 .. image:: images/gordon-scientist.jpg
 
-This is an unofficial documentation for the physics governing the Half-Life_ universe. There have been many very comprehensive wikis for games in the Half-Life series, such as the `Half-Life Wikia`_ and the `Combine OverWiki`_. These wikis focus on the storyline and casual gaming aspects of the Half-Life series video games. There is also a wiki for the practical speedrunning aspects of these games, namely the `SourceRuns Wiki`_, though it has been virtually abandoned with little to no updates. Despite the wealth of strategy guides available for Half-Life, it is almost impossible to find documentations describing the physics of the game with a satisfying level of technical accuracy.
+This document serves as an unofficial technical reference for the physics governing the Half-Life_ universe. While the community has produced very comprehensive resources for games in the Half-Life series, such as the `Half-Life Wikia`_ and the `Combine OverWiki`_, *these wikis primarily prioritise narrative lore and casual gameplay*. The `SourceRuns Wiki`_, which addresses the practicalities of speedrunning, has fallen into disuse, leaving a void in technical documentation at the level of mathematics and code. Despite the abundance of strategy guides, there remains a distinct lack of resources that describe the game's underlying physics with a satisfying level of rigour.
 
 .. _Half-Life: https://en.wikipedia.org/wiki/Half-Life_(video_game)
 .. _Half-Life Wikia: http://half-life.wikia.com/wiki/Main_Page
 .. _Combine OverWiki: http://combineoverwiki.net/wiki/Main_Page
 .. _SourceRuns Wiki: http://wiki.sourceruns.org/wiki/Main_Page
 
-Knowledge about the physics of Half-Life is important for developing tools for Half-Life TAS production and for the process of TASing itself. Highly precise tools are required to exploit the in-game physics to the fullest extent. Perhaps more importantly, developing an understanding and intuition for Half-Life physics is vital in producing a highly optimised TAS for the game and resolving tricky physics issues arising out of speedrunning.
+Understanding the mechanics of Half-Life is essential for the development of tool-assisted speedruns (TAS) utilities and the execution of the runs themselves. Exploiting the engine to its fullest extent requires high-precision tools, but perhaps more importantly, it requires a deep intuition for how the game processes various complex mechanics such as :ref:`strafing`, :ref:`nuking` etc. Developing this understanding is vital for optimising routes, along with problem solving and troubleshooting tricky physics issues that arise during speedrunning.
 
-Thus, this documentation strives to detail all aspects of the physics in a way that would help any curious minds to gain a much deeper appreciation for Half-Life and its speedruns. The potential tool developers will also find this documentation a helpful guide. This documentation aims to serve as a definitive reference material for Half-Life physics.
+Thus, this documentation strives to detail all aspects of the engine's physics to provide curious minds with a much deeper appreciation for the technical side of Half-Life and the breathtaking speedruns produced by multiple generations of the community over the years. Whether you are a tool developer seeking a guide or a runner looking to master the game's inner workings, this material aims to be your primary reference.
 
 Frequently asked questions
 --------------------------
 
-**Who are you?** I'm someone who played Half-Life as a kid, and became deeply
-fascinated by its physics much later when this_ monumental single-segment run
-was published in 2011 by quadrazid. I sought to understand how every trick in
-the run worked, which necessitated the study of the physics of the entire game.
+**Who are you?** I'm someone who played Half-Life as a kid and became deeply fascinated by its physics much later when quadrazid published this_ monumental single-segment run was published in 2011. My drive to understand how every trick in that run functioned necessitated a deep dive into the physics and mathematics of the engine game.
 
 .. _this: https://youtu.be/AKIpyz0EjuY
 
@@ -38,33 +35,32 @@ high proficiency in trigonometry. Some knowledge of calculus is also assumed.
 **Couldn't you write this documentation in a simpler way?** Our goal with this
 documentation is to describe the physics of Half-Life as precisely as possible.
 Many of the concepts in Half-Life are highly intricate and precise. Attempts to
-simplify these concepts may help in many situations, but the simplified
-explanations will fail under some edge cases. It is often these edge cases that
+simplify these concepts may help in general play and manual speedrunning, but the simplified
+explanations may fail to account for the edge cases. It is often these edge cases that
 we seek to exploit in a TAS. A quote often attributed to Albert Einstein sums
 this up aptly:
 
-   *Everything should be made as simple as possible, but no simpler.*
+   "*Everything should be made as simple as possible, but no simpler.*"
 
 **Are the equations made up from thin air?** We do not conjure up any equation
 based on conjectures or guesswork, unless *clearly* stated otherwise. All
 equations and mathematics in this documentation are ultimately derived from the
 Half-Life SDK or the reverse-engineered engine code. Empirically derived
-equations will also be stated clearly.
+equations will also be explicitly identified as such.
 
-**How did you create this documentation?** We experimented with many different
+**How did you create this documentation?** We experimented with various
 tools, including LaTeX, but ultimately settled on reStructuredText with Sphinx_
-in combination with `pre-rendered`_ MathJax_. Sphinx is a really good system for
+in combination with pre-rendered MathJax_. Sphinx is an exceptional system for
 generating highly structured documentations. In fact, it is used to document
 most Python modules, including the heavy hitters like numpy_, requests_, etc. In
 addition, reStructuredText is the most extensible and structured markup language
 that is not LaTeX, rivalled only by AsciiDoc or AsciiDoctor. For mathematical
 typesetting, MathJax is by far the most mature for the web which runs well on
 many browsers. Prominent sites such as MathOverflow_ use it. By pre-rendering
-MathJax, the loading times of pages can be dramatically reduced.
+MathJax, we have significantly reduced page loading times.
 
 .. _Sphinx: http://www.sphinx-doc.org/en/master/
-.. _pre-rendered: https://github.com/mathjax/MathJax-node
-.. _MathJax: https://www.mathjax.org
+.. _MathJax: https://docs.mathjax.org/en/latest/
 .. _numpy: http://www.numpy.org
 .. _requests: http://docs.python-requests.org/en/master/
 .. _MathOverflow: https://mathoverflow.net
@@ -107,6 +103,8 @@ The dot product between two vectors :math:`\mathbf{a}` and :math:`\mathbf{b}` is
 On the other hand, the cross product between :math:`\mathbf{a}` and :math:`\mathbf{b}` is
 
 .. math:: \mathbf{a} \times \mathbf{b}
+
+We do not use the prime notation as in :math:`x'` to mean :math:`dx/dt`. Generally, the prime version of a variable denotes the *next state* of the variable, whatever "next" may be. If we intend to notate differentiation, we always write out :math:`dx/dt` explicitly.
 
 Contact
 -------
