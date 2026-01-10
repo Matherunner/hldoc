@@ -6,23 +6,34 @@ Half-Life Physics Reference
 
 .. image:: images/gordon-scientist.jpg
 
-This document serves as an unofficial technical reference for the physics governing the Half-Life_ universe. While the community has produced very comprehensive resources for games in the Half-Life series, such as the `Half-Life Wikia`_ and the `Combine OverWiki`_, *these wikis primarily prioritise narrative lore and casual gameplay*. The `SourceRuns Wiki`_, which addresses the practicalities of speedrunning, has fallen into disuse, leaving a void in technical documentation at the level of mathematics and code. Despite the abundance of strategy guides, there remains a distinct lack of resources that describe the game's underlying physics with a satisfying level of rigour.
+Welcome to the unofficial technical reference for the physics governing the Half-Life_ universe!
+
+While the community has produced very comprehensive resources for games in the Half-Life series, such as the `Half-Life Wiki`_ and the `Combine OverWiki`_, *these wikis primarily prioritise narrative lore and casual gameplay*. In addition, while both the `old <old SourceRuns Wiki_>`_ and the `new SourceRuns Wiki`_ do address the practicalities of speedrunning and provide technical descriptions of tricks aimed to help speedrunners gain a working knowledge or operational understanding of them, they leave a void in precision and formality at the level of mathematics and code. Despite the abundance of strategy guides, there remains a distinct lack of resources that describe the game's underlying physics with a satisfying level of rigour.
 
 .. _Half-Life: https://en.wikipedia.org/wiki/Half-Life_(video_game)
-.. _Half-Life Wikia: http://half-life.wikia.com/wiki/Main_Page
-.. _Combine OverWiki: http://combineoverwiki.net/wiki/Main_Page
-.. _SourceRuns Wiki: http://wiki.sourceruns.org/wiki/Main_Page
+.. _Half-Life Wiki: https://half-life.fandom.com/wiki/Main_Page
+.. _Combine OverWiki: https://combineoverwiki.net/wiki/Main_Page
+.. _old SourceRuns Wiki: https://wiki.sourceruns.org/Main-Page.html
+.. _new SourceRuns Wiki: https://wiki.openag.pro/
 
 Understanding the mechanics of Half-Life is essential for the development of tool-assisted speedruns (TAS) utilities and the execution of the runs themselves. Exploiting the engine to its fullest extent requires high-precision tools, but perhaps more importantly, it requires a deep intuition for how the game processes various complex mechanics such as :ref:`strafing`, :ref:`nuking` etc. Developing this understanding is vital for optimising routes, along with problem solving and troubleshooting tricky physics issues that arise during speedrunning.
 
 Thus, this documentation strives to detail all aspects of the engine's physics to provide curious minds with a much deeper appreciation for the technical side of Half-Life and the breathtaking speedruns produced by multiple generations of the community over the years. Whether you are a tool developer seeking a guide or a runner looking to master the game's inner workings, this material aims to be your primary reference.
 
+Contact
+-------
+
+This documentation is currently a one-man project maintained by `Jiangwei Chong <https://jwchong.com>`_, a software engineer. Feel free to reach out via the following for questions, feedback, suggestions, ideas, or anything you'd like to talk about:
+
+- **Matherunner** at `Discord <https://discord.gg/sourceruns>`_
+- jw@jwchong.com
+
 Frequently asked questions
 --------------------------
 
-**Who are you?** I'm someone who played Half-Life as a kid and became deeply fascinated by its physics much later when quadrazid published this_ monumental single-segment run was published in 2011. My drive to understand how every trick in that run functioned necessitated a deep dive into the physics and mathematics of the engine game.
+**Who are you?** I'm someone who played Half-Life as a kid and became deeply fascinated by its physics much later when quadrazid published `this monumental single-segment run <quadrazid single-segment_>`_ in 2011. My drive to understand how every trick in that run functioned necessitated a deep dive into the physics and mathematics of the engine game.
 
-.. _this: https://youtu.be/AKIpyz0EjuY
+.. _quadrazid single-segment: https://youtu.be/AKIpyz0EjuY
 
 **Would I be able to understand this documentation?** It depends on how much
 mathematics and programming you know. You are assumed to have an *intermediate*
@@ -31,6 +42,9 @@ times when you need to reference it. By extension, you are assumed to be
 proficient in C or C++. Since this documentation is heavy in mathematics, you
 are assumed to be fluent in vector algebra and some linear algebra, along with a
 high proficiency in trigonometry. Some knowledge of calculus is also assumed.
+
+.. image:: images/hlsdk-meme.webp
+   :width: 400px
 
 **Couldn't you write this documentation in a simpler way?** Our goal with this
 documentation is to describe the physics of Half-Life as precisely as possible.
@@ -105,13 +119,6 @@ On the other hand, the cross product between :math:`\mathbf{a}` and :math:`\math
 .. math:: \mathbf{a} \times \mathbf{b}
 
 We do not use the prime notation as in :math:`x'` to mean :math:`dx/dt`. Generally, the prime version of a variable denotes the *next state* of the variable, whatever "next" may be. If we intend to notate differentiation, we always write out :math:`dx/dt` explicitly.
-
-Contact
--------
-
-This documentation is currently a one-man project. `Contact me`_.
-
-.. _Contact me: jw@jwchong.com
 
 Contents
 --------
