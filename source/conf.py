@@ -17,7 +17,7 @@ author = "Jiangwei Chong"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_proof"]
+extensions = ["sphinx_proof", "sphinxext.opengraph"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "venv"]
@@ -59,3 +59,6 @@ html_show_sourcelink = False
 
 pygments_style = "sphinx"
 pygments_dark_style = "monokai"
+
+ogp_site_url = "https://jwchong.com/hl/"
+ogp_image = "https://jwchong.com/hl/_static/hlprlogo.svg"
