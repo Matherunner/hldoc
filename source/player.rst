@@ -225,7 +225,7 @@ As stated by :prf:ref:`anglemod error bounds`, anglemod introduces a loss of pre
 View vectors
 ------------
 
-In :ref:`viewangles` we parametrised the player's viewing direction in terms of the viewangles :math:`(\varphi, \vartheta, \varrho)`. In many game mechanics, we work with *vectors* associated with the viewing direction instead. We may call them *view vectors*.
+In :ref:`player viewangles` we parametrised the player's viewing direction in terms of the viewangles :math:`(\varphi, \vartheta, \varrho)`. In many game mechanics, we work with *vectors* associated with the viewing direction instead. We may call them *view vectors*.
 
 .. prf:definition:: Three dimensional view vectors
    :label: three dimensional view vectors
