@@ -31,7 +31,7 @@ This documentation is currently a one-man project maintained by `Jiangwei Chong 
 Frequently asked questions
 --------------------------
 
-**Who are you?** I'm someone who played Half-Life as a kid and became deeply fascinated by its physics much later when quadrazid published `this monumental single-segment run <quadrazid single-segment_>`_ in 2011. My drive to understand how every trick in that run functioned necessitated a deep dive into the physics and mathematics of the engine game.
+**Who are you?** I'm someone who played Half-Life as a kid and became deeply fascinated by its physics much later when quadrazid published `this monumental single-segment run <quadrazid single-segment_>`_ in 2011. My drive to understand how every trick in that run functioned necessitated a deep dive into the physics and mathematics of the game engine.
 
 .. _quadrazid single-segment: https://youtu.be/AKIpyz0EjuY
 
@@ -42,9 +42,6 @@ times when you need to reference it. By extension, you are assumed to be
 proficient in C or C++. Since this documentation is heavy in mathematics, you
 are assumed to be fluent in vector algebra and some linear algebra, along with a
 high proficiency in trigonometry. Some knowledge of calculus is also assumed.
-
-.. image:: images/hlsdk-meme.webp
-   :width: 400px
 
 **Couldn't you write this documentation in a simpler way?** Our goal with this
 documentation is to describe the physics of Half-Life as precisely as possible.

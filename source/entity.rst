@@ -150,8 +150,8 @@ Entities of movetype ``MOVETYPE_STEP`` experience ground friction in a similar w
 
 .. _collision:
 
-Player collision
-----------------
+Collision
+---------
 
 Many entities in Half-Life collide with one another.  The velocity of the
 colliding entity usually changes as a result, while the position and velocity
@@ -160,7 +160,7 @@ world Newtonian physics.  The process of changing the velocity is usually
 referred to as *velocity clipping*.  Collision between the player entity and a non-player entity is one of the most common and consequential events
 in Half-Life, so it is worthwhile to study its physics.
 
-Collisions occur in the position update step of an entity. The player entity's position update is described in :ref:`player position update`. A collision is detected by performing a player trace and checking if the trace strikes a plane.
+Collisions occur in the position update step of an entity. In particular, the player entity's position update is described in :ref:`player position update`. A collision is detected by performing a player trace and checking if the trace strikes a plane.
 
 .. prf:definition:: Generation collision equation
    :label: generation collision equation

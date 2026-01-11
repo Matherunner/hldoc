@@ -210,19 +210,83 @@ Savestates
 
 .. _delta:
 
-DELTA
------
+DELTA rounding
+--------------
 
-The DELTA mechanism is one of the ways Half-Life uses to save bandwidth in
-client-server communication.
+The DELTA mechanism is one of the ways Half-Life uses to save bandwidth in client-server communication. Data sent between them include, but not limited to, the player velocity, player position, viewangles (see :ref:`player viewangles`), entity positions, weapon states, and many others. Essentially, information about every entity and player input in the game. Curiously, the schema for all the data sent via the DELTA mechanism is stored as the ``delta.lst`` file under the ``valve`` or mod folder. To illustrate, the following code excerpt pertains to the player inputs:
 
-TODO
+.. code-block:: cpp
+   :caption: Excerpt from ``delta.lst``
+   :emphasize-lines: 5, 6, 8, 10, 11, 13
+   :name: delta.lst excerpt
 
+   usercmd_t none
+   {
+     DEFINE_DELTA( lerp_msec, DT_SHORT, 9, 1.0 ),
+     DEFINE_DELTA( msec, DT_BYTE, 8, 1.0 ),
+     DEFINE_DELTA( viewangles[1], DT_ANGLE, 16, 1.0 ),
+     DEFINE_DELTA( viewangles[0], DT_ANGLE, 16, 1.0 ),
+     DEFINE_DELTA( buttons, DT_SHORT, 16, 1.0 ),
+     DEFINE_DELTA( forwardmove, DT_SIGNED | DT_FLOAT, 12, 1.0 ),
+     DEFINE_DELTA( lightlevel, DT_BYTE, 8, 1.0 ),
+     DEFINE_DELTA( sidemove, DT_SIGNED | DT_FLOAT, 12, 1.0 ),
+     DEFINE_DELTA( upmove, DT_SIGNED | DT_FLOAT, 12, 1.0 ),
+     DEFINE_DELTA( impulse, DT_BYTE, 8, 1.0 ),
+     DEFINE_DELTA( viewangles[2], DT_ANGLE, 16, 1.0 ),
+     DEFINE_DELTA( impact_index, DT_INTEGER, 6, 1.0 ),
+     DEFINE_DELTA( impact_position[0], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
+     DEFINE_DELTA( impact_position[1], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
+     DEFINE_DELTA( impact_position[2], DT_SIGNED | DT_FLOAT, 16, 8.0 )
+   }
 
-Walking through a frame
------------------------
+For speedrunning purpose, it is not necessary to understand every field defined in the delta file. Nevertheless, it is important to be aware of the highlighted lines in :numref:`delta.lst excerpt`. To understand why, we first need to understand what ``DEFINE_DELTA`` means.
 
-This section attempts to outline some of the major events relevant to speedrunning that happen in a frame. Extreme detail on how each part of the game engine works is beyond the scope of this documentation. In fact, some believe that code is documentation! Until Valve releases the source code of Half-Life, one can study the Xash3D engine source or the disassembly of Half-Life.
+#. The first parameter is the field name.
+#. The second is the field type.
+#. The third is the number of bits to represent the field value after converting to an integer type.
+#. The fourth is a *post-multiplier* which the *receiver* must multiply by to restore the intended value. This name is seen in the DWARF symbol in the Linux binary.
+
+Take the definition for ``forwardmove`` as an example. We see that the type is defined to be ``DT_SIGNED | DT_FLOAT``. The number of bits to represent the value is only 12 and the post-multiplier is 1. This means that the value of ``forwardmove`` when received by the server-side code is an *integer* in the range of
+
+.. math:: F \in [-2047, 2047].
+
+Let's see why. Recall that a single-precision floating point number requires 32 bits. This implies that the ``forwardmove`` undergoes a **lossy compression** when sent across the network. To be more precise, ``DT_SIGNED | DT_FLOAT`` means that the value will first be converted into an integer, thus truncating it or rounding towards zero. Then, the integer value will be represented as a sign and magnitude bits, rather two's complement. In particular, the integer will be *clamped* or *clipped* to fit in the magnitude bits. In addition, a post-multiplier of 1 means that the serialised value will be multiplied by 1 when received to restore the intended value, which implies the intended value is exactly what is sent on the wire to begin with. (The reader may verify these facts by reverse engineering the ``DELTA_*`` and ``MSG_WriteSBits`` functions in ``hw.so`` or equivalents.) Since :math:`2^{11} = 2048`, we obtain the aforementioned range. The analysis here clearly also applies to ``sidemove`` and ``upmove`` as per the highlighted lines in :numref:`delta.lst excerpt`.
+
+Equally as important are the ``viewangles[*]`` fields. They have the data type ``DT_ANGLE``, represented in 16 bits, with a post-multiplier of 1. According to ``MSG_WriteBitsAngle`` in ``hw.so``, we may model the operation mathematically as follows.
+
+.. prf:lemma::
+   :label: delta angle write
+
+   Let :math:`\alpha \in \mathbb{R}` be the input angle. Assume 16 bits are used to serialise the value and a pre-multiplier of 1. Then the value on the wire via the DELTA mechanism is
+
+   .. math:: \tilde{\alpha}_w = \operatorname{int}\!\left( \frac{65536}{360} \left( \alpha \bmod 360 \right) \right) \mathbin{\mathtt{AND}} 65535
+
+   where the meaning of :math:`\operatorname{int}`, :math:`\bmod` on a real number, and :math:`\mathtt{AND}` are defined in :ref:`anglemod`.
+
+On the receiver side, the ``MSG_ReadBitsAngle`` is called to parse the wire format. Mathematically, it performs the following operation.
+
+.. prf:lemma::
+   :label: delta angle read
+
+   Let :math:`\tilde{\alpha}_w \in \mathbb{Z}` be the angle value received via the DELTA mechanism. Assume 16 bits are used to serialise the value and a pre-multiplier of 1. Then the restored value is given by
+
+   .. math:: \tilde{\alpha}_r = \frac{360}{65536} \tilde{\alpha}_w.
+
+We may now examine the end-to-end or round trip conversion. Putting :prf:ref:`delta angle write` and :prf:ref:`delta angle read` together, we obtain the function
+
+.. math:: \tilde{\alpha}_r = \frac{360}{65536} \left( \operatorname{int}\!\left( \frac{65536}{360} \left( \alpha \bmod 360 \right) \right) \mathbin{\mathtt{AND}} 65535 \right).
+   :label: delta angle end-to-end
+
+.. prf:theorem::
+   :label: delta angle equiv anglemod
+
+   If :math:`0 \le \alpha`, then the end-to-end conversion given in :eq:`delta angle end-to-end` is equivalent to the degrees-anglemod function :math:`\mathfrak{A}_d` in :prf:ref:`degrees anglemod`.
+
+.. prf:proof::
+
+   The only difference between the end-to-end conversion and :math:`\mathfrak{A}_d` is the presence of :math:`\alpha \bmod 360`. By :prf:ref:`periodicity of anglemod`, any :math:`\mathfrak{A}_d(\alpha + 360) = \mathfrak{A}(\alpha)`, which is equivalent to saying :math:`\mathfrak{A}_d(x \bmod 360) = \mathfrak{A}(x)`.
+
+In :prf:ref:`delta angle equiv anglemod` we only need to concern ourselves with nonnegative :math:`\alpha`. This is because the player viewangles supplied to the DELTA mechanism are always positive, as they are always first converted by :math:`\mathfrak{A}_d` itself before the DELTA operations, and :math:`\mathfrak{A}_d(x) \ge 0` for all :math:`x \in \mathbb{R}`. We will examine the properties of this function further in :ref:`anglemod`.
 
 .. rubric:: Footnotes
 

@@ -1,51 +1,56 @@
-Player fundamentals
-===================
+Player inputs
+=============
 
-The *player* refers to the self. Specifically it is not necessarily *you*, but rather the *self* in the Half-Life universe.
+The player entity is special in Half-Life in that it can be controlled by inputs on the client side. Before we examine how we might exploit player movement for speedrunning purposes, we must first understand the "control surface" available to us. We must also understand some of the important states associated with the player.
 
-Input
------
+All player movements can be controlled through commands. For instance, in the default game setup, pressing down the "W" key usually results in the ``+forward`` command being issued. Releasing the same key will cause ``-forward`` to be issued. This is because the "W" key is bound to the ``+forward`` command with the ``bind`` command, usually issued from ``config.cfg``. Though, the ``-forward`` command need not be explicitly bound.
 
-All player movements can be controlled through commands. In the default game setup, pressing down the "W" key usually results in the ``+forward`` command being issued. Releasing the same key will cause ``-forward`` to be issued. This is because the "W" key is bound to the ``+forward`` command with the ``bind`` command, usually issued from ``config.cfg``. The ``-forward`` command need not be explicitly bound.
-
-There are many similar commands available. It is beyond the scope of this documentation to provide a detailed description for all commands and indeed all cvars. The reader is invited to generate a list of all commands with the ``cmdlist`` command and study the SDK code for each of them.
-
-There are, however, a few points to note about command issuing that are of concern to speedrunning. One of them is the *impulse down* phenomena. This affects primarily the viewangles (see :ref:`player viewangles`) and the FSU (see :ref:`FSU`) computations. For example, the viewangles are typically changed by one of the viewangles commands such as ``+left`` for yawing left. This is done by adding to subtracting the viewangles by the value
-
-.. math:: \tau \times \mathtt{cl\_yawspeed/cl\_pitchspeed} \times \mathrm{key state}
-
-The "key state" is the state of the command being issued (``+left`` for example). The key state is typically 1, but in the *first frame* in which the command is being issued the value is 0.5. In other words, the change in viewangles is half of what it normally is in the *first frame* of the active command.
-
-This is not limited to the viewangles. The FSU values (which is crucial to player movement as will be described in :ref:`FSU`) are also affected by the impulse down. For example, by issuing ``+forward``, the following value will be added to :math:`F`:
-
-.. math:: \mathtt{cl\_forwardspeed} \times \mathrm{key state}
-
-Again, the key state here is typically 1, except the first frame of the ``+forward`` command. This can result in a noticeably drop in player acceleration.
-
-.. tip:: The reader is advised to perform a detailed study of ``cl_dlls/input.cpp`` to understand the processes and computations involved to greater depths.
+There are many similar commands available. It is beyond the scope of this documentation to provide a detailed description for all commands and indeed all cvars. The reader is invited to generate a list of all commands with the ``cmdlist`` command and study the SDK code for each of them, for example, in the ``cl_dlls/input.cpp`` file in the Half-Life SDK. Many of the commands are also self-explanatory or intuitive in their operations. For example, ``+attack2`` simply fires the secondary attack if a weapon is available. For speedrunning purposes, we will focus on the movement and the viewangles commands and cvars.
 
 .. _player viewangles:
 
 Viewangles
 ----------
 
-The term *viewangles* is usually associated with the player entity. The viewangles refer to a group of three angles which describe the player's view orientation. We call these angles *yaw*, *pitch* and *roll*. Mathematically, we denote the yaw by
+The term *viewangles* is commonly used to refer to viewing direction of the "camera" associated with the player entity. This is not a purely client side state: the "source of truth" is maintained on the server side, which is replicated to the client side for graphics rendering.
 
-.. math:: \vartheta
+.. prf:definition:: Viewangles
+   :label: viewangles
 
-and the pitch by
+   The viewangles is the triplet :math:`(\varphi, \vartheta, \varrho) \in \mathbb{R}^3` which respectively denotes the pitch, yaw, and roll angles.
 
-.. math:: \varphi
+As we will see in :ref:`anglemod`, the actual viewangles values stored on the server side are truncated and clamped into a multiple of :math:`360/65536`. Hence, we may alternatively define the *truncated viewangles* as in :prf:ref:`truncated viewangles`.
 
-Note that these are different from :math:`\theta` and :math:`\phi`. We do not have a mathematical symbol for roll as it is rarely used. In mathematical discussions, the viewangles are assumed to be in *radians* unless stated otherwise. However, do keep in mind that they are stored in degrees in the game.
+.. prf:definition:: Truncated viewangles
+   :label: truncated viewangles
+
+   Define the set
+
+   .. math:: \mathcal{V} = \left\{ \frac{360}{65536} k \mid k \in \{ 0, 1, 2, \ldots, 65535 \} \right\}.
+
+   The truncated viewangles are the triplet :math:`(\varphi, \vartheta, \varrho) \in \mathcal{V}^3`.
+
+Note that the notations for the pitch, yaw, roll are different from :math:`\theta`, :math:`\phi`, and :math:`\rho`. In mathematical discussions, the viewangles are assumed to be in *radians* unless stated otherwise. However, do keep in mind that they are stored in degrees in the game. The roll angle :math:`\varrho` is rarely used or involved in player physics, and it is almost always zero. With only the pitch and yaw to worry about, we may illustrate how they correspond to the camera viewing angle by :numref:`viewangles illustration`.
 
 .. figure:: images/viewangles.svg
+   :name: viewangles illustration
 
-   Illustration of the geometric meaning of :math:`\vartheta` and :math:`\varphi`, with the camera's view represented by :math:`\mathit{OV}` and :math:`\mathit{OF}` is the projection of :math:`\mathit{OV}` on the horizontal plane. Note that since the sign convention of in-game :math:`\varphi` differs from that of standard trigonometry, a negative sign is needed.
+   Illustration of the geometric meaning of :math:`\varphi` and :math:`\vartheta`, with the camera's view represented by :math:`\mathit{OV}`. Note that :math:`\mathit{OF}` is the projection of :math:`\mathit{OV}` on the horizontal plane. Note also that since the sign convention of in-game :math:`\varphi` differs from that of standard trigonometry, a negative sign is needed to represent "looking up".
 
-One way to change the yaw and pitch is by moving the mouse. This is not useful for tool-assisted speedrunning, however. A better method for precise control of the yaw and pitch angles is by issuing the commands ``+left``, ``+right``, ``+up``, or ``+down``. When these commands are active, the game increments or decrements the yaw or pitch by a certain controllable amount per frame. The amounts can be controlled by adjusting the variables ``cl_yawspeed`` and ``cl_pitchspeed``. For instance, when ``+right`` is active, the game multiplies the value of ``cl_yawspeed`` by the frame time, then subtracts the result from the yaw angle.
+One way to control the pitch and yaw is by moving the mouse. This is far too imprecise for tool-assisted speedrunning, however. A better method for precise control of the angles is by issuing the commands ``+left``, ``+right``, ``+up``, or ``+down``. When one or more of these commands are active, the game increments or decrements the pitch or yaw by a certain amount per frame. The amount can in turn be controlled by adjusting the cvars ``cl_yawspeed`` and ``cl_pitchspeed``. The roll angle can't be directly controlled by player inputs.
 
-.. TODO: should we talk about anglemod in the discussion about client-server in Game fundamentals?
+.. prf:definition:: Pitch and yaw controls
+
+   Assume :math:`\varphi` and :math:`\vartheta` are in **degrees**. For all frame :math:`k \in \mathbb{Z}`, the player pitch and yaw angles are modified in order as follows.
+
+   #. :math:`\varphi \gets \varphi + \left( \operatorname{KS}(\mathrm{down}, k) - \operatorname{KS}(\mathrm{up}, k) \right) \cdot \mathrm{cl\_pitchspeed} \cdot \tau_g`.
+   #. :math:`\vartheta \gets \vartheta + \left( \operatorname{KS}(\mathrm{right}, k) - \operatorname{KS}(\mathrm{left}, k) \right) \cdot \mathrm{cl\_yawspeed} \cdot \tau_g`.
+   #. :math:`\varphi \gets \mathfrak{A}_d(\varphi)`.
+   #. :math:`\vartheta \gets \mathfrak{A}_d(\vartheta)`.
+
+   Here, :math:`\operatorname{KS}` is defined in :prf:ref:`key state`, :math:`\mathfrak{A}_d` is defined in :prf:ref:`degrees anglemod`, and :math:`\tau_g` is defined in :ref:`frame rate`.
+
+Although the viewangles commands were originally intended to allow moving the camera slowly by arrow keys, in a TAS they are the primary means to precisely pinpointing the pitch and yaw angles to the desired value instantaneously at the beginning of a frame before all the game physics are run. For example, suppose in frame :math:`k` we have :math:`\tau_g = 0.001`, :math:`\operatorname{KS}(\mathrm{down}, k) = 1`, and :math:`\varphi = 0`. If we wish to set :math:`\varphi = 9 \cdot 360 / 65536` in frame :math:`k + 1`, we may set the cvar :math:`\mathrm{cl\_pitchspeed} = 9 \cdot \left( 360 / 65536 \right) / \tau_g \approx 49.4`. In practice, to avoid floating point rounding issues, we should target :math:`9.5 \cdot 360 / 65536` instead and calculate :math:`\mathrm{cl\_pitchspeed}` accordingly, allow the :math:`\mathfrak{A}_d` function to truncate the :math:`9.5 \cdot 360 / 65536` down to :math:`9 \cdot 360 / 65536`.
 
 .. _anglemod:
 
@@ -65,7 +70,7 @@ When the viewangles are sent to the server, their values *in degrees* are rounde
          \left\lceil x\right\rceil & x < 0,
          \end{cases}
 
-   where :math:`\mathbb{I}_n \subset \mathbb{Z}` is an :math:`n`-bit integer in two's complement. We will assume in this documentation that :math:`n > 16`.
+   where :math:`\mathbb{I}_n \subset \mathbb{Z}` is an :math:`n`-bit integer in two's complement. We will assume in this documentation that :math:`n > 16`. We may also interpret this function as rounding :math:`x` towards zero.
 
 .. prf:definition:: Degrees-anglemod
    :label: degrees anglemod
@@ -220,27 +225,57 @@ As stated by :prf:ref:`anglemod error bounds`, anglemod introduces a loss of pre
 View vectors
 ------------
 
-There are two vectors associated with the player's viewangles. These are called the *view vectors*. For discussions in 3D space, they are defined to be
+In :ref:`viewangles` we parametrised the player's viewing direction in terms of the viewangles :math:`(\varphi, \vartheta, \varrho)`. In many game mechanics, we work with *vectors* associated with the viewing direction instead. We may call them *view vectors*.
 
-.. math::
-   \begin{aligned}
-   \mathbf{\hat{f}} &:= \langle \cos\vartheta \cos\varphi, \sin\vartheta \cos\varphi, -\sin\varphi \rangle \\
-   \mathbf{\hat{s}} &:= \langle \sin\vartheta, -\cos\vartheta, 0 \rangle
-   \end{aligned}
+.. prf:definition:: Three dimensional view vectors
+   :label: three dimensional view vectors
 
-We will refer to the former as the *unit forward vector* and the latter as the *unit right vector*. The negative sign for :math:`f_z` is an idiosyncrasy of the GoldSrc engine inherited from Quake. This is the consequence of the fact that looking up gives negative pitch angles and looking down gives positive pitch angles.
+   Let :math:`\varphi` and :math:`\vartheta` be the pitch and yaw angles in radians as defined in :prf:ref:`viewangles`. Assume that :math:`\varrho = 0`. The three dimensional view vectors :math:`\mathbf{\hat{f}}, \mathbf{\hat{s}} \in \mathbb{R}^3` are defined as
 
-We sometimes restrict our discussions to the horizontal plane, such as in the description of strafing. In this case we assume :math:`\varphi = 0` and define
+   .. math::
+      \begin{aligned}
+      \mathbf{\hat{f}} &= \langle \cos\vartheta \cos\varphi, \sin\vartheta \cos\varphi, -\sin\varphi \rangle \\
+      \mathbf{\hat{s}} &= \langle \sin\vartheta, -\cos\vartheta, 0 \rangle
+      \end{aligned}
 
-.. math::
-   \begin{aligned}
-   \mathbf{\hat{f}} &:= \langle \cos\vartheta, \sin\vartheta \rangle \\
-   \mathbf{\hat{s}} &:= \langle \sin\vartheta, -\cos\vartheta \rangle
-   \end{aligned}
+   with :math:`\lVert\mathbf{\hat{f}}\rVert = \lVert\mathbf{\hat{s}}\rVert = 1`. We may refer to :math:`\mathbf{\hat{f}}` as the (unit) forward vector, and :math:`\mathbf{\hat{s}}` as the (unit) right vector.
 
-Such restriction is equivalent to projecting the :math:`\mathbf{\hat{f}}` vector onto the :math:`xy` plane, provided the original vector is not vertical.
+.. prf:lemma::
 
-The above definitions are not valid if the roll is nonzero. Nevertheless, the roll is very rarely nonzero in practice, and so it rarely affects the physics described in this document, if at all.
+   The unit right vector :math:`\mathbf{\hat{s}}` and the unit forward vector :math:`\mathbf{\hat{f}}` are perpendicular with each other. If :math:`-\pi/2 < \varphi < \pi/2`, the unit right vector points to the right of the unit forward vector when viewed from the top.
+
+.. prf:proof::
+
+   We have
+
+   .. math:: \mathbf{\hat{f}} \cdot \mathbf{\hat{s}} = \cos\vartheta \cos\varphi \sin\vartheta - \sin\vartheta \cos\varphi \cos\vartheta = 0
+
+   as required. In addition, compute
+
+   .. math:: \mathbf{\hat{s}} \times \mathbf{\hat{f}} = \langle \cos\vartheta \sin\varphi, \sin\vartheta \sin\varphi, \cos\varphi \rangle.
+
+   When :math:`-\pi/2 < \varphi < \pi/2`, we have :math:`0 < \cos\varphi`. This implies the cross product always points up with a positive :math:`z` coordinate. This implies :math:`\mathbf{\hat{s}}` is perpendicularly to the right of :math:`\mathbf{\hat{f}}`.
+
+Note that the negative sign for :math:`f_z` is an idiosyncrasy of the GoldSrc engine inherited from Quake. This is the consequence of the fact that looking up gives negative pitch angles and looking down gives positive pitch angles.
+
+We sometimes restrict our discussions to the horizontal plane, especially when discussing the air and ground player movement physics (see :ref:`player air ground`). In this case we assume :math:`\varphi = 0` and define the two dimensional view vectors.
+
+.. prf:definition:: Two dimensional view vectors
+   :label: two dimensional view vectors
+
+   The two dimensional view vectors may be defined by restricting :math:`\varphi = 0` and invoking :prf:ref:`three dimensional view vectors` as follows:
+
+   .. math::
+      \begin{aligned}
+      \mathbf{\hat{f}} &= \langle \cos\vartheta, \sin\vartheta \rangle \\
+      \mathbf{\hat{s}} &= \langle \sin\vartheta, -\cos\vartheta \rangle.
+      \end{aligned}
+
+Provided the original vector is not vertical, the two dimensional unit forward vector may equivalently be obtained by projecting the three dimensional :math:`\mathbf{\hat{f}}` vector onto the :math:`xy` plane, then normalising the result. The two dimensional unit side vector is simply a rotation of the forward vector by 90 degrees to the right. This is, in fact, how the game actually calculates the two dimensional view vectors in player movement physics. It is therefore very important that the pitch does not go vertically up or down, causing :math:`\sin\varphi = \pm 1` or `gimbal lock`_.
+
+.. _gimbal lock: https://en.wikipedia.org/wiki/Gimbal_lock
+
+Note that :prf:ref:`three dimensional view vectors` and :prf:ref:`two dimensional view vectors` are not valid if the roll angle :math:`\varrho \ne 0`. Nevertheless, the roll is very rarely nonzero in practice, and so it rarely affects the physics described in this document.
 
 Punchangles
 -----------
@@ -255,28 +290,100 @@ The punchangles may be denoted as :math:`\mathbf{P}`, consisting of punch pitch,
 
 The punchangles are rarely big issues except when the punch yaw and punch roll are nonzero. In these cases, strafing (:ref:`strafing`) can be affected. Though this very rarely happens.
 
-When a saveload is performed, the punchangles will be added to the viewangles permanently, while the punchangles will be set to zero. When this happens, the viewangles will not be reduced gradually like the case when punchangles are nonzero.
+When a saveload is performed, the punchangles will be added to the viewangles permanently, while the punchangles will be set to zero. When this happens, the viewangles will not be reduced gradually like the case when punchangles are nonzero, except for the roll angle.
+
+Key state
+---------
+
+Generally speaking, pressing a movement key translates to accelerating the player towards a particular direction, and pressing the viewangles keys translate to yawing and pitching the player viewangles. Unfortunately, how much the player accelerates and how much the viewangles change depends on whether the key in question started being pressed or if the key has been pressed for more than one frame. We may capture this "multiplier" succinctly by means of the *key state* function.
+
+.. prf:definition:: Key state
+   :label: key state
+
+   Let :math:`\mathrm{Cmd}` be the set of movement and viewangles commands. For example, :math:`\mathrm{forward} \in \operatorname{Cmd}`. Let
+
+   .. math:: \operatorname{KS} : \mathrm{Cmd} \times \mathbb{Z} \to \left\{0, \frac{1}{2}, 1\right\}
+
+   be the key state function defined as follows. Suppose a key :math:`K` is first pressed on frame :math:`0`, continuously held for subsequent frames, then released on frame :math:`n`. Then we may define operationally
+
+   .. math::
+      \operatorname{KS}(K, i) =
+      \begin{cases}
+         \frac{1}{2} & i = 0 \\
+         1 & 1 \le i < n \\
+         0 & n \le i.
+      \end{cases}
+
+The key state function is highly consequential for speedrunning, especially if we naively press and release the movement and viewangles keys rapidly. To see why, we need to define how the key inputs are translated to values used for movement physics.
+
+
+
+
+There are, however, a things we must point out about command issuing that are of concern to speedrunning. One of them is the *key state* mechanism. This affects primarily the viewangles (see :ref:`player viewangles`) and the FSU (see :ref:`FSU`) computations. For example, the viewangles are typically changed by one of the viewangles commands such as ``+left`` for yawing left. This is done by adding to subtracting the viewangles by the value
+
+.. math:: \tau \times \mathtt{cl\_yawspeed/cl\_pitchspeed} \times \operatorname{KS}(\mathrm{left})
+
+where :math:`\operatorname{KS}` is the *key state* function.
+
+The "key state" is the state of the command being issued (``+left`` for example). The key state is typically 1, but in the *first frame* in which the command is being issued the value is 0.5. In other words, the change in viewangles is half of what it normally is in the *first frame* of the active command.
+
+This is not limited to the viewangles. The FSU values (which is crucial to player movement as will be described in :ref:`FSU`) are also affected by the impulse down. For example, by issuing ``+forward``, the following value will be added to :math:`F`:
+
+.. math:: \mathtt{cl\_forwardspeed} \times \mathrm{key state}
+
+Again, the key state here is typically 1, except the first frame of the ``+forward`` command. This can result in a noticeably drop in player acceleration.
+
+.. tip:: The reader is advised to perform a detailed study of ``cl_dlls/input.cpp`` to understand the processes and computations involved to greater depths.
 
 .. _FSU:
 
 Forwardmove, sidemove, and upmove
 ---------------------------------
 
-When the movement keys are held, there exists three values, :math:`F`, :math:`S`, and :math:`U`, that are set. These values are called the *forwardmove*, *sidemove*, and *upmove* respectively, or *FSU* for short, and are used in player movement physics (see :ref:`player movement`). In the beginning of player movement physics, the FSU values are computed in the following way. First, define client side analogues of :math:`\tilde{F}`, :math:`\tilde{S}`, and :math:`\tilde{U}`. Then,
+When the WASD movement keys are held, the game computes three values: :math:`F`, :math:`S`, and :math:`U`. These values are called the *forwardmove*, *sidemove*, and *upmove* respectively, or *FSU* for short, and are critically important as inputs to the player movement physics (see :ref:`player movement`). The computation of FSU relies on several cvars which we will soon see.
 
-``+forward`` and ``+back``
-   Assigns the positive or negative ``cl_forwardspeed`` to :math:`\tilde{F}`
+.. prf:definition:: ``sv_maxspeed``
 
-``+moveright`` and ``+moveleft``
-   Assigns the positive or negative ``cl_sidespeed`` to :math:`\tilde{S}`
+   Let :math:`M_m \in \mathbb{R}` be the value of the cvar ``sv_maxspeed``. In vanilla Half-Life, :math:`M_m = 320`.
 
-``+moveup`` and ``+movedown``
-   Assigns the positive or negative ``cl_upspeed`` to :math:`\tilde{U}`
+Recall from :ref:`delta` that the ``forwardmove``, ``sidemove``, and ``upmove`` values from the client are truncated to a 12-bit sign-magnitude representation before sending to the server. For notational convenience, we have :prf:ref:`delta trunc`.
 
-This is done at client side. Before sending these values to the server, however, they will be truncated to integers and clamped to :math:`[-2047, 2047]`. Let :math:`M_m` the value of ``sv_maxspeed``. Then, ``PM_CheckParamters`` [*sic*] computes the final server side FSU values such that, assuming not all of FSU are zero,
+.. prf:definition:: DELTA truncation of FSU
+   :label: delta trunc
 
-.. math:: F = \frac{\tilde{F}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}} \quad
-          S = \frac{\tilde{S}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}} \quad
-          U = \frac{\tilde{U}M_m}{\sqrt{\tilde{F}^2 + \tilde{S}^2 + \tilde{U}^2}}
+   Let :math:`x \in \mathbb{R}`. The DELTA truncation and clamping function for FSU, :math:`\operatorname{DeltaTrunc} : \mathbb{R} \to \mathbb{Z}`, is
 
-If all of FSU are zero, then nothing is done and they remain zero.
+   .. math:: \operatorname{DeltaTrunc}(x) = \max(\min(\operatorname{int}(x), 2047), -2047).
+
+We may then define FSU computationally or operationally as :prf:ref:`fsu computation`.
+
+.. prf:definition:: FSU
+   :label: fsu computation
+
+   Let :math:`\tilde{F}, \tilde{S}, \tilde{U} \in \mathbb{R}` on the client side in some frame :math:`k \in \mathbb{Z}`. Let :math:`\operatorname{KS}` be the key state function defined in :prf:ref:`key state`. Then we compute the following in order.
+
+   #. Initialise :math:`(\tilde{F}, \tilde{S}, \tilde{U}) \gets (0, 0, 0)`.
+   #. :math:`\tilde{F} \gets \tilde{F} + \left( \operatorname{KS}(\mathrm{forward},k) - \operatorname{KS}(\mathrm{back},k) \right) \cdot \mathrm{cl\_forwardspeed}`.
+   #. :math:`\tilde{S} \gets \tilde{S} + \left( \operatorname{KS}(\mathrm{moveright},k) - \operatorname{KS}(\mathrm{moveleft},k) \right) \cdot \mathrm{cl\_sidespeed}`.
+   #. :math:`\tilde{U} \gets \tilde{U} + \left( \operatorname{KS}(\mathrm{moveup},k) - \operatorname{KS}(\mathrm{movedown},k) \right) \cdot \mathrm{cl\_upspeed}`.
+   #. :math:`(\tilde{F}, \tilde{S}, \tilde{U}) \gets (\operatorname{DeltaTrunc}(\tilde{F}), \operatorname{DeltaTrunc}(\tilde{S}), \operatorname{DeltaTrunc}(\tilde{U}))`.
+
+   Now if :math:`(\tilde{F}, \tilde{S}, \tilde{U}) = (0, 0, 0)`, then :math:`(F, S, U) = (0, 0, 0)` and we are done. Otherwise, let
+
+   .. math:: \rho = \min\!\left( \frac{M_m}{\left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert}, 1 \right).
+
+   Then :math:`(F, S, U) = ( \rho \tilde{F}, \rho \tilde{S}, \rho \tilde{U} )`.
+
+The reader may verify the computations in :prf:ref:`fsu computation` by examining the ``PPM_CheckParamters`` [*sic*] in the Half-Life SDK.
+
+.. prf:theorem::
+
+   Let :math:`\tilde{F}`, :math:`\tilde{S}`, :math:`\tilde{U}` be the values at the end of the computations in :prf:ref:`fsu computation`. Then
+
+   .. math:: \left\lVert \langle F, S, U\rangle \right\rVert = \min\!\left( M_m, \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U}\rangle \right\rVert \right).
+
+.. prf:proof::
+
+   If :math:`(\tilde{F}, \tilde{S}, \tilde{U}) = (0, 0, 0)` then we are done. Otherwise, note that :math:`\left\lVert \langle F, S, U\rangle \right\rVert = \rho \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`. If :math:`M_m \ge \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`, then :math:`\rho = 1` and we are done. Now suppose :math:`M_m < \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`. Then
+
+   .. math:: \left\lVert \langle F, S, U\rangle \right\rVert = \frac{M_m}{\left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert} \cdot \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert = M_m.
