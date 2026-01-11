@@ -294,9 +294,9 @@ The punchangles may be denoted as :math:`\mathbf{P}`, consisting of punch pitch,
 
    where :math:`\tau_p` is previously defined in :ref:`frame rate`.
 
-The punchangles are a matter of concern, except when the punch yaw and punch roll are nonzero, because they can affect strafing (:ref:`strafing`). Nevertheless, this rarely occurs when speedrunning in practice, and even if they do occur, the impact on strafing efficiency is globally minimal.
+The punchangles are rarely a matter of concern, except when the punch yaw and punch roll are nonzero, because they can affect strafing (:ref:`strafing`). Nevertheless, this rarely occurs when speedrunning in practice, and even if they do occur, the impact on strafing efficiency is globally minimal.
 
-Interestingly, when a save is performed then restoring from the save, the punchangles will be added to the viewangles :math:`(\varphi, \vartheta, \varrho)` themselves and the punchangles will be set to zero. When this happens, the player pitch and yaw will decrease gradually as is the case when punchangles are nonzero, though the roll angle still does.
+Interestingly, when a save is performed then restoring from the save, the punchangles will be added to the viewangles :math:`(\varphi, \vartheta, \varrho)` themselves and the punchangles will be set to zero. When this happens, the player pitch and yaw will not decrease gradually as is the case when punchangles are nonzero, though the roll angle still does.
 
 .. prf:theorem::
 
@@ -365,7 +365,7 @@ The reader may verify the computations in :prf:ref:`fsu computation` by examinin
 Key state
 ---------
 
-Generally speaking, pressing a movement key translates to accelerating the player towards a particular direction, and pressing the viewangles keys translate to yawing and pitching the player viewangles. Unfortunately, how much the player accelerates and how much the viewangles change depends on whether the key in question started being pressed or if the key has been pressed for more than one frame. We may capture this "multiplier" succinctly by means of the *key state* function.
+Generally speaking, pressing a movement key translates to accelerating the player towards a particular direction, and pressing the viewangles keys translates to yawing and pitching the player viewangles. Unfortunately, how much the player accelerates and how much the viewangles change depend on whether the key in question started being pressed or if the key has been pressed for more than one frame. We may capture this "multiplier" succinctly by means of the *key state* function.
 
 .. prf:definition:: Key state
    :label: key state
