@@ -310,49 +310,6 @@ Interestingly, when a save is performed then restoring from the save, the puncha
 
    We may also substitute :math:`n = t / \tau_p` to obtain an equation in terms of game time :math:`t \in \mathbb{R}`.
 
-Key state
----------
-
-Generally speaking, pressing a movement key translates to accelerating the player towards a particular direction, and pressing the viewangles keys translate to yawing and pitching the player viewangles. Unfortunately, how much the player accelerates and how much the viewangles change depends on whether the key in question started being pressed or if the key has been pressed for more than one frame. We may capture this "multiplier" succinctly by means of the *key state* function.
-
-.. prf:definition:: Key state
-   :label: key state
-
-   Let :math:`\mathrm{Cmd}` be the set of movement and viewangles commands. For example, :math:`\mathrm{forward} \in \operatorname{Cmd}`. Let
-
-   .. math:: \operatorname{KS} : \mathrm{Cmd} \times \mathbb{Z} \to \left\{0, \frac{1}{2}, 1\right\}
-
-   be the key state function defined as follows. Suppose a key :math:`K` is first pressed on frame :math:`0`, continuously held for subsequent frames, then released on frame :math:`n`. Then we may define operationally
-
-   .. math::
-      \operatorname{KS}(K, i) =
-      \begin{cases}
-         \frac{1}{2} & i = 0 \\
-         1 & 1 \le i < n \\
-         0 & n \le i.
-      \end{cases}
-
-The key state function is highly consequential for speedrunning, especially if we naively press and release the movement and viewangles keys rapidly. To see why, we need to define how the key inputs are translated to values used for movement physics.
-
-
-
-
-There are, however, a things we must point out about command issuing that are of concern to speedrunning. One of them is the *key state* mechanism. This affects primarily the viewangles (see :ref:`player viewangles`) and the FSU (see :ref:`FSU`) computations. For example, the viewangles are typically changed by one of the viewangles commands such as ``+left`` for yawing left. This is done by adding to subtracting the viewangles by the value
-
-.. math:: \tau \times \mathtt{cl\_yawspeed/cl\_pitchspeed} \times \operatorname{KS}(\mathrm{left})
-
-where :math:`\operatorname{KS}` is the *key state* function.
-
-The "key state" is the state of the command being issued (``+left`` for example). The key state is typically 1, but in the *first frame* in which the command is being issued the value is 0.5. In other words, the change in viewangles is half of what it normally is in the *first frame* of the active command.
-
-This is not limited to the viewangles. The FSU values (which is crucial to player movement as will be described in :ref:`FSU`) are also affected by the impulse down. For example, by issuing ``+forward``, the following value will be added to :math:`F`:
-
-.. math:: \mathtt{cl\_forwardspeed} \times \mathrm{key state}
-
-Again, the key state here is typically 1, except the first frame of the ``+forward`` command. This can result in a noticeably drop in player acceleration.
-
-.. tip:: The reader is advised to perform a detailed study of ``cl_dlls/input.cpp`` to understand the processes and computations involved to greater depths.
-
 .. _FSU:
 
 Forwardmove, sidemove, and upmove
@@ -380,10 +337,9 @@ We may then define FSU computationally or operationally as :prf:ref:`fsu computa
 
    Let :math:`\tilde{F}, \tilde{S}, \tilde{U} \in \mathbb{R}` on the client side in some frame :math:`k \in \mathbb{Z}`. Let :math:`\operatorname{KS}` be the key state function defined in :prf:ref:`key state`. Then we compute the following in order.
 
-   #. Initialise :math:`(\tilde{F}, \tilde{S}, \tilde{U}) \gets (0, 0, 0)`.
-   #. :math:`\tilde{F} \gets \tilde{F} + \left( \operatorname{KS}(\mathrm{forward},k) - \operatorname{KS}(\mathrm{back},k) \right) \cdot \mathrm{cl\_forwardspeed}`.
-   #. :math:`\tilde{S} \gets \tilde{S} + \left( \operatorname{KS}(\mathrm{moveright},k) - \operatorname{KS}(\mathrm{moveleft},k) \right) \cdot \mathrm{cl\_sidespeed}`.
-   #. :math:`\tilde{U} \gets \tilde{U} + \left( \operatorname{KS}(\mathrm{moveup},k) - \operatorname{KS}(\mathrm{movedown},k) \right) \cdot \mathrm{cl\_upspeed}`.
+   #. :math:`\tilde{F} \gets \left( \operatorname{KS}(\mathrm{forward},k) - \operatorname{KS}(\mathrm{back},k) \right) \cdot \mathrm{cl\_forwardspeed}`.
+   #. :math:`\tilde{S} \gets \left( \operatorname{KS}(\mathrm{moveright},k) - \operatorname{KS}(\mathrm{moveleft},k) \right) \cdot \mathrm{cl\_sidespeed}`.
+   #. :math:`\tilde{U} \gets \left( \operatorname{KS}(\mathrm{moveup},k) - \operatorname{KS}(\mathrm{movedown},k) \right) \cdot \mathrm{cl\_upspeed}`.
    #. :math:`(\tilde{F}, \tilde{S}, \tilde{U}) \gets (\operatorname{DeltaTrunc}(\tilde{F}), \operatorname{DeltaTrunc}(\tilde{S}), \operatorname{DeltaTrunc}(\tilde{U}))`.
 
    Now if :math:`(\tilde{F}, \tilde{S}, \tilde{U}) = (0, 0, 0)`, then :math:`(F, S, U) = (0, 0, 0)` and we are done. Otherwise, let
@@ -405,3 +361,37 @@ The reader may verify the computations in :prf:ref:`fsu computation` by examinin
    If :math:`(\tilde{F}, \tilde{S}, \tilde{U}) = (0, 0, 0)` then we are done. Otherwise, note that :math:`\left\lVert \langle F, S, U\rangle \right\rVert = \rho \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`. If :math:`M_m \ge \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`, then :math:`\rho = 1` and we are done. Now suppose :math:`M_m < \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert`. Then
 
    .. math:: \left\lVert \langle F, S, U\rangle \right\rVert = \frac{M_m}{\left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert} \cdot \left\lVert \langle \tilde{F}, \tilde{S}, \tilde{U} \rangle \right\rVert = M_m.
+
+Key state
+---------
+
+Generally speaking, pressing a movement key translates to accelerating the player towards a particular direction, and pressing the viewangles keys translate to yawing and pitching the player viewangles. Unfortunately, how much the player accelerates and how much the viewangles change depends on whether the key in question started being pressed or if the key has been pressed for more than one frame. We may capture this "multiplier" succinctly by means of the *key state* function.
+
+.. prf:definition:: Key state
+   :label: key state
+
+   Let :math:`\mathrm{Cmd}` be the set of movement and viewangles commands. For example, :math:`\mathrm{forward} \in \operatorname{Cmd}`. Let
+
+   .. math:: \operatorname{KS} : \mathrm{Cmd} \times \mathbb{Z} \to \left\{0, \frac{1}{2}, 1\right\}
+
+   be the key state function defined as follows. Suppose a key :math:`K` is first pressed on frame :math:`0`, continuously held for subsequent frames, then released on frame :math:`n`. Then we may define operationally
+
+   .. math::
+      \operatorname{KS}(K, i) =
+      \begin{cases}
+         \frac{1}{2} & i = 0 \\
+         1 & 1 \le i < n \\
+         0 & n \le i.
+      \end{cases}
+
+The key state function is highly consequential for speedrunning, especially if we naively press and release the movement and viewangles keys rapidly. To see why, consider how :math:`F` as defined in :prf:ref:`fsu computation` is computed. Without loss of generality, assume only the ``+forward`` key is being pressed. Then at frame :math:`k \in \mathbb{Z}`, we have
+
+.. math::
+   \begin{aligned}
+      \tilde{F}_k &= \operatorname{KS}(\mathrm{forward},k) \cdot \mathrm{cl\_forwardspeed} \\
+      F_k &= \min\!\left( \frac{M_m}{\tilde{F}_k}, 1 \right) \tilde{F}_k.
+   \end{aligned}
+
+In vanilla Half-Life, we have :math:`M_m = 320` and :math:`\mathrm{cl\_forwardspeed} = 400`. In the first frame of pressing ``+forward``, by definition :math:`\operatorname{KS}(\mathrm{forward},0) = 1/2`, while in subsequent frames :math:`k \ge 1`, :math:`\operatorname{KS}(\mathrm{forward},k) = 1`. Hence, :math:`\tilde{F}_0 = 200`, :math:`F_0 = 200`, and for :math:`k \ge 1`, :math:`\tilde{F}_k = 400` and :math:`F_k = 320 = M_m`. Since :math:`F` has a lower value in the first frame, the player will experience lower acceleration in the first frame (as we will see in :ref:`player movement` and :ref:`strafing`). As described in :ref:`line strafing`, in a TAS we often strafe along a straight line path, which necessitates alternating between strafing left and right at most 1000 times per second. The most naive way to implement this is by alternating between pressing and releasing ``+moveright`` and ``+moveleft``. However, this means each key is held for only 1 or 2 frames, so :math:`S` spends most of the time carrying the lower value. This results in drastically lower acceleration throughout the process. To mitigate this problem, a TAS tool might instead hold one of ``+moveright`` or ``+moveleft`` constantly for as long as the tool is active to ensure the key state stays at 1, while adjusting the values of ``cl_forwardspeed`` and ``cl_sidespeed`` directly on a frame by frame basis.
+
+The same problem also applies to adjusting the viewangles by the viewangles commands ``+left``, ``+right``, ``+up``, and ``+down``. Though the problem here can be mitigated much more easily by doubling the viewangles speed cvars ``cl_yawspeed`` and ``cl_pitchspeed`` to compensate for the :math:`1/2` factor given by the key state.

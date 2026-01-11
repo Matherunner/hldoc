@@ -490,6 +490,8 @@ Q`. In addition, we also have
 Namely, :math:`\tilde{\Phi}(\xi) + \tilde{\Phi}(\xi') = 1` if :math:`\xi/u` is
 not an integer.
 
+.. _line strafing:
+
 Line strafing
 -------------
 
