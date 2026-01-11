@@ -280,17 +280,35 @@ Note that :prf:ref:`three dimensional view vectors` and :prf:ref:`two dimensiona
 Punchangles
 -----------
 
-The punchangles can refer to the client side or the server side values. The client side punchangles are usually affected by weapon recoil and are cosmetic in nature. Namely, they do not affect the aiming viewangles of the player. The player may be aiming with zero pitch while the camera appears to point elsewhere. The server side punchangles, on the other hand, affects the viewangles and therefore the aiming. The server side punchangles are affected by certain types of damage (see :ref:`health and damage`) and punches from monsters (which are different from the purely damage itself).
+The punchangles can refer to the client side or the server side values. The client side punchangles are usually affected by weapon recoil and are cosmetic in nature. Namely, they do not affect the aiming viewangles of the player. The player may be aiming with zero pitch while the camera appears to point elsewhere, but the actual view vectors and server side physics calculations are not affected by the cosmetic punchangles. The server side punchangles, on the other hand, affects the viewangles and therefore the aiming. The server side punchangles are affected by certain types of damage (see :ref:`health and damage`) and attacks from monsters.
 
 .. TODO: the client side value can be set to server side after a saveload?
 
-The punchangles may be denoted as :math:`\mathbf{P}`, consisting of punch pitch, punch yaw, and punch roll. When the punchangles are nonzero, the game will smoothly decrease the angles until all of them become zero. In each frame, the game calculates
+The punchangles may be denoted as :math:`\mathbf{P}`, consisting of punch pitch, punch yaw, and punch roll. When the punchangles are nonzero, the game will smoothly decrease the angles until all of them become zero.
 
-.. math:: \mathbf{P}' = \max\left( 0, \lVert\mathbf{P}\rVert \left( 1 - \frac{1}{2} \tau \right) - 10\tau \right) \mathbf{\hat{P}}
+.. prf:definition:: Punchangles update equation
 
-The punchangles are rarely big issues except when the punch yaw and punch roll are nonzero. In these cases, strafing (:ref:`strafing`) can be affected. Though this very rarely happens.
+   Let :math:`\mathbf{P} \in \mathbb{R}^3` be the punchangles. In every frame, the game updates the player punchangles by setting
 
-When a saveload is performed, the punchangles will be added to the viewangles permanently, while the punchangles will be set to zero. When this happens, the viewangles will not be reduced gradually like the case when punchangles are nonzero, except for the roll angle.
+   .. math:: \mathbf{P}' = \max\!\left( 0, \lVert\mathbf{P}\rVert \left( 1 - \frac{1}{2} \tau_p \right) - 10\tau_p \right) \frac{\mathbf{P}}{\lVert\mathbf{P}\rVert},
+
+   where :math:`\tau_p` is previously defined in :ref:`frame rate`.
+
+The punchangles are a matter of concern, except when the punch yaw and punch roll are nonzero, because they can affect strafing (:ref:`strafing`). Nevertheless, this rarely occurs when speedrunning in practice, and even if they do occur, the impact on strafing efficiency is globally minimal.
+
+Interestingly, when a save is performed then restoring from the save, the punchangles will be added to the viewangles :math:`(\varphi, \vartheta, \varrho)` themselves and the punchangles will be set to zero. When this happens, the player pitch and yaw will decrease gradually as is the case when punchangles are nonzero, though the roll angle still does.
+
+.. prf:theorem::
+
+   Suppose the initial punchangles :math:`P_0` is set by some game mechanics and then left to decay. Then the punchangles update equation can be written in closed form to give the punchangles at frame :math:`n \in \mathbb{Z}` as
+
+   .. math:: \mathbf{P}_n = \frac{\lVert\mathbf{P}_n\rVert}{\lVert\mathbf{P}_0\rVert} \mathbf{P}_0,
+
+   where
+
+   .. math:: \lVert\mathbf{P}_n\rVert = \max\!\left( \left( 20 + \lVert\mathbf{P}_0\rVert \right) \left( 1 - \frac{1}{2} \tau_p \right)^n - 20, 0 \right).
+
+   We may also substitute :math:`n = t / \tau_p` to obtain an equation in terms of game time :math:`t \in \mathbb{R}`.
 
 Key state
 ---------
